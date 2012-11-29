@@ -3,7 +3,6 @@
 use strict;
 use Getopt::Long;
 require File::Temp;
-use File::Temp ();
 use File::Temp qw/ :seekable /;
 
 my $RESULTSDIRECTORY; #directory with output data
