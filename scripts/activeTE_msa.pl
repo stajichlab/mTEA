@@ -66,7 +66,7 @@ foreach my $row_ref (@full_id_array) {
 }
 close($full_id_out_path);
 
-#generate a gap column matric fro the full alignment
+#generate a gap column matrix fro the full alignment
 my $gap_cols = $full_aln_obj->gap_col_matrix();
 
 #open and parse the trimal output file with the % gap ID of each position in the full alignment
@@ -220,7 +220,7 @@ foreach my $seq_obj ($full_aln_obj->each_seq()) {
     $trim_left_pos_hash{$seq_name} = $left_res_pos;
     $trim_right_pos_hash{$seq_name} = $right_res_pos;
 }
-
+my @bad_aln;
 #grab all sequences from trimmed alignment
 foreach my $seq_obj ( $full_aln_obj->each_seq() ) {
     #grab sequence name and shorten it for use in some output filenames
@@ -261,6 +261,7 @@ foreach my $seq_obj ( $full_aln_obj->each_seq() ) {
         push @good_aln, $tir_match_result[1];
     }
     else {
+        push @bad_aln, $seq_name;
         $full_aln_obj->remove_seq($seq_obj);
     }
 }
@@ -326,10 +327,20 @@ foreach my $row_ref (@gap_seq_pos_remove) {
         push @search_tirs, $entry[0];
     }
 }
-
 foreach my $key (keys %gap_seq_remove2) {
     my $remove = $ori_aln_obj->get_seq_by_id($key);
     $ori_aln_obj->remove_seq($remove);
+}
+#remove any sequences that failed the first tir search
+foreach my $seq_name (@bad_aln) {
+    if (exists $gap_seq_remove2{$seq_name}) {
+        next;
+    }
+    else {
+        $gap_seq_remove2{$seq_name}++;
+        my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
+        $ori_aln_obj->remove_seq($remove);
+    }
 }
 my $final_aln_obj = $ori_aln_obj->remove_gaps('-',1);
 
@@ -372,11 +383,11 @@ foreach my $seq_name (@search_tirs) {
     
     my @tir_match_result = match_tirs($seq_obj, $out_opt);
     if ($tir_match_result[0] == 0) {
-        $full_aln_obj->remove_seq($seq_obj);
+        $final_aln_obj->remove_seq($seq_obj);
     }
 }
 
-$final_aln_obj = $ori_aln_obj->remove_gaps('-',1);
+$final_aln_obj = $final_aln_obj->remove_gaps('-',1);
 my $final_aln_out = File::Spec->catpath($volume, $out_path, $filename . ".final");
 $out = Bio::AlignIO->new(-file => ">$final_aln_out", -format => 'fasta');
 $out->write_aln($final_aln_obj);
@@ -605,7 +616,8 @@ sub match_tirs {
                 my $end_pos = '';
                 my $match_query = '';
                 my $match_hit = '';
-                my $mis_aln = 0;
+                my $match_mis_aln = 0;
+                my $total_mis_aln = 0;
                 my $last_good = 0;
                 my $hit_pos;
                 my $query_pos;
@@ -620,11 +632,25 @@ sub match_tirs {
                     my $hit_char =  substr($hit_str, $count, 1);
                     #print "$homo_char\n";
                     
+                    if ($count == 4 and $total_mis_aln >= 3) {
+                        $match_len = 0;
+                                $start_pos = '';
+                                $match_query = '';
+                                $match_hit = '';
+                                $end_pos = '';
+                                last;
+                    }
+                    
                     if ($match_len == 0){
                         #if match length equals 0 and position is not a match, continue to next position
                         if ($homo_char eq " ") {
-                            $mis_aln++;
-                            if ($mis_aln >= 4) {
+                            $total_mis_aln++;
+                            if ($total_mis_aln >= 2) {
+                                $match_len = 0;
+                                $start_pos = '';
+                                $match_query = '';
+                                $match_hit = '';
+                                $end_pos = '';
                                 last;
                             }                            
                             next;
@@ -633,7 +659,7 @@ sub match_tirs {
                         elsif ($homo_char eq ":") {
                             $start_pos = $count;
                             $last_good = $count;
-                            #print "1st If/1st elsif\t$mis_aln $match_len \n";
+                            #print "1st If/1st elsif\t$match_mis_aln $match_len \n";
                             $match_len++;
                             $match_query .= $query_char;
                             $match_hit .= $hit_char;
@@ -644,30 +670,39 @@ sub match_tirs {
                     elsif ($match_len >= 1 and $match_len < 4) {
                         #if match length is 1-3 and position is not a match, increment mismatch counter and check if more than one mismatch has occurred
                         if ($homo_char eq " ") {
-                            $mis_aln++;
+                            $match_mis_aln++;
+                            $total_mis_aln++;
                             #allow one mismatch, store info and continue
-                            if ($mis_aln <= 1) {
+                            if ($match_mis_aln <= 1) {
                                 $match_len++;
                                 $last_good = $count;
                                 $match_query .= $query_char;
                                 $match_hit .= $hit_char;
-                                #print "1st elsif/1st If\t$mis_aln $match_len \n";
+                                #print "1st elsif/1st If\t$match_mis_aln $match_len \n";
                                 next;
                             }
                             #more than one mismatch, reset counters and other info, continue
-                            elsif ($mis_aln > 1){ 
+                            elsif ($match_mis_aln > 1){ 
                                 $match_len = 0;
                                 $start_pos = '';
                                 $match_query = '';
                                 $match_hit = '';
-                                $mis_aln = 0;
-                                #print "1st elsif/1st elsif\t$mis_aln $match_len \n";
+                                $match_mis_aln = 0;
+                                #print "1st elsif/1st elsif\t$match_mis_aln $match_len \n";
                                 next;
+                            }
+                            elsif ($total_mis_aln >= 3) {
+                                $match_len = 0;
+                                $start_pos = '';
+                                $match_query = '';
+                                $match_hit = '';
+                                $end_pos = '';
+                                last;
                             }
                         }
                         #position is a match, store info and continue
                         elsif ($homo_char eq ":") {
-                            #print "1st elsif/2nd elsif\t$mis_aln $match_len \n";
+                            #print "1st elsif/2nd elsif\t$match_mis_aln $match_len \n";
                             $last_good = $count;
                             $match_len++;
                             $match_query .= $query_char;
@@ -679,18 +714,27 @@ sub match_tirs {
                     elsif ($match_len >= 4) {
                         #match length is 4 or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatch has occurred. If a match, continue.
                         if ($homo_char eq " ") {
-                            $mis_aln++;
+                            $match_mis_aln++;
+                            $total_mis_aln++;
                             #mismatches under 3, store info and continue
-                            if ($mis_aln < 3) {
+                            if ($match_mis_aln < 3) {
                                 $match_len++;
                                 $last_good = $count;
                                 $match_query .= $query_char;
                                 $match_hit .= $hit_char;
-                                #print "Last-1st If\t$mis_aln $match_len \n";
+                                #print "Last-1st If\t$match_mis_aln $match_len \n";
                                 next;
                             }
+                            elsif($total_mis_aln >= 4) {
+                                $match_len = 0;
+                                $start_pos = '';
+                                $match_query = '';
+                                $match_hit = '';
+                                $end_pos = '';
+                                last;
+                            }
                             #mismatches 3 or more, store final info for alignment match and end parsing
-                            elsif($mis_aln >= 3){
+                            elsif($match_mis_aln >= 3){
                                 $end_pos = $last_good;
                                 $match_query =~ s/-//g;
                                 $match_hit =~ s/-//g;
@@ -717,12 +761,12 @@ sub match_tirs {
                             $match_len++;
                             $match_query .= $query_char;
                             $match_hit .= $hit_char;
-                            #print "Last-Very last elsif\t$mis_aln $match_len \n";
+                            #print "Last-Very last elsif\t$match_mis_aln $match_len \n";
                             next;
                         }
                     }
                 }
-                #add in check to see if TIRs were found. if not, remove the sequence from the MSA, and print out to 'no TIRs list'
+                #add in check to see if TIRs were found. if not, remove the sequence from the MSA, and print out to 'no TIRs list' (TO DO)
                 if ($end_pos eq '') {
                     push @result, (0);
                 }
