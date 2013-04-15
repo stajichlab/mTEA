@@ -1,0 +1,80 @@
+#Use this file to set parameters for Blogo_Batch.pl, 
+#all words after a "#" in a line are comments.
+
+####################
+#  sequense type    #
+####################
+#choose your sequense type, nucleotides (NTs), amino acids (AAs), codons    
+# or translate to AAs from your nucleotides sequenses (trNT)        
+seq_type= AAs      # NTs, AAs trNT or codons
+#sequence format: multi-fasta (fasta) or one sequence one line (plain_txt)
+seq_format=plain_txt   # fasta or plain_txt
+
+##########################
+#  background frequencies  #
+##########################
+#choose method to calculate the background frequencies of NTs or AAs:
+# calculated from your sequences (auto) or input yourself (manual)
+bgfrqtype= auto    # auto or manual
+
+#if you choose to input the background frequencies by yourself, set bg_fre value,
+# i.e. for Nts, you can set (A,C,G,T):  0.25,0.25,0.25,0.25
+# for AAs, you can set (G,S,T,Y,C,Q,N,K,R,H,D,E,A,V,L,I,P,W,F,M):  
+#     0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05
+# for codons, you can set (A1 C1 G1 T1 A2 C2 G2 T2 A3 C3 G3 T3):
+#  0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25
+bg_fre= 0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25
+
+#########################
+#  choose region          #
+#########################
+# choose region to analysis:
+# full length of your shortest sequence (shortest) or input by yourself (manual)
+reg_type= shortest        #shortest or manual
+
+#if you choose to set region by yourself (reg_type=manual), set reg_start and reg_length
+reg_start= 54    # analysis from ..
+reg_length= 100   # analysis length
+first_num=1     # set the number of the first symbol of your logo 
+
+#######################
+#  Logo preperties      #
+#######################
+
+#  logo types (type1 or type2)
+logo_type=type2   
+ 
+# set Middle height (pixcel)
+middle_total_height= 200
+
+#Information Content: Y max (bit), should be positive
+y_max= 3
+
+#Information Content: Y min (bit), should be 0 in type 1 logo and negative in type 2 logo
+y_min= -1
+
+#character width (pixcel)
+char_width=25
+
+#Chi square test
+do_statis_test=1 # 1 or 0 (1 means that you want to do statistical test, chi square or fisher's exact test determined by your the number of your sequences)
+p_threshold=0.05 #the threshold value of P, Only highlight symbols with P-Value less than this value
+
+#######################
+#  sequences input      #
+#######################
+#set file path and names, sequences should be in multi-fasta format.
+#file_names could be multiple, seperate names with comos (don't use 
+#white space or tab, file names should not contain comos and white space);
+file_path= E:/lwc/website/blogo/seq/  # /home/lwc/Blogo_1.0/web/seq/
+file_names= test1.seq, test2.seq 
+
+#######################
+#  logo output setting  #
+#######################
+
+#image format (choose from jpg, gif, pdf, tif, ps etc.):
+image_format=jpg
+ 
+#output path (image absolute directory):
+img_abs_dir= E:/lwc/website/blogo/img/ # /home/lwc/Blogo_1.0/web/img/ 

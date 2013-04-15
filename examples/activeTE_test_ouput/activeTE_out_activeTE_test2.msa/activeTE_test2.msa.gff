@@ -1,0 +1,825 @@
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	terminal_inverted_repeat_element	765322	765465	.	plus	.	ID=Aedes_L1_5_40651-281;Name=Aedes_L1_5_40651 Copy281;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	five_prime_terminal_inverted_repeat	765322	765332	.	.	.	Parent=Aedes_L1_5_40651-281
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	three_prime_terminal_inverted_repeat	765455	765465	.	.	.	Parent=Aedes_L1_5_40651-281
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	target_site_duplication	765320	765321	.	.	.	Derives_from=Aedes_L1_5_40651-281
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	target_site_duplication	765466	765467	.	.	.	Derives_from=Aedes_L1_5_40651-281
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	terminal_inverted_repeat_element	648318	648461	.	minus	.	ID=Aedes_L1_5_40651-293;Name=Aedes_L1_5_40651 Copy293;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	five_prime_terminal_inverted_repeat	648318	648328	.	.	.	Parent=Aedes_L1_5_40651-293
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	three_prime_terminal_inverted_repeat	648451	648461	.	.	.	Parent=Aedes_L1_5_40651-293
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	target_site_duplication	648316	648317	.	.	.	Derives_from=Aedes_L1_5_40651-293
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	target_site_duplication	648462	648463	.	.	.	Derives_from=Aedes_L1_5_40651-293
+supercontig:AaegL1:supercont1.516:1:831107:1	activeTE	terminal_inverted_repeat_element	66539	66682	.	minus	.	ID=Aedes_L1_5_40651-188;Name=Aedes_L1_5_40651 Copy188;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.516:1:831107:1	activeTE	five_prime_terminal_inverted_repeat	66539	66549	.	.	.	Parent=Aedes_L1_5_40651-188
+supercontig:AaegL1:supercont1.516:1:831107:1	activeTE	three_prime_terminal_inverted_repeat	66672	66682	.	.	.	Parent=Aedes_L1_5_40651-188
+supercontig:AaegL1:supercont1.516:1:831107:1	activeTE	target_site_duplication	66537	66538	.	.	.	Derives_from=Aedes_L1_5_40651-188
+supercontig:AaegL1:supercont1.516:1:831107:1	activeTE	target_site_duplication	66683	66684	.	.	.	Derives_from=Aedes_L1_5_40651-188
+supercontig:AaegL1:supercont1.638:1:697426:1	activeTE	terminal_inverted_repeat_element	228500	228643	.	minus	.	ID=Aedes_L1_5_40651-452;Name=Aedes_L1_5_40651 Copy452;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.638:1:697426:1	activeTE	five_prime_terminal_inverted_repeat	228500	228510	.	.	.	Parent=Aedes_L1_5_40651-452
+supercontig:AaegL1:supercont1.638:1:697426:1	activeTE	three_prime_terminal_inverted_repeat	228633	228643	.	.	.	Parent=Aedes_L1_5_40651-452
+supercontig:AaegL1:supercont1.638:1:697426:1	activeTE	target_site_duplication	228498	228499	.	.	.	Derives_from=Aedes_L1_5_40651-452
+supercontig:AaegL1:supercont1.638:1:697426:1	activeTE	target_site_duplication	228644	228645	.	.	.	Derives_from=Aedes_L1_5_40651-452
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	terminal_inverted_repeat_element	2937886	2938029	.	minus	.	ID=Aedes_L1_5_40651-154;Name=Aedes_L1_5_40651 Copy154;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	five_prime_terminal_inverted_repeat	2937886	2937896	.	.	.	Parent=Aedes_L1_5_40651-154
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	three_prime_terminal_inverted_repeat	2938019	2938029	.	.	.	Parent=Aedes_L1_5_40651-154
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	target_site_duplication	2937884	2937885	.	.	.	Derives_from=Aedes_L1_5_40651-154
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	target_site_duplication	2938030	2938031	.	.	.	Derives_from=Aedes_L1_5_40651-154
+supercontig:AaegL1:supercont1.244:1:1610334:1	activeTE	terminal_inverted_repeat_element	237335	237478	.	minus	.	ID=Aedes_L1_5_40651-491;Name=Aedes_L1_5_40651 Copy491;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.244:1:1610334:1	activeTE	five_prime_terminal_inverted_repeat	237335	237345	.	.	.	Parent=Aedes_L1_5_40651-491
+supercontig:AaegL1:supercont1.244:1:1610334:1	activeTE	three_prime_terminal_inverted_repeat	237468	237478	.	.	.	Parent=Aedes_L1_5_40651-491
+supercontig:AaegL1:supercont1.244:1:1610334:1	activeTE	target_site_duplication	237333	237334	.	.	.	Derives_from=Aedes_L1_5_40651-491
+supercontig:AaegL1:supercont1.244:1:1610334:1	activeTE	target_site_duplication	237479	237480	.	.	.	Derives_from=Aedes_L1_5_40651-491
+supercontig:AaegL1:supercont1.51:1:3160936:1	activeTE	terminal_inverted_repeat_element	1904441	1904584	.	minus	.	ID=Aedes_L1_5_40651-453;Name=Aedes_L1_5_40651 Copy453;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.51:1:3160936:1	activeTE	five_prime_terminal_inverted_repeat	1904441	1904451	.	.	.	Parent=Aedes_L1_5_40651-453
+supercontig:AaegL1:supercont1.51:1:3160936:1	activeTE	three_prime_terminal_inverted_repeat	1904574	1904584	.	.	.	Parent=Aedes_L1_5_40651-453
+supercontig:AaegL1:supercont1.51:1:3160936:1	activeTE	target_site_duplication	1904439	1904440	.	.	.	Derives_from=Aedes_L1_5_40651-453
+supercontig:AaegL1:supercont1.51:1:3160936:1	activeTE	target_site_duplication	1904585	1904586	.	.	.	Derives_from=Aedes_L1_5_40651-453
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	terminal_inverted_repeat_element	53004	53147	.	minus	.	ID=Aedes_L1_5_40651-109;Name=Aedes_L1_5_40651 Copy109;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	five_prime_terminal_inverted_repeat	53004	53014	.	.	.	Parent=Aedes_L1_5_40651-109
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	three_prime_terminal_inverted_repeat	53137	53147	.	.	.	Parent=Aedes_L1_5_40651-109
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	target_site_duplication	53002	53003	.	.	.	Derives_from=Aedes_L1_5_40651-109
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	target_site_duplication	53148	53149	.	.	.	Derives_from=Aedes_L1_5_40651-109
+supercontig:AaegL1:supercont1.112:1:2520184:1	activeTE	terminal_inverted_repeat_element	889398	889541	.	plus	.	ID=Aedes_L1_5_40651-318;Name=Aedes_L1_5_40651 Copy318;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.112:1:2520184:1	activeTE	five_prime_terminal_inverted_repeat	889398	889408	.	.	.	Parent=Aedes_L1_5_40651-318
+supercontig:AaegL1:supercont1.112:1:2520184:1	activeTE	three_prime_terminal_inverted_repeat	889531	889541	.	.	.	Parent=Aedes_L1_5_40651-318
+supercontig:AaegL1:supercont1.112:1:2520184:1	activeTE	target_site_duplication	889396	889397	.	.	.	Derives_from=Aedes_L1_5_40651-318
+supercontig:AaegL1:supercont1.112:1:2520184:1	activeTE	target_site_duplication	889542	889543	.	.	.	Derives_from=Aedes_L1_5_40651-318
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	terminal_inverted_repeat_element	192390	192533	.	minus	.	ID=Aedes_L1_5_40651-267;Name=Aedes_L1_5_40651 Copy267;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	five_prime_terminal_inverted_repeat	192390	192400	.	.	.	Parent=Aedes_L1_5_40651-267
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	three_prime_terminal_inverted_repeat	192523	192533	.	.	.	Parent=Aedes_L1_5_40651-267
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	target_site_duplication	192388	192389	.	.	.	Derives_from=Aedes_L1_5_40651-267
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	target_site_duplication	192534	192535	.	.	.	Derives_from=Aedes_L1_5_40651-267
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	terminal_inverted_repeat_element	1629525	1629668	.	plus	.	ID=Aedes_L1_5_40651-243;Name=Aedes_L1_5_40651 Copy243;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	five_prime_terminal_inverted_repeat	1629525	1629535	.	.	.	Parent=Aedes_L1_5_40651-243
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	three_prime_terminal_inverted_repeat	1629658	1629668	.	.	.	Parent=Aedes_L1_5_40651-243
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	target_site_duplication	1629523	1629524	.	.	.	Derives_from=Aedes_L1_5_40651-243
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	target_site_duplication	1629669	1629670	.	.	.	Derives_from=Aedes_L1_5_40651-243
+supercontig:AaegL1:supercont1.789:1:529157:1	activeTE	terminal_inverted_repeat_element	67658	67801	.	minus	.	ID=Aedes_L1_5_40651-283;Name=Aedes_L1_5_40651 Copy283;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.789:1:529157:1	activeTE	five_prime_terminal_inverted_repeat	67658	67668	.	.	.	Parent=Aedes_L1_5_40651-283
+supercontig:AaegL1:supercont1.789:1:529157:1	activeTE	three_prime_terminal_inverted_repeat	67791	67801	.	.	.	Parent=Aedes_L1_5_40651-283
+supercontig:AaegL1:supercont1.789:1:529157:1	activeTE	target_site_duplication	67656	67657	.	.	.	Derives_from=Aedes_L1_5_40651-283
+supercontig:AaegL1:supercont1.789:1:529157:1	activeTE	target_site_duplication	67802	67803	.	.	.	Derives_from=Aedes_L1_5_40651-283
+supercontig:AaegL1:supercont1.368:1:1193203:1	activeTE	terminal_inverted_repeat_element	276142	276285	.	plus	.	ID=Aedes_L1_5_40651-309;Name=Aedes_L1_5_40651 Copy309;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.368:1:1193203:1	activeTE	five_prime_terminal_inverted_repeat	276142	276152	.	.	.	Parent=Aedes_L1_5_40651-309
+supercontig:AaegL1:supercont1.368:1:1193203:1	activeTE	three_prime_terminal_inverted_repeat	276275	276285	.	.	.	Parent=Aedes_L1_5_40651-309
+supercontig:AaegL1:supercont1.368:1:1193203:1	activeTE	target_site_duplication	276140	276141	.	.	.	Derives_from=Aedes_L1_5_40651-309
+supercontig:AaegL1:supercont1.368:1:1193203:1	activeTE	target_site_duplication	276286	276287	.	.	.	Derives_from=Aedes_L1_5_40651-309
+supercontig:AaegL1:supercont1.323:1:1316576:1	activeTE	terminal_inverted_repeat_element	715772	715915	.	minus	.	ID=Aedes_L1_5_40651-431;Name=Aedes_L1_5_40651 Copy431;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.323:1:1316576:1	activeTE	five_prime_terminal_inverted_repeat	715772	715782	.	.	.	Parent=Aedes_L1_5_40651-431
+supercontig:AaegL1:supercont1.323:1:1316576:1	activeTE	three_prime_terminal_inverted_repeat	715905	715915	.	.	.	Parent=Aedes_L1_5_40651-431
+supercontig:AaegL1:supercont1.323:1:1316576:1	activeTE	target_site_duplication	715770	715771	.	.	.	Derives_from=Aedes_L1_5_40651-431
+supercontig:AaegL1:supercont1.323:1:1316576:1	activeTE	target_site_duplication	715916	715917	.	.	.	Derives_from=Aedes_L1_5_40651-431
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	terminal_inverted_repeat_element	746478	746621	.	plus	.	ID=Aedes_L1_5_40651-207;Name=Aedes_L1_5_40651 Copy207;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	five_prime_terminal_inverted_repeat	746478	746488	.	.	.	Parent=Aedes_L1_5_40651-207
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	three_prime_terminal_inverted_repeat	746611	746621	.	.	.	Parent=Aedes_L1_5_40651-207
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	target_site_duplication	746476	746477	.	.	.	Derives_from=Aedes_L1_5_40651-207
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	target_site_duplication	746622	746623	.	.	.	Derives_from=Aedes_L1_5_40651-207
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	terminal_inverted_repeat_element	540276	540419	.	minus	.	ID=Aedes_L1_5_40651-316;Name=Aedes_L1_5_40651 Copy316;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	five_prime_terminal_inverted_repeat	540276	540286	.	.	.	Parent=Aedes_L1_5_40651-316
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	three_prime_terminal_inverted_repeat	540409	540419	.	.	.	Parent=Aedes_L1_5_40651-316
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	target_site_duplication	540274	540275	.	.	.	Derives_from=Aedes_L1_5_40651-316
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	target_site_duplication	540420	540421	.	.	.	Derives_from=Aedes_L1_5_40651-316
+supercontig:AaegL1:supercont1.576:1:733731:1	activeTE	terminal_inverted_repeat_element	565762	565905	.	minus	.	ID=Aedes_L1_5_40651-214;Name=Aedes_L1_5_40651 Copy214;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.576:1:733731:1	activeTE	five_prime_terminal_inverted_repeat	565762	565772	.	.	.	Parent=Aedes_L1_5_40651-214
+supercontig:AaegL1:supercont1.576:1:733731:1	activeTE	three_prime_terminal_inverted_repeat	565895	565905	.	.	.	Parent=Aedes_L1_5_40651-214
+supercontig:AaegL1:supercont1.576:1:733731:1	activeTE	target_site_duplication	565760	565761	.	.	.	Derives_from=Aedes_L1_5_40651-214
+supercontig:AaegL1:supercont1.576:1:733731:1	activeTE	target_site_duplication	565906	565907	.	.	.	Derives_from=Aedes_L1_5_40651-214
+supercontig:AaegL1:supercont1.30:1:3879053:1	activeTE	terminal_inverted_repeat_element	2459744	2459887	.	plus	.	ID=Aedes_L1_5_40651-334;Name=Aedes_L1_5_40651 Copy334;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.30:1:3879053:1	activeTE	five_prime_terminal_inverted_repeat	2459744	2459754	.	.	.	Parent=Aedes_L1_5_40651-334
+supercontig:AaegL1:supercont1.30:1:3879053:1	activeTE	three_prime_terminal_inverted_repeat	2459877	2459887	.	.	.	Parent=Aedes_L1_5_40651-334
+supercontig:AaegL1:supercont1.30:1:3879053:1	activeTE	target_site_duplication	2459742	2459743	.	.	.	Derives_from=Aedes_L1_5_40651-334
+supercontig:AaegL1:supercont1.30:1:3879053:1	activeTE	target_site_duplication	2459888	2459889	.	.	.	Derives_from=Aedes_L1_5_40651-334
+supercontig:AaegL1:supercont1.602:1:782064:1	activeTE	terminal_inverted_repeat_element	727875	728018	.	plus	.	ID=Aedes_L1_5_40651-158;Name=Aedes_L1_5_40651 Copy158;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.602:1:782064:1	activeTE	five_prime_terminal_inverted_repeat	727875	727885	.	.	.	Parent=Aedes_L1_5_40651-158
+supercontig:AaegL1:supercont1.602:1:782064:1	activeTE	three_prime_terminal_inverted_repeat	728008	728018	.	.	.	Parent=Aedes_L1_5_40651-158
+supercontig:AaegL1:supercont1.602:1:782064:1	activeTE	target_site_duplication	727873	727874	.	.	.	Derives_from=Aedes_L1_5_40651-158
+supercontig:AaegL1:supercont1.602:1:782064:1	activeTE	target_site_duplication	728019	728020	.	.	.	Derives_from=Aedes_L1_5_40651-158
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	terminal_inverted_repeat_element	522569	522712	.	plus	.	ID=Aedes_L1_5_40651-433;Name=Aedes_L1_5_40651 Copy433;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	five_prime_terminal_inverted_repeat	522569	522579	.	.	.	Parent=Aedes_L1_5_40651-433
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	three_prime_terminal_inverted_repeat	522702	522712	.	.	.	Parent=Aedes_L1_5_40651-433
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	target_site_duplication	522567	522568	.	.	.	Derives_from=Aedes_L1_5_40651-433
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	target_site_duplication	522713	522714	.	.	.	Derives_from=Aedes_L1_5_40651-433
+supercontig:AaegL1:supercont1.656:1:665946:1	activeTE	terminal_inverted_repeat_element	365457	365600	.	minus	.	ID=Aedes_L1_5_40651-263;Name=Aedes_L1_5_40651 Copy263;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.656:1:665946:1	activeTE	five_prime_terminal_inverted_repeat	365457	365467	.	.	.	Parent=Aedes_L1_5_40651-263
+supercontig:AaegL1:supercont1.656:1:665946:1	activeTE	three_prime_terminal_inverted_repeat	365590	365600	.	.	.	Parent=Aedes_L1_5_40651-263
+supercontig:AaegL1:supercont1.656:1:665946:1	activeTE	target_site_duplication	365455	365456	.	.	.	Derives_from=Aedes_L1_5_40651-263
+supercontig:AaegL1:supercont1.656:1:665946:1	activeTE	target_site_duplication	365601	365602	.	.	.	Derives_from=Aedes_L1_5_40651-263
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	terminal_inverted_repeat_element	935561	935704	.	minus	.	ID=Aedes_L1_5_40651-324;Name=Aedes_L1_5_40651 Copy324;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	five_prime_terminal_inverted_repeat	935561	935571	.	.	.	Parent=Aedes_L1_5_40651-324
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	three_prime_terminal_inverted_repeat	935694	935704	.	.	.	Parent=Aedes_L1_5_40651-324
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	target_site_duplication	935559	935560	.	.	.	Derives_from=Aedes_L1_5_40651-324
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	target_site_duplication	935705	935706	.	.	.	Derives_from=Aedes_L1_5_40651-324
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	terminal_inverted_repeat_element	1448875	1449018	.	minus	.	ID=Aedes_L1_5_40651-487;Name=Aedes_L1_5_40651 Copy487;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	five_prime_terminal_inverted_repeat	1448875	1448885	.	.	.	Parent=Aedes_L1_5_40651-487
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	three_prime_terminal_inverted_repeat	1449008	1449018	.	.	.	Parent=Aedes_L1_5_40651-487
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	target_site_duplication	1448873	1448874	.	.	.	Derives_from=Aedes_L1_5_40651-487
+supercontig:AaegL1:supercont1.106:1:2597682:1	activeTE	target_site_duplication	1449019	1449020	.	.	.	Derives_from=Aedes_L1_5_40651-487
+supercontig:AaegL1:supercont1.97:1:2754592:1	activeTE	terminal_inverted_repeat_element	314846	314989	.	plus	.	ID=Aedes_L1_5_40651-272;Name=Aedes_L1_5_40651 Copy272;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.97:1:2754592:1	activeTE	five_prime_terminal_inverted_repeat	314846	314856	.	.	.	Parent=Aedes_L1_5_40651-272
+supercontig:AaegL1:supercont1.97:1:2754592:1	activeTE	three_prime_terminal_inverted_repeat	314979	314989	.	.	.	Parent=Aedes_L1_5_40651-272
+supercontig:AaegL1:supercont1.97:1:2754592:1	activeTE	target_site_duplication	314844	314845	.	.	.	Derives_from=Aedes_L1_5_40651-272
+supercontig:AaegL1:supercont1.97:1:2754592:1	activeTE	target_site_duplication	314990	314991	.	.	.	Derives_from=Aedes_L1_5_40651-272
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	terminal_inverted_repeat_element	1456847	1456990	.	minus	.	ID=Aedes_L1_5_40651-420;Name=Aedes_L1_5_40651 Copy420;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	five_prime_terminal_inverted_repeat	1456847	1456857	.	.	.	Parent=Aedes_L1_5_40651-420
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	three_prime_terminal_inverted_repeat	1456980	1456990	.	.	.	Parent=Aedes_L1_5_40651-420
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	target_site_duplication	1456845	1456846	.	.	.	Derives_from=Aedes_L1_5_40651-420
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	target_site_duplication	1456991	1456992	.	.	.	Derives_from=Aedes_L1_5_40651-420
+supercontig:AaegL1:supercont1.185:1:1913756:1	activeTE	terminal_inverted_repeat_element	282756	282899	.	minus	.	ID=Aedes_L1_5_40651-249;Name=Aedes_L1_5_40651 Copy249;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.185:1:1913756:1	activeTE	five_prime_terminal_inverted_repeat	282756	282766	.	.	.	Parent=Aedes_L1_5_40651-249
+supercontig:AaegL1:supercont1.185:1:1913756:1	activeTE	three_prime_terminal_inverted_repeat	282889	282899	.	.	.	Parent=Aedes_L1_5_40651-249
+supercontig:AaegL1:supercont1.185:1:1913756:1	activeTE	target_site_duplication	282754	282755	.	.	.	Derives_from=Aedes_L1_5_40651-249
+supercontig:AaegL1:supercont1.185:1:1913756:1	activeTE	target_site_duplication	282900	282901	.	.	.	Derives_from=Aedes_L1_5_40651-249
+supercontig:AaegL1:supercont1.66:1:3011136:1	activeTE	terminal_inverted_repeat_element	2320831	2320974	.	minus	.	ID=Aedes_L1_5_40651-312;Name=Aedes_L1_5_40651 Copy312;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.66:1:3011136:1	activeTE	five_prime_terminal_inverted_repeat	2320831	2320841	.	.	.	Parent=Aedes_L1_5_40651-312
+supercontig:AaegL1:supercont1.66:1:3011136:1	activeTE	three_prime_terminal_inverted_repeat	2320964	2320974	.	.	.	Parent=Aedes_L1_5_40651-312
+supercontig:AaegL1:supercont1.66:1:3011136:1	activeTE	target_site_duplication	2320829	2320830	.	.	.	Derives_from=Aedes_L1_5_40651-312
+supercontig:AaegL1:supercont1.66:1:3011136:1	activeTE	target_site_duplication	2320975	2320976	.	.	.	Derives_from=Aedes_L1_5_40651-312
+supercontig:AaegL1:supercont1.1282:1:163182:1	activeTE	terminal_inverted_repeat_element	74387	74530	.	plus	.	ID=Aedes_L1_5_40651-436;Name=Aedes_L1_5_40651 Copy436;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1282:1:163182:1	activeTE	five_prime_terminal_inverted_repeat	74387	74397	.	.	.	Parent=Aedes_L1_5_40651-436
+supercontig:AaegL1:supercont1.1282:1:163182:1	activeTE	three_prime_terminal_inverted_repeat	74520	74530	.	.	.	Parent=Aedes_L1_5_40651-436
+supercontig:AaegL1:supercont1.1282:1:163182:1	activeTE	target_site_duplication	74385	74386	.	.	.	Derives_from=Aedes_L1_5_40651-436
+supercontig:AaegL1:supercont1.1282:1:163182:1	activeTE	target_site_duplication	74531	74532	.	.	.	Derives_from=Aedes_L1_5_40651-436
+supercontig:AaegL1:supercont1.889:1:404117:1	activeTE	terminal_inverted_repeat_element	186421	186564	.	plus	.	ID=Aedes_L1_5_40651-406;Name=Aedes_L1_5_40651 Copy406;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.889:1:404117:1	activeTE	five_prime_terminal_inverted_repeat	186421	186431	.	.	.	Parent=Aedes_L1_5_40651-406
+supercontig:AaegL1:supercont1.889:1:404117:1	activeTE	three_prime_terminal_inverted_repeat	186554	186564	.	.	.	Parent=Aedes_L1_5_40651-406
+supercontig:AaegL1:supercont1.889:1:404117:1	activeTE	target_site_duplication	186419	186420	.	.	.	Derives_from=Aedes_L1_5_40651-406
+supercontig:AaegL1:supercont1.889:1:404117:1	activeTE	target_site_duplication	186565	186566	.	.	.	Derives_from=Aedes_L1_5_40651-406
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	terminal_inverted_repeat_element	338468	338611	.	minus	.	ID=Aedes_L1_5_40651-257;Name=Aedes_L1_5_40651 Copy257;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	five_prime_terminal_inverted_repeat	338468	338478	.	.	.	Parent=Aedes_L1_5_40651-257
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	three_prime_terminal_inverted_repeat	338601	338611	.	.	.	Parent=Aedes_L1_5_40651-257
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	target_site_duplication	338466	338467	.	.	.	Derives_from=Aedes_L1_5_40651-257
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	target_site_duplication	338612	338613	.	.	.	Derives_from=Aedes_L1_5_40651-257
+supercontig:AaegL1:supercont1.1734:1:27820:1	activeTE	terminal_inverted_repeat_element	71	168	.	minus	.	ID=Aedes_L1_5_40651-886;Name=Aedes_L1_5_40651 Copy886;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1734:1:27820:1	activeTE	five_prime_terminal_inverted_repeat	71	81	.	.	.	Parent=Aedes_L1_5_40651-886
+supercontig:AaegL1:supercont1.1734:1:27820:1	activeTE	three_prime_terminal_inverted_repeat	158	168	.	.	.	Parent=Aedes_L1_5_40651-886
+supercontig:AaegL1:supercont1.1734:1:27820:1	activeTE	target_site_duplication	69	70	.	.	.	Derives_from=Aedes_L1_5_40651-886
+supercontig:AaegL1:supercont1.1734:1:27820:1	activeTE	target_site_duplication	169	170	.	.	.	Derives_from=Aedes_L1_5_40651-886
+supercontig:AaegL1:supercont1.237:1:1754865:1	activeTE	terminal_inverted_repeat_element	162196	162339	.	minus	.	ID=Aedes_L1_5_40651-347;Name=Aedes_L1_5_40651 Copy347;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.237:1:1754865:1	activeTE	five_prime_terminal_inverted_repeat	162196	162206	.	.	.	Parent=Aedes_L1_5_40651-347
+supercontig:AaegL1:supercont1.237:1:1754865:1	activeTE	three_prime_terminal_inverted_repeat	162329	162339	.	.	.	Parent=Aedes_L1_5_40651-347
+supercontig:AaegL1:supercont1.237:1:1754865:1	activeTE	target_site_duplication	162194	162195	.	.	.	Derives_from=Aedes_L1_5_40651-347
+supercontig:AaegL1:supercont1.237:1:1754865:1	activeTE	target_site_duplication	162340	162341	.	.	.	Derives_from=Aedes_L1_5_40651-347
+supercontig:AaegL1:supercont1.282:1:1465385:1	activeTE	terminal_inverted_repeat_element	1246319	1246462	.	minus	.	ID=Aedes_L1_5_40651-378;Name=Aedes_L1_5_40651 Copy378;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.282:1:1465385:1	activeTE	five_prime_terminal_inverted_repeat	1246319	1246329	.	.	.	Parent=Aedes_L1_5_40651-378
+supercontig:AaegL1:supercont1.282:1:1465385:1	activeTE	three_prime_terminal_inverted_repeat	1246452	1246462	.	.	.	Parent=Aedes_L1_5_40651-378
+supercontig:AaegL1:supercont1.282:1:1465385:1	activeTE	target_site_duplication	1246317	1246318	.	.	.	Derives_from=Aedes_L1_5_40651-378
+supercontig:AaegL1:supercont1.282:1:1465385:1	activeTE	target_site_duplication	1246463	1246464	.	.	.	Derives_from=Aedes_L1_5_40651-378
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	terminal_inverted_repeat_element	988768	988911	.	plus	.	ID=Aedes_L1_5_40651-180;Name=Aedes_L1_5_40651 Copy180;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	five_prime_terminal_inverted_repeat	988768	988778	.	.	.	Parent=Aedes_L1_5_40651-180
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	three_prime_terminal_inverted_repeat	988901	988911	.	.	.	Parent=Aedes_L1_5_40651-180
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	target_site_duplication	988766	988767	.	.	.	Derives_from=Aedes_L1_5_40651-180
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	target_site_duplication	988912	988913	.	.	.	Derives_from=Aedes_L1_5_40651-180
+supercontig:AaegL1:supercont1.351:1:1223003:1	activeTE	terminal_inverted_repeat_element	28115	28258	.	minus	.	ID=Aedes_L1_5_40651-300;Name=Aedes_L1_5_40651 Copy300;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.351:1:1223003:1	activeTE	five_prime_terminal_inverted_repeat	28115	28125	.	.	.	Parent=Aedes_L1_5_40651-300
+supercontig:AaegL1:supercont1.351:1:1223003:1	activeTE	three_prime_terminal_inverted_repeat	28248	28258	.	.	.	Parent=Aedes_L1_5_40651-300
+supercontig:AaegL1:supercont1.351:1:1223003:1	activeTE	target_site_duplication	28113	28114	.	.	.	Derives_from=Aedes_L1_5_40651-300
+supercontig:AaegL1:supercont1.351:1:1223003:1	activeTE	target_site_duplication	28259	28260	.	.	.	Derives_from=Aedes_L1_5_40651-300
+supercontig:AaegL1:supercont1.853:1:436314:1	activeTE	terminal_inverted_repeat_element	131246	131389	.	plus	.	ID=Aedes_L1_5_40651-456;Name=Aedes_L1_5_40651 Copy456;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.853:1:436314:1	activeTE	five_prime_terminal_inverted_repeat	131246	131256	.	.	.	Parent=Aedes_L1_5_40651-456
+supercontig:AaegL1:supercont1.853:1:436314:1	activeTE	three_prime_terminal_inverted_repeat	131379	131389	.	.	.	Parent=Aedes_L1_5_40651-456
+supercontig:AaegL1:supercont1.853:1:436314:1	activeTE	target_site_duplication	131244	131245	.	.	.	Derives_from=Aedes_L1_5_40651-456
+supercontig:AaegL1:supercont1.853:1:436314:1	activeTE	target_site_duplication	131390	131391	.	.	.	Derives_from=Aedes_L1_5_40651-456
+supercontig:AaegL1:supercont1.391:1:1138338:1	activeTE	terminal_inverted_repeat_element	341642	341785	.	plus	.	ID=Aedes_L1_5_40651-296;Name=Aedes_L1_5_40651 Copy296;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.391:1:1138338:1	activeTE	five_prime_terminal_inverted_repeat	341642	341652	.	.	.	Parent=Aedes_L1_5_40651-296
+supercontig:AaegL1:supercont1.391:1:1138338:1	activeTE	three_prime_terminal_inverted_repeat	341775	341785	.	.	.	Parent=Aedes_L1_5_40651-296
+supercontig:AaegL1:supercont1.391:1:1138338:1	activeTE	target_site_duplication	341640	341641	.	.	.	Derives_from=Aedes_L1_5_40651-296
+supercontig:AaegL1:supercont1.391:1:1138338:1	activeTE	target_site_duplication	341786	341787	.	.	.	Derives_from=Aedes_L1_5_40651-296
+supercontig:AaegL1:supercont1.76:1:2906033:1	activeTE	terminal_inverted_repeat_element	1670760	1670903	.	plus	.	ID=Aedes_L1_5_40651-441;Name=Aedes_L1_5_40651 Copy441;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.76:1:2906033:1	activeTE	five_prime_terminal_inverted_repeat	1670760	1670770	.	.	.	Parent=Aedes_L1_5_40651-441
+supercontig:AaegL1:supercont1.76:1:2906033:1	activeTE	three_prime_terminal_inverted_repeat	1670893	1670903	.	.	.	Parent=Aedes_L1_5_40651-441
+supercontig:AaegL1:supercont1.76:1:2906033:1	activeTE	target_site_duplication	1670758	1670759	.	.	.	Derives_from=Aedes_L1_5_40651-441
+supercontig:AaegL1:supercont1.76:1:2906033:1	activeTE	target_site_duplication	1670904	1670905	.	.	.	Derives_from=Aedes_L1_5_40651-441
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	terminal_inverted_repeat_element	351618	351761	.	plus	.	ID=Aedes_L1_5_40651-376;Name=Aedes_L1_5_40651 Copy376;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	five_prime_terminal_inverted_repeat	351618	351628	.	.	.	Parent=Aedes_L1_5_40651-376
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	three_prime_terminal_inverted_repeat	351751	351761	.	.	.	Parent=Aedes_L1_5_40651-376
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	target_site_duplication	351616	351617	.	.	.	Derives_from=Aedes_L1_5_40651-376
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	target_site_duplication	351762	351763	.	.	.	Derives_from=Aedes_L1_5_40651-376
+supercontig:AaegL1:supercont1.59:1:3045158:1	activeTE	terminal_inverted_repeat_element	649330	649473	.	plus	.	ID=Aedes_L1_5_40651-400;Name=Aedes_L1_5_40651 Copy400;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.59:1:3045158:1	activeTE	five_prime_terminal_inverted_repeat	649330	649340	.	.	.	Parent=Aedes_L1_5_40651-400
+supercontig:AaegL1:supercont1.59:1:3045158:1	activeTE	three_prime_terminal_inverted_repeat	649463	649473	.	.	.	Parent=Aedes_L1_5_40651-400
+supercontig:AaegL1:supercont1.59:1:3045158:1	activeTE	target_site_duplication	649328	649329	.	.	.	Derives_from=Aedes_L1_5_40651-400
+supercontig:AaegL1:supercont1.59:1:3045158:1	activeTE	target_site_duplication	649474	649475	.	.	.	Derives_from=Aedes_L1_5_40651-400
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	terminal_inverted_repeat_element	3427163	3427306	.	plus	.	ID=Aedes_L1_5_40651-466;Name=Aedes_L1_5_40651 Copy466;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	five_prime_terminal_inverted_repeat	3427163	3427173	.	.	.	Parent=Aedes_L1_5_40651-466
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	three_prime_terminal_inverted_repeat	3427296	3427306	.	.	.	Parent=Aedes_L1_5_40651-466
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	target_site_duplication	3427161	3427162	.	.	.	Derives_from=Aedes_L1_5_40651-466
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	target_site_duplication	3427307	3427308	.	.	.	Derives_from=Aedes_L1_5_40651-466
+supercontig:AaegL1:supercont1.99:1:2698768:1	activeTE	terminal_inverted_repeat_element	1093305	1093448	.	minus	.	ID=Aedes_L1_5_40651-338;Name=Aedes_L1_5_40651 Copy338;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.99:1:2698768:1	activeTE	five_prime_terminal_inverted_repeat	1093305	1093315	.	.	.	Parent=Aedes_L1_5_40651-338
+supercontig:AaegL1:supercont1.99:1:2698768:1	activeTE	three_prime_terminal_inverted_repeat	1093438	1093448	.	.	.	Parent=Aedes_L1_5_40651-338
+supercontig:AaegL1:supercont1.99:1:2698768:1	activeTE	target_site_duplication	1093303	1093304	.	.	.	Derives_from=Aedes_L1_5_40651-338
+supercontig:AaegL1:supercont1.99:1:2698768:1	activeTE	target_site_duplication	1093449	1093450	.	.	.	Derives_from=Aedes_L1_5_40651-338
+supercontig:AaegL1:supercont1.53:1:3153367:1	activeTE	terminal_inverted_repeat_element	2954540	2954683	.	minus	.	ID=Aedes_L1_5_40651-176;Name=Aedes_L1_5_40651 Copy176;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.53:1:3153367:1	activeTE	five_prime_terminal_inverted_repeat	2954540	2954550	.	.	.	Parent=Aedes_L1_5_40651-176
+supercontig:AaegL1:supercont1.53:1:3153367:1	activeTE	three_prime_terminal_inverted_repeat	2954673	2954683	.	.	.	Parent=Aedes_L1_5_40651-176
+supercontig:AaegL1:supercont1.53:1:3153367:1	activeTE	target_site_duplication	2954538	2954539	.	.	.	Derives_from=Aedes_L1_5_40651-176
+supercontig:AaegL1:supercont1.53:1:3153367:1	activeTE	target_site_duplication	2954684	2954685	.	.	.	Derives_from=Aedes_L1_5_40651-176
+supercontig:AaegL1:supercont1.21:1:4040890:1	activeTE	terminal_inverted_repeat_element	2246817	2246960	.	plus	.	ID=Aedes_L1_5_40651-380;Name=Aedes_L1_5_40651 Copy380;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.21:1:4040890:1	activeTE	five_prime_terminal_inverted_repeat	2246817	2246827	.	.	.	Parent=Aedes_L1_5_40651-380
+supercontig:AaegL1:supercont1.21:1:4040890:1	activeTE	three_prime_terminal_inverted_repeat	2246950	2246960	.	.	.	Parent=Aedes_L1_5_40651-380
+supercontig:AaegL1:supercont1.21:1:4040890:1	activeTE	target_site_duplication	2246815	2246816	.	.	.	Derives_from=Aedes_L1_5_40651-380
+supercontig:AaegL1:supercont1.21:1:4040890:1	activeTE	target_site_duplication	2246961	2246962	.	.	.	Derives_from=Aedes_L1_5_40651-380
+supercontig:AaegL1:supercont1.374:1:1194343:1	activeTE	terminal_inverted_repeat_element	635931	636074	.	minus	.	ID=Aedes_L1_5_40651-235;Name=Aedes_L1_5_40651 Copy235;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.374:1:1194343:1	activeTE	five_prime_terminal_inverted_repeat	635931	635941	.	.	.	Parent=Aedes_L1_5_40651-235
+supercontig:AaegL1:supercont1.374:1:1194343:1	activeTE	three_prime_terminal_inverted_repeat	636064	636074	.	.	.	Parent=Aedes_L1_5_40651-235
+supercontig:AaegL1:supercont1.374:1:1194343:1	activeTE	target_site_duplication	635929	635930	.	.	.	Derives_from=Aedes_L1_5_40651-235
+supercontig:AaegL1:supercont1.374:1:1194343:1	activeTE	target_site_duplication	636075	636076	.	.	.	Derives_from=Aedes_L1_5_40651-235
+supercontig:AaegL1:supercont1.427:1:1030483:1	activeTE	terminal_inverted_repeat_element	200179	200322	.	minus	.	ID=Aedes_L1_5_40651-481;Name=Aedes_L1_5_40651 Copy481;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.427:1:1030483:1	activeTE	five_prime_terminal_inverted_repeat	200179	200189	.	.	.	Parent=Aedes_L1_5_40651-481
+supercontig:AaegL1:supercont1.427:1:1030483:1	activeTE	three_prime_terminal_inverted_repeat	200312	200322	.	.	.	Parent=Aedes_L1_5_40651-481
+supercontig:AaegL1:supercont1.427:1:1030483:1	activeTE	target_site_duplication	200177	200178	.	.	.	Derives_from=Aedes_L1_5_40651-481
+supercontig:AaegL1:supercont1.427:1:1030483:1	activeTE	target_site_duplication	200323	200324	.	.	.	Derives_from=Aedes_L1_5_40651-481
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	terminal_inverted_repeat_element	619406	619549	.	plus	.	ID=Aedes_L1_5_40651-329;Name=Aedes_L1_5_40651 Copy329;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	five_prime_terminal_inverted_repeat	619406	619416	.	.	.	Parent=Aedes_L1_5_40651-329
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	three_prime_terminal_inverted_repeat	619539	619549	.	.	.	Parent=Aedes_L1_5_40651-329
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	target_site_duplication	619404	619405	.	.	.	Derives_from=Aedes_L1_5_40651-329
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	target_site_duplication	619550	619551	.	.	.	Derives_from=Aedes_L1_5_40651-329
+supercontig:AaegL1:supercont1.338:1:1244558:1	activeTE	terminal_inverted_repeat_element	154211	154354	.	plus	.	ID=Aedes_L1_5_40651-349;Name=Aedes_L1_5_40651 Copy349;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.338:1:1244558:1	activeTE	five_prime_terminal_inverted_repeat	154211	154221	.	.	.	Parent=Aedes_L1_5_40651-349
+supercontig:AaegL1:supercont1.338:1:1244558:1	activeTE	three_prime_terminal_inverted_repeat	154344	154354	.	.	.	Parent=Aedes_L1_5_40651-349
+supercontig:AaegL1:supercont1.338:1:1244558:1	activeTE	target_site_duplication	154209	154210	.	.	.	Derives_from=Aedes_L1_5_40651-349
+supercontig:AaegL1:supercont1.338:1:1244558:1	activeTE	target_site_duplication	154355	154356	.	.	.	Derives_from=Aedes_L1_5_40651-349
+supercontig:AaegL1:supercont1.463:1:992532:1	activeTE	terminal_inverted_repeat_element	840891	841034	.	plus	.	ID=Aedes_L1_5_40651-241;Name=Aedes_L1_5_40651 Copy241;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.463:1:992532:1	activeTE	five_prime_terminal_inverted_repeat	840891	840901	.	.	.	Parent=Aedes_L1_5_40651-241
+supercontig:AaegL1:supercont1.463:1:992532:1	activeTE	three_prime_terminal_inverted_repeat	841024	841034	.	.	.	Parent=Aedes_L1_5_40651-241
+supercontig:AaegL1:supercont1.463:1:992532:1	activeTE	target_site_duplication	840889	840890	.	.	.	Derives_from=Aedes_L1_5_40651-241
+supercontig:AaegL1:supercont1.463:1:992532:1	activeTE	target_site_duplication	841035	841036	.	.	.	Derives_from=Aedes_L1_5_40651-241
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	terminal_inverted_repeat_element	920934	921077	.	minus	.	ID=Aedes_L1_5_40651-367;Name=Aedes_L1_5_40651 Copy367;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	five_prime_terminal_inverted_repeat	920934	920944	.	.	.	Parent=Aedes_L1_5_40651-367
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	three_prime_terminal_inverted_repeat	921067	921077	.	.	.	Parent=Aedes_L1_5_40651-367
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	target_site_duplication	920932	920933	.	.	.	Derives_from=Aedes_L1_5_40651-367
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	target_site_duplication	921078	921079	.	.	.	Derives_from=Aedes_L1_5_40651-367
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	terminal_inverted_repeat_element	553035	553178	.	plus	.	ID=Aedes_L1_5_40651-258;Name=Aedes_L1_5_40651 Copy258;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	five_prime_terminal_inverted_repeat	553035	553045	.	.	.	Parent=Aedes_L1_5_40651-258
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	three_prime_terminal_inverted_repeat	553168	553178	.	.	.	Parent=Aedes_L1_5_40651-258
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	target_site_duplication	553033	553034	.	.	.	Derives_from=Aedes_L1_5_40651-258
+supercontig:AaegL1:supercont1.574:1:885517:1	activeTE	target_site_duplication	553179	553180	.	.	.	Derives_from=Aedes_L1_5_40651-258
+supercontig:AaegL1:supercont1.644:1:718962:1	activeTE	terminal_inverted_repeat_element	389823	389966	.	plus	.	ID=Aedes_L1_5_40651-244;Name=Aedes_L1_5_40651 Copy244;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.644:1:718962:1	activeTE	five_prime_terminal_inverted_repeat	389823	389833	.	.	.	Parent=Aedes_L1_5_40651-244
+supercontig:AaegL1:supercont1.644:1:718962:1	activeTE	three_prime_terminal_inverted_repeat	389956	389966	.	.	.	Parent=Aedes_L1_5_40651-244
+supercontig:AaegL1:supercont1.644:1:718962:1	activeTE	target_site_duplication	389821	389822	.	.	.	Derives_from=Aedes_L1_5_40651-244
+supercontig:AaegL1:supercont1.644:1:718962:1	activeTE	target_site_duplication	389967	389968	.	.	.	Derives_from=Aedes_L1_5_40651-244
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	terminal_inverted_repeat_element	719043	719186	.	plus	.	ID=Aedes_L1_5_40651-262;Name=Aedes_L1_5_40651 Copy262;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	five_prime_terminal_inverted_repeat	719043	719053	.	.	.	Parent=Aedes_L1_5_40651-262
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	three_prime_terminal_inverted_repeat	719176	719186	.	.	.	Parent=Aedes_L1_5_40651-262
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	target_site_duplication	719041	719042	.	.	.	Derives_from=Aedes_L1_5_40651-262
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	target_site_duplication	719187	719188	.	.	.	Derives_from=Aedes_L1_5_40651-262
+supercontig:AaegL1:supercont1.246:1:1607634:1	activeTE	terminal_inverted_repeat_element	1533145	1533288	.	plus	.	ID=Aedes_L1_5_40651-217;Name=Aedes_L1_5_40651 Copy217;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.246:1:1607634:1	activeTE	five_prime_terminal_inverted_repeat	1533145	1533155	.	.	.	Parent=Aedes_L1_5_40651-217
+supercontig:AaegL1:supercont1.246:1:1607634:1	activeTE	three_prime_terminal_inverted_repeat	1533278	1533288	.	.	.	Parent=Aedes_L1_5_40651-217
+supercontig:AaegL1:supercont1.246:1:1607634:1	activeTE	target_site_duplication	1533143	1533144	.	.	.	Derives_from=Aedes_L1_5_40651-217
+supercontig:AaegL1:supercont1.246:1:1607634:1	activeTE	target_site_duplication	1533289	1533290	.	.	.	Derives_from=Aedes_L1_5_40651-217
+supercontig:AaegL1:supercont1.75:1:2975254:1	activeTE	terminal_inverted_repeat_element	2668696	2668839	.	plus	.	ID=Aedes_L1_5_40651-389;Name=Aedes_L1_5_40651 Copy389;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.75:1:2975254:1	activeTE	five_prime_terminal_inverted_repeat	2668696	2668706	.	.	.	Parent=Aedes_L1_5_40651-389
+supercontig:AaegL1:supercont1.75:1:2975254:1	activeTE	three_prime_terminal_inverted_repeat	2668829	2668839	.	.	.	Parent=Aedes_L1_5_40651-389
+supercontig:AaegL1:supercont1.75:1:2975254:1	activeTE	target_site_duplication	2668694	2668695	.	.	.	Derives_from=Aedes_L1_5_40651-389
+supercontig:AaegL1:supercont1.75:1:2975254:1	activeTE	target_site_duplication	2668840	2668841	.	.	.	Derives_from=Aedes_L1_5_40651-389
+supercontig:AaegL1:supercont1.310:1:1509481:1	activeTE	terminal_inverted_repeat_element	414011	414154	.	plus	.	ID=Aedes_L1_5_40651-458;Name=Aedes_L1_5_40651 Copy458;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.310:1:1509481:1	activeTE	five_prime_terminal_inverted_repeat	414011	414021	.	.	.	Parent=Aedes_L1_5_40651-458
+supercontig:AaegL1:supercont1.310:1:1509481:1	activeTE	three_prime_terminal_inverted_repeat	414144	414154	.	.	.	Parent=Aedes_L1_5_40651-458
+supercontig:AaegL1:supercont1.310:1:1509481:1	activeTE	target_site_duplication	414009	414010	.	.	.	Derives_from=Aedes_L1_5_40651-458
+supercontig:AaegL1:supercont1.310:1:1509481:1	activeTE	target_site_duplication	414155	414156	.	.	.	Derives_from=Aedes_L1_5_40651-458
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	terminal_inverted_repeat_element	938047	938190	.	plus	.	ID=Aedes_L1_5_40651-351;Name=Aedes_L1_5_40651 Copy351;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	five_prime_terminal_inverted_repeat	938047	938057	.	.	.	Parent=Aedes_L1_5_40651-351
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	three_prime_terminal_inverted_repeat	938180	938190	.	.	.	Parent=Aedes_L1_5_40651-351
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	target_site_duplication	938045	938046	.	.	.	Derives_from=Aedes_L1_5_40651-351
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	target_site_duplication	938191	938192	.	.	.	Derives_from=Aedes_L1_5_40651-351
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	terminal_inverted_repeat_element	1040980	1041123	.	minus	.	ID=Aedes_L1_5_40651-464;Name=Aedes_L1_5_40651 Copy464;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	five_prime_terminal_inverted_repeat	1040980	1040990	.	.	.	Parent=Aedes_L1_5_40651-464
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	three_prime_terminal_inverted_repeat	1041113	1041123	.	.	.	Parent=Aedes_L1_5_40651-464
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	target_site_duplication	1040978	1040979	.	.	.	Derives_from=Aedes_L1_5_40651-464
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	target_site_duplication	1041124	1041125	.	.	.	Derives_from=Aedes_L1_5_40651-464
+supercontig:AaegL1:supercont1.164:1:2039552:1	activeTE	terminal_inverted_repeat_element	1206324	1206467	.	minus	.	ID=Aedes_L1_5_40651-340;Name=Aedes_L1_5_40651 Copy340;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.164:1:2039552:1	activeTE	five_prime_terminal_inverted_repeat	1206324	1206334	.	.	.	Parent=Aedes_L1_5_40651-340
+supercontig:AaegL1:supercont1.164:1:2039552:1	activeTE	three_prime_terminal_inverted_repeat	1206457	1206467	.	.	.	Parent=Aedes_L1_5_40651-340
+supercontig:AaegL1:supercont1.164:1:2039552:1	activeTE	target_site_duplication	1206322	1206323	.	.	.	Derives_from=Aedes_L1_5_40651-340
+supercontig:AaegL1:supercont1.164:1:2039552:1	activeTE	target_site_duplication	1206468	1206469	.	.	.	Derives_from=Aedes_L1_5_40651-340
+supercontig:AaegL1:supercont1.184:1:2028366:1	activeTE	terminal_inverted_repeat_element	552012	552155	.	plus	.	ID=Aedes_L1_5_40651-485;Name=Aedes_L1_5_40651 Copy485;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.184:1:2028366:1	activeTE	five_prime_terminal_inverted_repeat	552012	552022	.	.	.	Parent=Aedes_L1_5_40651-485
+supercontig:AaegL1:supercont1.184:1:2028366:1	activeTE	three_prime_terminal_inverted_repeat	552145	552155	.	.	.	Parent=Aedes_L1_5_40651-485
+supercontig:AaegL1:supercont1.184:1:2028366:1	activeTE	target_site_duplication	552010	552011	.	.	.	Derives_from=Aedes_L1_5_40651-485
+supercontig:AaegL1:supercont1.184:1:2028366:1	activeTE	target_site_duplication	552156	552157	.	.	.	Derives_from=Aedes_L1_5_40651-485
+supercontig:AaegL1:supercont1.209:1:1779872:1	activeTE	terminal_inverted_repeat_element	417850	417993	.	plus	.	ID=Aedes_L1_5_40651-443;Name=Aedes_L1_5_40651 Copy443;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.209:1:1779872:1	activeTE	five_prime_terminal_inverted_repeat	417850	417860	.	.	.	Parent=Aedes_L1_5_40651-443
+supercontig:AaegL1:supercont1.209:1:1779872:1	activeTE	three_prime_terminal_inverted_repeat	417983	417993	.	.	.	Parent=Aedes_L1_5_40651-443
+supercontig:AaegL1:supercont1.209:1:1779872:1	activeTE	target_site_duplication	417848	417849	.	.	.	Derives_from=Aedes_L1_5_40651-443
+supercontig:AaegL1:supercont1.209:1:1779872:1	activeTE	target_site_duplication	417994	417995	.	.	.	Derives_from=Aedes_L1_5_40651-443
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	terminal_inverted_repeat_element	863934	864077	.	plus	.	ID=Aedes_L1_5_40651-256;Name=Aedes_L1_5_40651 Copy256;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	five_prime_terminal_inverted_repeat	863934	863944	.	.	.	Parent=Aedes_L1_5_40651-256
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	three_prime_terminal_inverted_repeat	864067	864077	.	.	.	Parent=Aedes_L1_5_40651-256
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	target_site_duplication	863932	863933	.	.	.	Derives_from=Aedes_L1_5_40651-256
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	target_site_duplication	864078	864079	.	.	.	Derives_from=Aedes_L1_5_40651-256
+supercontig:AaegL1:supercont1.624:1:843261:1	activeTE	terminal_inverted_repeat_element	3180	3323	.	plus	.	ID=Aedes_L1_5_40651-183;Name=Aedes_L1_5_40651 Copy183;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.624:1:843261:1	activeTE	five_prime_terminal_inverted_repeat	3180	3190	.	.	.	Parent=Aedes_L1_5_40651-183
+supercontig:AaegL1:supercont1.624:1:843261:1	activeTE	three_prime_terminal_inverted_repeat	3313	3323	.	.	.	Parent=Aedes_L1_5_40651-183
+supercontig:AaegL1:supercont1.624:1:843261:1	activeTE	target_site_duplication	3178	3179	.	.	.	Derives_from=Aedes_L1_5_40651-183
+supercontig:AaegL1:supercont1.624:1:843261:1	activeTE	target_site_duplication	3324	3325	.	.	.	Derives_from=Aedes_L1_5_40651-183
+supercontig:AaegL1:supercont1.1342:1:143966:1	activeTE	terminal_inverted_repeat_element	97680	97823	.	plus	.	ID=Aedes_L1_5_40651-446;Name=Aedes_L1_5_40651 Copy446;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1342:1:143966:1	activeTE	five_prime_terminal_inverted_repeat	97680	97690	.	.	.	Parent=Aedes_L1_5_40651-446
+supercontig:AaegL1:supercont1.1342:1:143966:1	activeTE	three_prime_terminal_inverted_repeat	97813	97823	.	.	.	Parent=Aedes_L1_5_40651-446
+supercontig:AaegL1:supercont1.1342:1:143966:1	activeTE	target_site_duplication	97678	97679	.	.	.	Derives_from=Aedes_L1_5_40651-446
+supercontig:AaegL1:supercont1.1342:1:143966:1	activeTE	target_site_duplication	97824	97825	.	.	.	Derives_from=Aedes_L1_5_40651-446
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	terminal_inverted_repeat_element	124326	124469	.	plus	.	ID=Aedes_L1_5_40651-424;Name=Aedes_L1_5_40651 Copy424;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	five_prime_terminal_inverted_repeat	124326	124336	.	.	.	Parent=Aedes_L1_5_40651-424
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	three_prime_terminal_inverted_repeat	124459	124469	.	.	.	Parent=Aedes_L1_5_40651-424
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	target_site_duplication	124324	124325	.	.	.	Derives_from=Aedes_L1_5_40651-424
+supercontig:AaegL1:supercont1.449:1:988145:1	activeTE	target_site_duplication	124470	124471	.	.	.	Derives_from=Aedes_L1_5_40651-424
+supercontig:AaegL1:supercont1.300:1:1467236:1	activeTE	terminal_inverted_repeat_element	1170251	1170394	.	minus	.	ID=Aedes_L1_5_40651-361;Name=Aedes_L1_5_40651 Copy361;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.300:1:1467236:1	activeTE	five_prime_terminal_inverted_repeat	1170251	1170261	.	.	.	Parent=Aedes_L1_5_40651-361
+supercontig:AaegL1:supercont1.300:1:1467236:1	activeTE	three_prime_terminal_inverted_repeat	1170384	1170394	.	.	.	Parent=Aedes_L1_5_40651-361
+supercontig:AaegL1:supercont1.300:1:1467236:1	activeTE	target_site_duplication	1170249	1170250	.	.	.	Derives_from=Aedes_L1_5_40651-361
+supercontig:AaegL1:supercont1.300:1:1467236:1	activeTE	target_site_duplication	1170395	1170396	.	.	.	Derives_from=Aedes_L1_5_40651-361
+supercontig:AaegL1:supercont1.3034:1:7543:1	activeTE	terminal_inverted_repeat_element	5295	5438	.	plus	.	ID=Aedes_L1_5_40651-153;Name=Aedes_L1_5_40651 Copy153;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.3034:1:7543:1	activeTE	five_prime_terminal_inverted_repeat	5295	5305	.	.	.	Parent=Aedes_L1_5_40651-153
+supercontig:AaegL1:supercont1.3034:1:7543:1	activeTE	three_prime_terminal_inverted_repeat	5428	5438	.	.	.	Parent=Aedes_L1_5_40651-153
+supercontig:AaegL1:supercont1.3034:1:7543:1	activeTE	target_site_duplication	5293	5294	.	.	.	Derives_from=Aedes_L1_5_40651-153
+supercontig:AaegL1:supercont1.3034:1:7543:1	activeTE	target_site_duplication	5439	5440	.	.	.	Derives_from=Aedes_L1_5_40651-153
+supercontig:AaegL1:supercont1.143:1:2167940:1	activeTE	terminal_inverted_repeat_element	144478	144621	.	plus	.	ID=Aedes_L1_5_40651-322;Name=Aedes_L1_5_40651 Copy322;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.143:1:2167940:1	activeTE	five_prime_terminal_inverted_repeat	144478	144488	.	.	.	Parent=Aedes_L1_5_40651-322
+supercontig:AaegL1:supercont1.143:1:2167940:1	activeTE	three_prime_terminal_inverted_repeat	144611	144621	.	.	.	Parent=Aedes_L1_5_40651-322
+supercontig:AaegL1:supercont1.143:1:2167940:1	activeTE	target_site_duplication	144476	144477	.	.	.	Derives_from=Aedes_L1_5_40651-322
+supercontig:AaegL1:supercont1.143:1:2167940:1	activeTE	target_site_duplication	144622	144623	.	.	.	Derives_from=Aedes_L1_5_40651-322
+supercontig:AaegL1:supercont1.139:1:2181600:1	activeTE	terminal_inverted_repeat_element	1007259	1007402	.	minus	.	ID=Aedes_L1_5_40651-310;Name=Aedes_L1_5_40651 Copy310;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.139:1:2181600:1	activeTE	five_prime_terminal_inverted_repeat	1007259	1007269	.	.	.	Parent=Aedes_L1_5_40651-310
+supercontig:AaegL1:supercont1.139:1:2181600:1	activeTE	three_prime_terminal_inverted_repeat	1007392	1007402	.	.	.	Parent=Aedes_L1_5_40651-310
+supercontig:AaegL1:supercont1.139:1:2181600:1	activeTE	target_site_duplication	1007257	1007258	.	.	.	Derives_from=Aedes_L1_5_40651-310
+supercontig:AaegL1:supercont1.139:1:2181600:1	activeTE	target_site_duplication	1007403	1007404	.	.	.	Derives_from=Aedes_L1_5_40651-310
+supercontig:AaegL1:supercont1.607:1:695224:1	activeTE	terminal_inverted_repeat_element	483312	483455	.	plus	.	ID=Aedes_L1_5_40651-131;Name=Aedes_L1_5_40651 Copy131;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.607:1:695224:1	activeTE	five_prime_terminal_inverted_repeat	483312	483322	.	.	.	Parent=Aedes_L1_5_40651-131
+supercontig:AaegL1:supercont1.607:1:695224:1	activeTE	three_prime_terminal_inverted_repeat	483445	483455	.	.	.	Parent=Aedes_L1_5_40651-131
+supercontig:AaegL1:supercont1.607:1:695224:1	activeTE	target_site_duplication	483310	483311	.	.	.	Derives_from=Aedes_L1_5_40651-131
+supercontig:AaegL1:supercont1.607:1:695224:1	activeTE	target_site_duplication	483456	483457	.	.	.	Derives_from=Aedes_L1_5_40651-131
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	terminal_inverted_repeat_element	2931275	2931418	.	plus	.	ID=Aedes_L1_5_40651-342;Name=Aedes_L1_5_40651 Copy342;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	five_prime_terminal_inverted_repeat	2931275	2931285	.	.	.	Parent=Aedes_L1_5_40651-342
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	three_prime_terminal_inverted_repeat	2931408	2931418	.	.	.	Parent=Aedes_L1_5_40651-342
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	target_site_duplication	2931273	2931274	.	.	.	Derives_from=Aedes_L1_5_40651-342
+supercontig:AaegL1:supercont1.57:1:3098917:1	activeTE	target_site_duplication	2931419	2931420	.	.	.	Derives_from=Aedes_L1_5_40651-342
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	terminal_inverted_repeat_element	448672	448815	.	plus	.	ID=Aedes_L1_5_40651-404;Name=Aedes_L1_5_40651 Copy404;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	five_prime_terminal_inverted_repeat	448672	448682	.	.	.	Parent=Aedes_L1_5_40651-404
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	three_prime_terminal_inverted_repeat	448805	448815	.	.	.	Parent=Aedes_L1_5_40651-404
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	target_site_duplication	448670	448671	.	.	.	Derives_from=Aedes_L1_5_40651-404
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	target_site_duplication	448816	448817	.	.	.	Derives_from=Aedes_L1_5_40651-404
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	terminal_inverted_repeat_element	1366432	1366575	.	plus	.	ID=Aedes_L1_5_40651-356;Name=Aedes_L1_5_40651 Copy356;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	five_prime_terminal_inverted_repeat	1366432	1366442	.	.	.	Parent=Aedes_L1_5_40651-356
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	three_prime_terminal_inverted_repeat	1366565	1366575	.	.	.	Parent=Aedes_L1_5_40651-356
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	target_site_duplication	1366430	1366431	.	.	.	Derives_from=Aedes_L1_5_40651-356
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	target_site_duplication	1366576	1366577	.	.	.	Derives_from=Aedes_L1_5_40651-356
+supercontig:AaegL1:supercont1.102:1:2665163:1	activeTE	terminal_inverted_repeat_element	2086134	2086277	.	minus	.	ID=Aedes_L1_5_40651-246;Name=Aedes_L1_5_40651 Copy246;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.102:1:2665163:1	activeTE	five_prime_terminal_inverted_repeat	2086134	2086144	.	.	.	Parent=Aedes_L1_5_40651-246
+supercontig:AaegL1:supercont1.102:1:2665163:1	activeTE	three_prime_terminal_inverted_repeat	2086267	2086277	.	.	.	Parent=Aedes_L1_5_40651-246
+supercontig:AaegL1:supercont1.102:1:2665163:1	activeTE	target_site_duplication	2086132	2086133	.	.	.	Derives_from=Aedes_L1_5_40651-246
+supercontig:AaegL1:supercont1.102:1:2665163:1	activeTE	target_site_duplication	2086278	2086279	.	.	.	Derives_from=Aedes_L1_5_40651-246
+supercontig:AaegL1:supercont1.501:1:855566:1	activeTE	terminal_inverted_repeat_element	643360	643503	.	plus	.	ID=Aedes_L1_5_40651-363;Name=Aedes_L1_5_40651 Copy363;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.501:1:855566:1	activeTE	five_prime_terminal_inverted_repeat	643360	643370	.	.	.	Parent=Aedes_L1_5_40651-363
+supercontig:AaegL1:supercont1.501:1:855566:1	activeTE	three_prime_terminal_inverted_repeat	643493	643503	.	.	.	Parent=Aedes_L1_5_40651-363
+supercontig:AaegL1:supercont1.501:1:855566:1	activeTE	target_site_duplication	643358	643359	.	.	.	Derives_from=Aedes_L1_5_40651-363
+supercontig:AaegL1:supercont1.501:1:855566:1	activeTE	target_site_duplication	643504	643505	.	.	.	Derives_from=Aedes_L1_5_40651-363
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	terminal_inverted_repeat_element	721637	721780	.	minus	.	ID=Aedes_L1_5_40651-280;Name=Aedes_L1_5_40651 Copy280;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	five_prime_terminal_inverted_repeat	721637	721647	.	.	.	Parent=Aedes_L1_5_40651-280
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	three_prime_terminal_inverted_repeat	721770	721780	.	.	.	Parent=Aedes_L1_5_40651-280
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	target_site_duplication	721635	721636	.	.	.	Derives_from=Aedes_L1_5_40651-280
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	target_site_duplication	721781	721782	.	.	.	Derives_from=Aedes_L1_5_40651-280
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	terminal_inverted_repeat_element	1326821	1326964	.	minus	.	ID=Aedes_L1_5_40651-352;Name=Aedes_L1_5_40651 Copy352;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	five_prime_terminal_inverted_repeat	1326821	1326831	.	.	.	Parent=Aedes_L1_5_40651-352
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	three_prime_terminal_inverted_repeat	1326954	1326964	.	.	.	Parent=Aedes_L1_5_40651-352
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	target_site_duplication	1326819	1326820	.	.	.	Derives_from=Aedes_L1_5_40651-352
+supercontig:AaegL1:supercont1.54:1:3433061:1	activeTE	target_site_duplication	1326965	1326966	.	.	.	Derives_from=Aedes_L1_5_40651-352
+supercontig:AaegL1:supercont1.208:1:1789578:1	activeTE	terminal_inverted_repeat_element	985678	985821	.	plus	.	ID=Aedes_L1_5_40651-74;Name=Aedes_L1_5_40651 Copy74;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.208:1:1789578:1	activeTE	five_prime_terminal_inverted_repeat	985678	985688	.	.	.	Parent=Aedes_L1_5_40651-74
+supercontig:AaegL1:supercont1.208:1:1789578:1	activeTE	three_prime_terminal_inverted_repeat	985811	985821	.	.	.	Parent=Aedes_L1_5_40651-74
+supercontig:AaegL1:supercont1.208:1:1789578:1	activeTE	target_site_duplication	985676	985677	.	.	.	Derives_from=Aedes_L1_5_40651-74
+supercontig:AaegL1:supercont1.208:1:1789578:1	activeTE	target_site_duplication	985822	985823	.	.	.	Derives_from=Aedes_L1_5_40651-74
+supercontig:AaegL1:supercont1.334:1:1263900:1	activeTE	terminal_inverted_repeat_element	146519	146662	.	plus	.	ID=Aedes_L1_5_40651-387;Name=Aedes_L1_5_40651 Copy387;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.334:1:1263900:1	activeTE	five_prime_terminal_inverted_repeat	146519	146529	.	.	.	Parent=Aedes_L1_5_40651-387
+supercontig:AaegL1:supercont1.334:1:1263900:1	activeTE	three_prime_terminal_inverted_repeat	146652	146662	.	.	.	Parent=Aedes_L1_5_40651-387
+supercontig:AaegL1:supercont1.334:1:1263900:1	activeTE	target_site_duplication	146517	146518	.	.	.	Derives_from=Aedes_L1_5_40651-387
+supercontig:AaegL1:supercont1.334:1:1263900:1	activeTE	target_site_duplication	146663	146664	.	.	.	Derives_from=Aedes_L1_5_40651-387
+supercontig:AaegL1:supercont1.991:1:301048:1	activeTE	terminal_inverted_repeat_element	105059	105202	.	plus	.	ID=Aedes_L1_5_40651-201;Name=Aedes_L1_5_40651 Copy201;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.991:1:301048:1	activeTE	five_prime_terminal_inverted_repeat	105059	105069	.	.	.	Parent=Aedes_L1_5_40651-201
+supercontig:AaegL1:supercont1.991:1:301048:1	activeTE	three_prime_terminal_inverted_repeat	105192	105202	.	.	.	Parent=Aedes_L1_5_40651-201
+supercontig:AaegL1:supercont1.991:1:301048:1	activeTE	target_site_duplication	105057	105058	.	.	.	Derives_from=Aedes_L1_5_40651-201
+supercontig:AaegL1:supercont1.991:1:301048:1	activeTE	target_site_duplication	105203	105204	.	.	.	Derives_from=Aedes_L1_5_40651-201
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	terminal_inverted_repeat_element	2204430	2204573	.	plus	.	ID=Aedes_L1_5_40651-391;Name=Aedes_L1_5_40651 Copy391;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	five_prime_terminal_inverted_repeat	2204430	2204440	.	.	.	Parent=Aedes_L1_5_40651-391
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	three_prime_terminal_inverted_repeat	2204563	2204573	.	.	.	Parent=Aedes_L1_5_40651-391
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	target_site_duplication	2204428	2204429	.	.	.	Derives_from=Aedes_L1_5_40651-391
+supercontig:AaegL1:supercont1.39:1:3590018:1	activeTE	target_site_duplication	2204574	2204575	.	.	.	Derives_from=Aedes_L1_5_40651-391
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	terminal_inverted_repeat_element	332438	332581	.	plus	.	ID=Aedes_L1_5_40651-261;Name=Aedes_L1_5_40651 Copy261;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	five_prime_terminal_inverted_repeat	332438	332448	.	.	.	Parent=Aedes_L1_5_40651-261
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	three_prime_terminal_inverted_repeat	332571	332581	.	.	.	Parent=Aedes_L1_5_40651-261
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	target_site_duplication	332436	332437	.	.	.	Derives_from=Aedes_L1_5_40651-261
+supercontig:AaegL1:supercont1.381:1:1184037:1	activeTE	target_site_duplication	332582	332583	.	.	.	Derives_from=Aedes_L1_5_40651-261
+supercontig:AaegL1:supercont1.409:1:1156094:1	activeTE	terminal_inverted_repeat_element	1105828	1105971	.	minus	.	ID=Aedes_L1_5_40651-394;Name=Aedes_L1_5_40651 Copy394;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.409:1:1156094:1	activeTE	five_prime_terminal_inverted_repeat	1105828	1105838	.	.	.	Parent=Aedes_L1_5_40651-394
+supercontig:AaegL1:supercont1.409:1:1156094:1	activeTE	three_prime_terminal_inverted_repeat	1105961	1105971	.	.	.	Parent=Aedes_L1_5_40651-394
+supercontig:AaegL1:supercont1.409:1:1156094:1	activeTE	target_site_duplication	1105826	1105827	.	.	.	Derives_from=Aedes_L1_5_40651-394
+supercontig:AaegL1:supercont1.409:1:1156094:1	activeTE	target_site_duplication	1105972	1105973	.	.	.	Derives_from=Aedes_L1_5_40651-394
+supercontig:AaegL1:supercont1.144:1:2222656:1	activeTE	terminal_inverted_repeat_element	1074890	1075033	.	minus	.	ID=Aedes_L1_5_40651-396;Name=Aedes_L1_5_40651 Copy396;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.144:1:2222656:1	activeTE	five_prime_terminal_inverted_repeat	1074890	1074900	.	.	.	Parent=Aedes_L1_5_40651-396
+supercontig:AaegL1:supercont1.144:1:2222656:1	activeTE	three_prime_terminal_inverted_repeat	1075023	1075033	.	.	.	Parent=Aedes_L1_5_40651-396
+supercontig:AaegL1:supercont1.144:1:2222656:1	activeTE	target_site_duplication	1074888	1074889	.	.	.	Derives_from=Aedes_L1_5_40651-396
+supercontig:AaegL1:supercont1.144:1:2222656:1	activeTE	target_site_duplication	1075034	1075035	.	.	.	Derives_from=Aedes_L1_5_40651-396
+supercontig:AaegL1:supercont1.149:1:2106025:1	activeTE	terminal_inverted_repeat_element	677629	677772	.	minus	.	ID=Aedes_L1_5_40651-398;Name=Aedes_L1_5_40651 Copy398;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.149:1:2106025:1	activeTE	five_prime_terminal_inverted_repeat	677629	677639	.	.	.	Parent=Aedes_L1_5_40651-398
+supercontig:AaegL1:supercont1.149:1:2106025:1	activeTE	three_prime_terminal_inverted_repeat	677762	677772	.	.	.	Parent=Aedes_L1_5_40651-398
+supercontig:AaegL1:supercont1.149:1:2106025:1	activeTE	target_site_duplication	677627	677628	.	.	.	Derives_from=Aedes_L1_5_40651-398
+supercontig:AaegL1:supercont1.149:1:2106025:1	activeTE	target_site_duplication	677773	677774	.	.	.	Derives_from=Aedes_L1_5_40651-398
+supercontig:AaegL1:supercont1.16:1:4402401:1	activeTE	terminal_inverted_repeat_element	3908612	3908755	.	plus	.	ID=Aedes_L1_5_40651-449;Name=Aedes_L1_5_40651 Copy449;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.16:1:4402401:1	activeTE	five_prime_terminal_inverted_repeat	3908612	3908622	.	.	.	Parent=Aedes_L1_5_40651-449
+supercontig:AaegL1:supercont1.16:1:4402401:1	activeTE	three_prime_terminal_inverted_repeat	3908745	3908755	.	.	.	Parent=Aedes_L1_5_40651-449
+supercontig:AaegL1:supercont1.16:1:4402401:1	activeTE	target_site_duplication	3908610	3908611	.	.	.	Derives_from=Aedes_L1_5_40651-449
+supercontig:AaegL1:supercont1.16:1:4402401:1	activeTE	target_site_duplication	3908756	3908757	.	.	.	Derives_from=Aedes_L1_5_40651-449
+supercontig:AaegL1:supercont1.104:1:2593914:1	activeTE	terminal_inverted_repeat_element	1727881	1728024	.	minus	.	ID=Aedes_L1_5_40651-407;Name=Aedes_L1_5_40651 Copy407;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.104:1:2593914:1	activeTE	five_prime_terminal_inverted_repeat	1727881	1727891	.	.	.	Parent=Aedes_L1_5_40651-407
+supercontig:AaegL1:supercont1.104:1:2593914:1	activeTE	three_prime_terminal_inverted_repeat	1728014	1728024	.	.	.	Parent=Aedes_L1_5_40651-407
+supercontig:AaegL1:supercont1.104:1:2593914:1	activeTE	target_site_duplication	1727879	1727880	.	.	.	Derives_from=Aedes_L1_5_40651-407
+supercontig:AaegL1:supercont1.104:1:2593914:1	activeTE	target_site_duplication	1728025	1728026	.	.	.	Derives_from=Aedes_L1_5_40651-407
+supercontig:AaegL1:supercont1.128:1:2297307:1	activeTE	terminal_inverted_repeat_element	1402773	1402916	.	plus	.	ID=Aedes_L1_5_40651-319;Name=Aedes_L1_5_40651 Copy319;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.128:1:2297307:1	activeTE	five_prime_terminal_inverted_repeat	1402773	1402783	.	.	.	Parent=Aedes_L1_5_40651-319
+supercontig:AaegL1:supercont1.128:1:2297307:1	activeTE	three_prime_terminal_inverted_repeat	1402906	1402916	.	.	.	Parent=Aedes_L1_5_40651-319
+supercontig:AaegL1:supercont1.128:1:2297307:1	activeTE	target_site_duplication	1402771	1402772	.	.	.	Derives_from=Aedes_L1_5_40651-319
+supercontig:AaegL1:supercont1.128:1:2297307:1	activeTE	target_site_duplication	1402917	1402918	.	.	.	Derives_from=Aedes_L1_5_40651-319
+supercontig:AaegL1:supercont1.125:1:2472376:1	activeTE	terminal_inverted_repeat_element	1450400	1450543	.	minus	.	ID=Aedes_L1_5_40651-107;Name=Aedes_L1_5_40651 Copy107;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.125:1:2472376:1	activeTE	five_prime_terminal_inverted_repeat	1450400	1450410	.	.	.	Parent=Aedes_L1_5_40651-107
+supercontig:AaegL1:supercont1.125:1:2472376:1	activeTE	three_prime_terminal_inverted_repeat	1450533	1450543	.	.	.	Parent=Aedes_L1_5_40651-107
+supercontig:AaegL1:supercont1.125:1:2472376:1	activeTE	target_site_duplication	1450398	1450399	.	.	.	Derives_from=Aedes_L1_5_40651-107
+supercontig:AaegL1:supercont1.125:1:2472376:1	activeTE	target_site_duplication	1450544	1450545	.	.	.	Derives_from=Aedes_L1_5_40651-107
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	terminal_inverted_repeat_element	542744	542887	.	minus	.	ID=Aedes_L1_5_40651-314;Name=Aedes_L1_5_40651 Copy314;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	five_prime_terminal_inverted_repeat	542744	542754	.	.	.	Parent=Aedes_L1_5_40651-314
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	three_prime_terminal_inverted_repeat	542877	542887	.	.	.	Parent=Aedes_L1_5_40651-314
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	target_site_duplication	542742	542743	.	.	.	Derives_from=Aedes_L1_5_40651-314
+supercontig:AaegL1:supercont1.436:1:1005155:1	activeTE	target_site_duplication	542888	542889	.	.	.	Derives_from=Aedes_L1_5_40651-314
+supercontig:AaegL1:supercont1.724:1:594999:1	activeTE	terminal_inverted_repeat_element	486282	486425	.	minus	.	ID=Aedes_L1_5_40651-360;Name=Aedes_L1_5_40651 Copy360;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.724:1:594999:1	activeTE	five_prime_terminal_inverted_repeat	486282	486292	.	.	.	Parent=Aedes_L1_5_40651-360
+supercontig:AaegL1:supercont1.724:1:594999:1	activeTE	three_prime_terminal_inverted_repeat	486415	486425	.	.	.	Parent=Aedes_L1_5_40651-360
+supercontig:AaegL1:supercont1.724:1:594999:1	activeTE	target_site_duplication	486280	486281	.	.	.	Derives_from=Aedes_L1_5_40651-360
+supercontig:AaegL1:supercont1.724:1:594999:1	activeTE	target_site_duplication	486426	486427	.	.	.	Derives_from=Aedes_L1_5_40651-360
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	terminal_inverted_repeat_element	184180	184323	.	plus	.	ID=Aedes_L1_5_40651-252;Name=Aedes_L1_5_40651 Copy252;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	five_prime_terminal_inverted_repeat	184180	184190	.	.	.	Parent=Aedes_L1_5_40651-252
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	three_prime_terminal_inverted_repeat	184313	184323	.	.	.	Parent=Aedes_L1_5_40651-252
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	target_site_duplication	184178	184179	.	.	.	Derives_from=Aedes_L1_5_40651-252
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	target_site_duplication	184324	184325	.	.	.	Derives_from=Aedes_L1_5_40651-252
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	terminal_inverted_repeat_element	170598	170741	.	plus	.	ID=Aedes_L1_5_40651-186;Name=Aedes_L1_5_40651 Copy186;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	five_prime_terminal_inverted_repeat	170598	170608	.	.	.	Parent=Aedes_L1_5_40651-186
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	three_prime_terminal_inverted_repeat	170731	170741	.	.	.	Parent=Aedes_L1_5_40651-186
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	target_site_duplication	170596	170597	.	.	.	Derives_from=Aedes_L1_5_40651-186
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	target_site_duplication	170742	170743	.	.	.	Derives_from=Aedes_L1_5_40651-186
+supercontig:AaegL1:supercont1.562:1:746419:1	activeTE	terminal_inverted_repeat_element	612649	612792	.	plus	.	ID=Aedes_L1_5_40651-395;Name=Aedes_L1_5_40651 Copy395;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.562:1:746419:1	activeTE	five_prime_terminal_inverted_repeat	612649	612659	.	.	.	Parent=Aedes_L1_5_40651-395
+supercontig:AaegL1:supercont1.562:1:746419:1	activeTE	three_prime_terminal_inverted_repeat	612782	612792	.	.	.	Parent=Aedes_L1_5_40651-395
+supercontig:AaegL1:supercont1.562:1:746419:1	activeTE	target_site_duplication	612647	612648	.	.	.	Derives_from=Aedes_L1_5_40651-395
+supercontig:AaegL1:supercont1.562:1:746419:1	activeTE	target_site_duplication	612793	612794	.	.	.	Derives_from=Aedes_L1_5_40651-395
+supercontig:AaegL1:supercont1.1067:1:266615:1	activeTE	terminal_inverted_repeat_element	131461	131604	.	minus	.	ID=Aedes_L1_5_40651-386;Name=Aedes_L1_5_40651 Copy386;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1067:1:266615:1	activeTE	five_prime_terminal_inverted_repeat	131461	131471	.	.	.	Parent=Aedes_L1_5_40651-386
+supercontig:AaegL1:supercont1.1067:1:266615:1	activeTE	three_prime_terminal_inverted_repeat	131594	131604	.	.	.	Parent=Aedes_L1_5_40651-386
+supercontig:AaegL1:supercont1.1067:1:266615:1	activeTE	target_site_duplication	131459	131460	.	.	.	Derives_from=Aedes_L1_5_40651-386
+supercontig:AaegL1:supercont1.1067:1:266615:1	activeTE	target_site_duplication	131605	131606	.	.	.	Derives_from=Aedes_L1_5_40651-386
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	terminal_inverted_repeat_element	639478	639621	.	minus	.	ID=Aedes_L1_5_40651-409;Name=Aedes_L1_5_40651 Copy409;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	five_prime_terminal_inverted_repeat	639478	639488	.	.	.	Parent=Aedes_L1_5_40651-409
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	three_prime_terminal_inverted_repeat	639611	639621	.	.	.	Parent=Aedes_L1_5_40651-409
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	target_site_duplication	639476	639477	.	.	.	Derives_from=Aedes_L1_5_40651-409
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	target_site_duplication	639622	639623	.	.	.	Derives_from=Aedes_L1_5_40651-409
+supercontig:AaegL1:supercont1.534:1:813811:1	activeTE	terminal_inverted_repeat_element	423404	423547	.	minus	.	ID=Aedes_L1_5_40651-478;Name=Aedes_L1_5_40651 Copy478;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.534:1:813811:1	activeTE	five_prime_terminal_inverted_repeat	423404	423414	.	.	.	Parent=Aedes_L1_5_40651-478
+supercontig:AaegL1:supercont1.534:1:813811:1	activeTE	three_prime_terminal_inverted_repeat	423537	423547	.	.	.	Parent=Aedes_L1_5_40651-478
+supercontig:AaegL1:supercont1.534:1:813811:1	activeTE	target_site_duplication	423402	423403	.	.	.	Derives_from=Aedes_L1_5_40651-478
+supercontig:AaegL1:supercont1.534:1:813811:1	activeTE	target_site_duplication	423548	423549	.	.	.	Derives_from=Aedes_L1_5_40651-478
+supercontig:AaegL1:supercont1.837:1:448833:1	activeTE	terminal_inverted_repeat_element	161382	161525	.	plus	.	ID=Aedes_L1_5_40651-440;Name=Aedes_L1_5_40651 Copy440;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.837:1:448833:1	activeTE	five_prime_terminal_inverted_repeat	161382	161392	.	.	.	Parent=Aedes_L1_5_40651-440
+supercontig:AaegL1:supercont1.837:1:448833:1	activeTE	three_prime_terminal_inverted_repeat	161515	161525	.	.	.	Parent=Aedes_L1_5_40651-440
+supercontig:AaegL1:supercont1.837:1:448833:1	activeTE	target_site_duplication	161380	161381	.	.	.	Derives_from=Aedes_L1_5_40651-440
+supercontig:AaegL1:supercont1.837:1:448833:1	activeTE	target_site_duplication	161526	161527	.	.	.	Derives_from=Aedes_L1_5_40651-440
+supercontig:AaegL1:supercont1.1082:1:242587:1	activeTE	terminal_inverted_repeat_element	166249	166392	.	minus	.	ID=Aedes_L1_5_40651-439;Name=Aedes_L1_5_40651 Copy439;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1082:1:242587:1	activeTE	five_prime_terminal_inverted_repeat	166249	166259	.	.	.	Parent=Aedes_L1_5_40651-439
+supercontig:AaegL1:supercont1.1082:1:242587:1	activeTE	three_prime_terminal_inverted_repeat	166382	166392	.	.	.	Parent=Aedes_L1_5_40651-439
+supercontig:AaegL1:supercont1.1082:1:242587:1	activeTE	target_site_duplication	166247	166248	.	.	.	Derives_from=Aedes_L1_5_40651-439
+supercontig:AaegL1:supercont1.1082:1:242587:1	activeTE	target_site_duplication	166393	166394	.	.	.	Derives_from=Aedes_L1_5_40651-439
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	terminal_inverted_repeat_element	1918263	1918406	.	plus	.	ID=Aedes_L1_5_40651-289;Name=Aedes_L1_5_40651 Copy289;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	five_prime_terminal_inverted_repeat	1918263	1918273	.	.	.	Parent=Aedes_L1_5_40651-289
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	three_prime_terminal_inverted_repeat	1918396	1918406	.	.	.	Parent=Aedes_L1_5_40651-289
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	target_site_duplication	1918261	1918262	.	.	.	Derives_from=Aedes_L1_5_40651-289
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	target_site_duplication	1918407	1918408	.	.	.	Derives_from=Aedes_L1_5_40651-289
+supercontig:AaegL1:supercont1.343:1:1241552:1	activeTE	terminal_inverted_repeat_element	1058607	1058750	.	plus	.	ID=Aedes_L1_5_40651-276;Name=Aedes_L1_5_40651 Copy276;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.343:1:1241552:1	activeTE	five_prime_terminal_inverted_repeat	1058607	1058617	.	.	.	Parent=Aedes_L1_5_40651-276
+supercontig:AaegL1:supercont1.343:1:1241552:1	activeTE	three_prime_terminal_inverted_repeat	1058740	1058750	.	.	.	Parent=Aedes_L1_5_40651-276
+supercontig:AaegL1:supercont1.343:1:1241552:1	activeTE	target_site_duplication	1058605	1058606	.	.	.	Derives_from=Aedes_L1_5_40651-276
+supercontig:AaegL1:supercont1.343:1:1241552:1	activeTE	target_site_duplication	1058751	1058752	.	.	.	Derives_from=Aedes_L1_5_40651-276
+supercontig:AaegL1:supercont1.668:1:614529:1	activeTE	terminal_inverted_repeat_element	609650	609793	.	minus	.	ID=Aedes_L1_5_40651-381;Name=Aedes_L1_5_40651 Copy381;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.668:1:614529:1	activeTE	five_prime_terminal_inverted_repeat	609650	609660	.	.	.	Parent=Aedes_L1_5_40651-381
+supercontig:AaegL1:supercont1.668:1:614529:1	activeTE	three_prime_terminal_inverted_repeat	609783	609793	.	.	.	Parent=Aedes_L1_5_40651-381
+supercontig:AaegL1:supercont1.668:1:614529:1	activeTE	target_site_duplication	609648	609649	.	.	.	Derives_from=Aedes_L1_5_40651-381
+supercontig:AaegL1:supercont1.668:1:614529:1	activeTE	target_site_duplication	609794	609795	.	.	.	Derives_from=Aedes_L1_5_40651-381
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	terminal_inverted_repeat_element	458707	458849	.	plus	.	ID=Aedes_L1_5_40651-495;Name=Aedes_L1_5_40651 Copy495;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	five_prime_terminal_inverted_repeat	458707	458717	.	.	.	Parent=Aedes_L1_5_40651-495
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	three_prime_terminal_inverted_repeat	458839	458849	.	.	.	Parent=Aedes_L1_5_40651-495
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	target_site_duplication	458705	458706	.	.	.	Derives_from=Aedes_L1_5_40651-495
+supercontig:AaegL1:supercont1.292:1:1406973:1	activeTE	target_site_duplication	458850	458851	.	.	.	Derives_from=Aedes_L1_5_40651-495
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	terminal_inverted_repeat_element	1818379	1818522	.	plus	.	ID=Aedes_L1_5_40651-165;Name=Aedes_L1_5_40651 Copy165;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	five_prime_terminal_inverted_repeat	1818379	1818389	.	.	.	Parent=Aedes_L1_5_40651-165
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	three_prime_terminal_inverted_repeat	1818512	1818522	.	.	.	Parent=Aedes_L1_5_40651-165
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	target_site_duplication	1818377	1818378	.	.	.	Derives_from=Aedes_L1_5_40651-165
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	target_site_duplication	1818523	1818524	.	.	.	Derives_from=Aedes_L1_5_40651-165
+supercontig:AaegL1:supercont1.1641:1:40317:1	activeTE	terminal_inverted_repeat_element	7768	7911	.	minus	.	ID=Aedes_L1_5_40651-299;Name=Aedes_L1_5_40651 Copy299;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1641:1:40317:1	activeTE	five_prime_terminal_inverted_repeat	7768	7778	.	.	.	Parent=Aedes_L1_5_40651-299
+supercontig:AaegL1:supercont1.1641:1:40317:1	activeTE	three_prime_terminal_inverted_repeat	7901	7911	.	.	.	Parent=Aedes_L1_5_40651-299
+supercontig:AaegL1:supercont1.1641:1:40317:1	activeTE	target_site_duplication	7766	7767	.	.	.	Derives_from=Aedes_L1_5_40651-299
+supercontig:AaegL1:supercont1.1641:1:40317:1	activeTE	target_site_duplication	7912	7913	.	.	.	Derives_from=Aedes_L1_5_40651-299
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	terminal_inverted_repeat_element	4226742	4226885	.	minus	.	ID=Aedes_L1_5_40651-226;Name=Aedes_L1_5_40651 Copy226;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	five_prime_terminal_inverted_repeat	4226742	4226752	.	.	.	Parent=Aedes_L1_5_40651-226
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	three_prime_terminal_inverted_repeat	4226875	4226885	.	.	.	Parent=Aedes_L1_5_40651-226
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	target_site_duplication	4226740	4226741	.	.	.	Derives_from=Aedes_L1_5_40651-226
+supercontig:AaegL1:supercont1.9:1:4759463:1	activeTE	target_site_duplication	4226886	4226887	.	.	.	Derives_from=Aedes_L1_5_40651-226
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	terminal_inverted_repeat_element	1486845	1486988	.	minus	.	ID=Aedes_L1_5_40651-421;Name=Aedes_L1_5_40651 Copy421;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	five_prime_terminal_inverted_repeat	1486845	1486855	.	.	.	Parent=Aedes_L1_5_40651-421
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	three_prime_terminal_inverted_repeat	1486978	1486988	.	.	.	Parent=Aedes_L1_5_40651-421
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	target_site_duplication	1486843	1486844	.	.	.	Derives_from=Aedes_L1_5_40651-421
+supercontig:AaegL1:supercont1.166:1:2012222:1	activeTE	target_site_duplication	1486989	1486990	.	.	.	Derives_from=Aedes_L1_5_40651-421
+supercontig:AaegL1:supercont1.293:1:1411600:1	activeTE	terminal_inverted_repeat_element	1075146	1075289	.	minus	.	ID=Aedes_L1_5_40651-303;Name=Aedes_L1_5_40651 Copy303;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.293:1:1411600:1	activeTE	five_prime_terminal_inverted_repeat	1075146	1075156	.	.	.	Parent=Aedes_L1_5_40651-303
+supercontig:AaegL1:supercont1.293:1:1411600:1	activeTE	three_prime_terminal_inverted_repeat	1075279	1075289	.	.	.	Parent=Aedes_L1_5_40651-303
+supercontig:AaegL1:supercont1.293:1:1411600:1	activeTE	target_site_duplication	1075144	1075145	.	.	.	Derives_from=Aedes_L1_5_40651-303
+supercontig:AaegL1:supercont1.293:1:1411600:1	activeTE	target_site_duplication	1075290	1075291	.	.	.	Derives_from=Aedes_L1_5_40651-303
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	terminal_inverted_repeat_element	837763	837906	.	plus	.	ID=Aedes_L1_5_40651-707;Name=Aedes_L1_5_40651 Copy707;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	five_prime_terminal_inverted_repeat	837763	837773	.	.	.	Parent=Aedes_L1_5_40651-707
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	three_prime_terminal_inverted_repeat	837896	837906	.	.	.	Parent=Aedes_L1_5_40651-707
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	target_site_duplication	837761	837762	.	.	.	Derives_from=Aedes_L1_5_40651-707
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	target_site_duplication	837907	837908	.	.	.	Derives_from=Aedes_L1_5_40651-707
+supercontig:AaegL1:supercont1.349:1:1234927:1	activeTE	terminal_inverted_repeat_element	277537	277680	.	plus	.	ID=Aedes_L1_5_40651-447;Name=Aedes_L1_5_40651 Copy447;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.349:1:1234927:1	activeTE	five_prime_terminal_inverted_repeat	277537	277547	.	.	.	Parent=Aedes_L1_5_40651-447
+supercontig:AaegL1:supercont1.349:1:1234927:1	activeTE	three_prime_terminal_inverted_repeat	277670	277680	.	.	.	Parent=Aedes_L1_5_40651-447
+supercontig:AaegL1:supercont1.349:1:1234927:1	activeTE	target_site_duplication	277535	277536	.	.	.	Derives_from=Aedes_L1_5_40651-447
+supercontig:AaegL1:supercont1.349:1:1234927:1	activeTE	target_site_duplication	277681	277682	.	.	.	Derives_from=Aedes_L1_5_40651-447
+supercontig:AaegL1:supercont1.353:1:1192126:1	activeTE	terminal_inverted_repeat_element	267103	267246	.	minus	.	ID=Aedes_L1_5_40651-348;Name=Aedes_L1_5_40651 Copy348;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.353:1:1192126:1	activeTE	five_prime_terminal_inverted_repeat	267103	267113	.	.	.	Parent=Aedes_L1_5_40651-348
+supercontig:AaegL1:supercont1.353:1:1192126:1	activeTE	three_prime_terminal_inverted_repeat	267236	267246	.	.	.	Parent=Aedes_L1_5_40651-348
+supercontig:AaegL1:supercont1.353:1:1192126:1	activeTE	target_site_duplication	267101	267102	.	.	.	Derives_from=Aedes_L1_5_40651-348
+supercontig:AaegL1:supercont1.353:1:1192126:1	activeTE	target_site_duplication	267247	267248	.	.	.	Derives_from=Aedes_L1_5_40651-348
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	terminal_inverted_repeat_element	921202	921345	.	plus	.	ID=Aedes_L1_5_40651-370;Name=Aedes_L1_5_40651 Copy370;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	five_prime_terminal_inverted_repeat	921202	921212	.	.	.	Parent=Aedes_L1_5_40651-370
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	three_prime_terminal_inverted_repeat	921335	921345	.	.	.	Parent=Aedes_L1_5_40651-370
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	target_site_duplication	921200	921201	.	.	.	Derives_from=Aedes_L1_5_40651-370
+supercontig:AaegL1:supercont1.160:1:2408894:1	activeTE	target_site_duplication	921346	921347	.	.	.	Derives_from=Aedes_L1_5_40651-370
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	terminal_inverted_repeat_element	768719	768862	.	minus	.	ID=Aedes_L1_5_40651-402;Name=Aedes_L1_5_40651 Copy402;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	five_prime_terminal_inverted_repeat	768719	768729	.	.	.	Parent=Aedes_L1_5_40651-402
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	three_prime_terminal_inverted_repeat	768852	768862	.	.	.	Parent=Aedes_L1_5_40651-402
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	target_site_duplication	768717	768718	.	.	.	Derives_from=Aedes_L1_5_40651-402
+supercontig:AaegL1:supercont1.443:1:997164:1	activeTE	target_site_duplication	768863	768864	.	.	.	Derives_from=Aedes_L1_5_40651-402
+supercontig:AaegL1:supercont1.173:1:1959865:1	activeTE	terminal_inverted_repeat_element	863927	864070	.	plus	.	ID=Aedes_L1_5_40651-57;Name=Aedes_L1_5_40651 Copy57;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.173:1:1959865:1	activeTE	five_prime_terminal_inverted_repeat	863927	863937	.	.	.	Parent=Aedes_L1_5_40651-57
+supercontig:AaegL1:supercont1.173:1:1959865:1	activeTE	three_prime_terminal_inverted_repeat	864060	864070	.	.	.	Parent=Aedes_L1_5_40651-57
+supercontig:AaegL1:supercont1.173:1:1959865:1	activeTE	target_site_duplication	863925	863926	.	.	.	Derives_from=Aedes_L1_5_40651-57
+supercontig:AaegL1:supercont1.173:1:1959865:1	activeTE	target_site_duplication	864071	864072	.	.	.	Derives_from=Aedes_L1_5_40651-57
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	terminal_inverted_repeat_element	437623	437766	.	minus	.	ID=Aedes_L1_5_40651-230;Name=Aedes_L1_5_40651 Copy230;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	five_prime_terminal_inverted_repeat	437623	437633	.	.	.	Parent=Aedes_L1_5_40651-230
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	three_prime_terminal_inverted_repeat	437756	437766	.	.	.	Parent=Aedes_L1_5_40651-230
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	target_site_duplication	437621	437622	.	.	.	Derives_from=Aedes_L1_5_40651-230
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	target_site_duplication	437767	437768	.	.	.	Derives_from=Aedes_L1_5_40651-230
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	terminal_inverted_repeat_element	429029	429172	.	minus	.	ID=Aedes_L1_5_40651-231;Name=Aedes_L1_5_40651 Copy231;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	five_prime_terminal_inverted_repeat	429029	429039	.	.	.	Parent=Aedes_L1_5_40651-231
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	three_prime_terminal_inverted_repeat	429162	429172	.	.	.	Parent=Aedes_L1_5_40651-231
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	target_site_duplication	429027	429028	.	.	.	Derives_from=Aedes_L1_5_40651-231
+supercontig:AaegL1:supercont1.786:1:488859:1	activeTE	target_site_duplication	429173	429174	.	.	.	Derives_from=Aedes_L1_5_40651-231
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	terminal_inverted_repeat_element	1238509	1238652	.	minus	.	ID=Aedes_L1_5_40651-282;Name=Aedes_L1_5_40651 Copy282;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	five_prime_terminal_inverted_repeat	1238509	1238519	.	.	.	Parent=Aedes_L1_5_40651-282
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	three_prime_terminal_inverted_repeat	1238642	1238652	.	.	.	Parent=Aedes_L1_5_40651-282
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	target_site_duplication	1238507	1238508	.	.	.	Derives_from=Aedes_L1_5_40651-282
+supercontig:AaegL1:supercont1.314:1:1358904:1	activeTE	target_site_duplication	1238653	1238654	.	.	.	Derives_from=Aedes_L1_5_40651-282
+supercontig:AaegL1:supercont1.373:1:1210988:1	activeTE	terminal_inverted_repeat_element	976468	976611	.	plus	.	ID=Aedes_L1_5_40651-416;Name=Aedes_L1_5_40651 Copy416;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.373:1:1210988:1	activeTE	five_prime_terminal_inverted_repeat	976468	976478	.	.	.	Parent=Aedes_L1_5_40651-416
+supercontig:AaegL1:supercont1.373:1:1210988:1	activeTE	three_prime_terminal_inverted_repeat	976601	976611	.	.	.	Parent=Aedes_L1_5_40651-416
+supercontig:AaegL1:supercont1.373:1:1210988:1	activeTE	target_site_duplication	976466	976467	.	.	.	Derives_from=Aedes_L1_5_40651-416
+supercontig:AaegL1:supercont1.373:1:1210988:1	activeTE	target_site_duplication	976612	976613	.	.	.	Derives_from=Aedes_L1_5_40651-416
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	terminal_inverted_repeat_element	1174727	1174870	.	minus	.	ID=Aedes_L1_5_40651-279;Name=Aedes_L1_5_40651 Copy279;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	five_prime_terminal_inverted_repeat	1174727	1174737	.	.	.	Parent=Aedes_L1_5_40651-279
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	three_prime_terminal_inverted_repeat	1174860	1174870	.	.	.	Parent=Aedes_L1_5_40651-279
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	target_site_duplication	1174725	1174726	.	.	.	Derives_from=Aedes_L1_5_40651-279
+supercontig:AaegL1:supercont1.328:1:1305728:1	activeTE	target_site_duplication	1174871	1174872	.	.	.	Derives_from=Aedes_L1_5_40651-279
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	terminal_inverted_repeat_element	673494	673637	.	minus	.	ID=Aedes_L1_5_40651-410;Name=Aedes_L1_5_40651 Copy410;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	five_prime_terminal_inverted_repeat	673494	673504	.	.	.	Parent=Aedes_L1_5_40651-410
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	three_prime_terminal_inverted_repeat	673627	673637	.	.	.	Parent=Aedes_L1_5_40651-410
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	target_site_duplication	673492	673493	.	.	.	Derives_from=Aedes_L1_5_40651-410
+supercontig:AaegL1:supercont1.747:1:809714:1	activeTE	target_site_duplication	673638	673639	.	.	.	Derives_from=Aedes_L1_5_40651-410
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	terminal_inverted_repeat_element	7549	7692	.	minus	.	ID=Aedes_L1_5_40651-306;Name=Aedes_L1_5_40651 Copy306;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	five_prime_terminal_inverted_repeat	7549	7559	.	.	.	Parent=Aedes_L1_5_40651-306
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	three_prime_terminal_inverted_repeat	7682	7692	.	.	.	Parent=Aedes_L1_5_40651-306
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	target_site_duplication	7547	7548	.	.	.	Derives_from=Aedes_L1_5_40651-306
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	target_site_duplication	7693	7694	.	.	.	Derives_from=Aedes_L1_5_40651-306
+supercontig:AaegL1:supercont1.176:1:2016409:1	activeTE	terminal_inverted_repeat_element	414198	414341	.	minus	.	ID=Aedes_L1_5_40651-117;Name=Aedes_L1_5_40651 Copy117;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.176:1:2016409:1	activeTE	five_prime_terminal_inverted_repeat	414198	414208	.	.	.	Parent=Aedes_L1_5_40651-117
+supercontig:AaegL1:supercont1.176:1:2016409:1	activeTE	three_prime_terminal_inverted_repeat	414331	414341	.	.	.	Parent=Aedes_L1_5_40651-117
+supercontig:AaegL1:supercont1.176:1:2016409:1	activeTE	target_site_duplication	414196	414197	.	.	.	Derives_from=Aedes_L1_5_40651-117
+supercontig:AaegL1:supercont1.176:1:2016409:1	activeTE	target_site_duplication	414342	414343	.	.	.	Derives_from=Aedes_L1_5_40651-117
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	terminal_inverted_repeat_element	1601502	1601645	.	minus	.	ID=Aedes_L1_5_40651-132;Name=Aedes_L1_5_40651 Copy132;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	five_prime_terminal_inverted_repeat	1601502	1601512	.	.	.	Parent=Aedes_L1_5_40651-132
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	three_prime_terminal_inverted_repeat	1601635	1601645	.	.	.	Parent=Aedes_L1_5_40651-132
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	target_site_duplication	1601500	1601501	.	.	.	Derives_from=Aedes_L1_5_40651-132
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	target_site_duplication	1601646	1601647	.	.	.	Derives_from=Aedes_L1_5_40651-132
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	terminal_inverted_repeat_element	601451	601594	.	minus	.	ID=Aedes_L1_5_40651-305;Name=Aedes_L1_5_40651 Copy305;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	five_prime_terminal_inverted_repeat	601451	601461	.	.	.	Parent=Aedes_L1_5_40651-305
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	three_prime_terminal_inverted_repeat	601584	601594	.	.	.	Parent=Aedes_L1_5_40651-305
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	target_site_duplication	601449	601450	.	.	.	Derives_from=Aedes_L1_5_40651-305
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	target_site_duplication	601595	601596	.	.	.	Derives_from=Aedes_L1_5_40651-305
+supercontig:AaegL1:supercont1.10:1:4486241:1	activeTE	terminal_inverted_repeat_element	1847698	1847841	.	minus	.	ID=Aedes_L1_5_40651-227;Name=Aedes_L1_5_40651 Copy227;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.10:1:4486241:1	activeTE	five_prime_terminal_inverted_repeat	1847698	1847708	.	.	.	Parent=Aedes_L1_5_40651-227
+supercontig:AaegL1:supercont1.10:1:4486241:1	activeTE	three_prime_terminal_inverted_repeat	1847831	1847841	.	.	.	Parent=Aedes_L1_5_40651-227
+supercontig:AaegL1:supercont1.10:1:4486241:1	activeTE	target_site_duplication	1847696	1847697	.	.	.	Derives_from=Aedes_L1_5_40651-227
+supercontig:AaegL1:supercont1.10:1:4486241:1	activeTE	target_site_duplication	1847842	1847843	.	.	.	Derives_from=Aedes_L1_5_40651-227
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	terminal_inverted_repeat_element	72986	73129	.	plus	.	ID=Aedes_L1_5_40651-377;Name=Aedes_L1_5_40651 Copy377;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	five_prime_terminal_inverted_repeat	72986	72996	.	.	.	Parent=Aedes_L1_5_40651-377
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	three_prime_terminal_inverted_repeat	73119	73129	.	.	.	Parent=Aedes_L1_5_40651-377
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	target_site_duplication	72984	72985	.	.	.	Derives_from=Aedes_L1_5_40651-377
+supercontig:AaegL1:supercont1.224:1:1736477:1	activeTE	target_site_duplication	73130	73131	.	.	.	Derives_from=Aedes_L1_5_40651-377
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	terminal_inverted_repeat_element	116156	116299	.	plus	.	ID=Aedes_L1_5_40651-432;Name=Aedes_L1_5_40651 Copy432;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	five_prime_terminal_inverted_repeat	116156	116166	.	.	.	Parent=Aedes_L1_5_40651-432
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	three_prime_terminal_inverted_repeat	116289	116299	.	.	.	Parent=Aedes_L1_5_40651-432
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	target_site_duplication	116154	116155	.	.	.	Derives_from=Aedes_L1_5_40651-432
+supercontig:AaegL1:supercont1.554:1:775041:1	activeTE	target_site_duplication	116300	116301	.	.	.	Derives_from=Aedes_L1_5_40651-432
+supercontig:AaegL1:supercont1.1054:1:256344:1	activeTE	terminal_inverted_repeat_element	91193	91336	.	plus	.	ID=Aedes_L1_5_40651-203;Name=Aedes_L1_5_40651 Copy203;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1054:1:256344:1	activeTE	five_prime_terminal_inverted_repeat	91193	91203	.	.	.	Parent=Aedes_L1_5_40651-203
+supercontig:AaegL1:supercont1.1054:1:256344:1	activeTE	three_prime_terminal_inverted_repeat	91326	91336	.	.	.	Parent=Aedes_L1_5_40651-203
+supercontig:AaegL1:supercont1.1054:1:256344:1	activeTE	target_site_duplication	91191	91192	.	.	.	Derives_from=Aedes_L1_5_40651-203
+supercontig:AaegL1:supercont1.1054:1:256344:1	activeTE	target_site_duplication	91337	91338	.	.	.	Derives_from=Aedes_L1_5_40651-203
+supercontig:AaegL1:supercont1.4149:1:5346:1	activeTE	terminal_inverted_repeat_element	3085	3228	.	plus	.	ID=Aedes_L1_5_40651-122;Name=Aedes_L1_5_40651 Copy122;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.4149:1:5346:1	activeTE	five_prime_terminal_inverted_repeat	3085	3095	.	.	.	Parent=Aedes_L1_5_40651-122
+supercontig:AaegL1:supercont1.4149:1:5346:1	activeTE	three_prime_terminal_inverted_repeat	3218	3228	.	.	.	Parent=Aedes_L1_5_40651-122
+supercontig:AaegL1:supercont1.4149:1:5346:1	activeTE	target_site_duplication	3083	3084	.	.	.	Derives_from=Aedes_L1_5_40651-122
+supercontig:AaegL1:supercont1.4149:1:5346:1	activeTE	target_site_duplication	3229	3230	.	.	.	Derives_from=Aedes_L1_5_40651-122
+supercontig:AaegL1:supercont1.74:1:2917482:1	activeTE	terminal_inverted_repeat_element	1792815	1792958	.	plus	.	ID=Aedes_L1_5_40651-119;Name=Aedes_L1_5_40651 Copy119;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.74:1:2917482:1	activeTE	five_prime_terminal_inverted_repeat	1792815	1792825	.	.	.	Parent=Aedes_L1_5_40651-119
+supercontig:AaegL1:supercont1.74:1:2917482:1	activeTE	three_prime_terminal_inverted_repeat	1792948	1792958	.	.	.	Parent=Aedes_L1_5_40651-119
+supercontig:AaegL1:supercont1.74:1:2917482:1	activeTE	target_site_duplication	1792813	1792814	.	.	.	Derives_from=Aedes_L1_5_40651-119
+supercontig:AaegL1:supercont1.74:1:2917482:1	activeTE	target_site_duplication	1792959	1792960	.	.	.	Derives_from=Aedes_L1_5_40651-119
+supercontig:AaegL1:supercont1.38:1:3498553:1	activeTE	terminal_inverted_repeat_element	380371	380514	.	plus	.	ID=Aedes_L1_5_40651-371;Name=Aedes_L1_5_40651 Copy371;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.38:1:3498553:1	activeTE	five_prime_terminal_inverted_repeat	380371	380381	.	.	.	Parent=Aedes_L1_5_40651-371
+supercontig:AaegL1:supercont1.38:1:3498553:1	activeTE	three_prime_terminal_inverted_repeat	380504	380514	.	.	.	Parent=Aedes_L1_5_40651-371
+supercontig:AaegL1:supercont1.38:1:3498553:1	activeTE	target_site_duplication	380369	380370	.	.	.	Derives_from=Aedes_L1_5_40651-371
+supercontig:AaegL1:supercont1.38:1:3498553:1	activeTE	target_site_duplication	380515	380516	.	.	.	Derives_from=Aedes_L1_5_40651-371
+supercontig:AaegL1:supercont1.507:1:845243:1	activeTE	terminal_inverted_repeat_element	116837	116980	.	minus	.	ID=Aedes_L1_5_40651-445;Name=Aedes_L1_5_40651 Copy445;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.507:1:845243:1	activeTE	five_prime_terminal_inverted_repeat	116837	116847	.	.	.	Parent=Aedes_L1_5_40651-445
+supercontig:AaegL1:supercont1.507:1:845243:1	activeTE	three_prime_terminal_inverted_repeat	116970	116980	.	.	.	Parent=Aedes_L1_5_40651-445
+supercontig:AaegL1:supercont1.507:1:845243:1	activeTE	target_site_duplication	116835	116836	.	.	.	Derives_from=Aedes_L1_5_40651-445
+supercontig:AaegL1:supercont1.507:1:845243:1	activeTE	target_site_duplication	116981	116982	.	.	.	Derives_from=Aedes_L1_5_40651-445
+supercontig:AaegL1:supercont1.152:1:2109071:1	activeTE	terminal_inverted_repeat_element	1978705	1978848	.	plus	.	ID=Aedes_L1_5_40651-413;Name=Aedes_L1_5_40651 Copy413;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.152:1:2109071:1	activeTE	five_prime_terminal_inverted_repeat	1978705	1978715	.	.	.	Parent=Aedes_L1_5_40651-413
+supercontig:AaegL1:supercont1.152:1:2109071:1	activeTE	three_prime_terminal_inverted_repeat	1978838	1978848	.	.	.	Parent=Aedes_L1_5_40651-413
+supercontig:AaegL1:supercont1.152:1:2109071:1	activeTE	target_site_duplication	1978703	1978704	.	.	.	Derives_from=Aedes_L1_5_40651-413
+supercontig:AaegL1:supercont1.152:1:2109071:1	activeTE	target_site_duplication	1978849	1978850	.	.	.	Derives_from=Aedes_L1_5_40651-413
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	terminal_inverted_repeat_element	964997	965140	.	minus	.	ID=Aedes_L1_5_40651-134;Name=Aedes_L1_5_40651 Copy134;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	five_prime_terminal_inverted_repeat	964997	965007	.	.	.	Parent=Aedes_L1_5_40651-134
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	three_prime_terminal_inverted_repeat	965130	965140	.	.	.	Parent=Aedes_L1_5_40651-134
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	target_site_duplication	964995	964996	.	.	.	Derives_from=Aedes_L1_5_40651-134
+supercontig:AaegL1:supercont1.94:1:2735815:1	activeTE	target_site_duplication	965141	965142	.	.	.	Derives_from=Aedes_L1_5_40651-134
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	terminal_inverted_repeat_element	1043773	1043916	.	minus	.	ID=Aedes_L1_5_40651-405;Name=Aedes_L1_5_40651 Copy405;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	five_prime_terminal_inverted_repeat	1043773	1043783	.	.	.	Parent=Aedes_L1_5_40651-405
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	three_prime_terminal_inverted_repeat	1043906	1043916	.	.	.	Parent=Aedes_L1_5_40651-405
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	target_site_duplication	1043771	1043772	.	.	.	Derives_from=Aedes_L1_5_40651-405
+supercontig:AaegL1:supercont1.194:1:1869119:1	activeTE	target_site_duplication	1043917	1043918	.	.	.	Derives_from=Aedes_L1_5_40651-405
+supercontig:AaegL1:supercont1.665:1:651343:1	activeTE	terminal_inverted_repeat_element	545677	545820	.	minus	.	ID=Aedes_L1_5_40651-185;Name=Aedes_L1_5_40651 Copy185;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.665:1:651343:1	activeTE	five_prime_terminal_inverted_repeat	545677	545687	.	.	.	Parent=Aedes_L1_5_40651-185
+supercontig:AaegL1:supercont1.665:1:651343:1	activeTE	three_prime_terminal_inverted_repeat	545810	545820	.	.	.	Parent=Aedes_L1_5_40651-185
+supercontig:AaegL1:supercont1.665:1:651343:1	activeTE	target_site_duplication	545675	545676	.	.	.	Derives_from=Aedes_L1_5_40651-185
+supercontig:AaegL1:supercont1.665:1:651343:1	activeTE	target_site_duplication	545821	545822	.	.	.	Derives_from=Aedes_L1_5_40651-185
+supercontig:AaegL1:supercont1.1166:1:209340:1	activeTE	terminal_inverted_repeat_element	143986	144129	.	minus	.	ID=Aedes_L1_5_40651-143;Name=Aedes_L1_5_40651 Copy143;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.1166:1:209340:1	activeTE	five_prime_terminal_inverted_repeat	143986	143996	.	.	.	Parent=Aedes_L1_5_40651-143
+supercontig:AaegL1:supercont1.1166:1:209340:1	activeTE	three_prime_terminal_inverted_repeat	144119	144129	.	.	.	Parent=Aedes_L1_5_40651-143
+supercontig:AaegL1:supercont1.1166:1:209340:1	activeTE	target_site_duplication	143984	143985	.	.	.	Derives_from=Aedes_L1_5_40651-143
+supercontig:AaegL1:supercont1.1166:1:209340:1	activeTE	target_site_duplication	144130	144131	.	.	.	Derives_from=Aedes_L1_5_40651-143
+supercontig:AaegL1:supercont1.122:1:2401221:1	activeTE	terminal_inverted_repeat_element	676658	676801	.	minus	.	ID=Aedes_L1_5_40651-159;Name=Aedes_L1_5_40651 Copy159;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.122:1:2401221:1	activeTE	five_prime_terminal_inverted_repeat	676658	676668	.	.	.	Parent=Aedes_L1_5_40651-159
+supercontig:AaegL1:supercont1.122:1:2401221:1	activeTE	three_prime_terminal_inverted_repeat	676791	676801	.	.	.	Parent=Aedes_L1_5_40651-159
+supercontig:AaegL1:supercont1.122:1:2401221:1	activeTE	target_site_duplication	676656	676657	.	.	.	Derives_from=Aedes_L1_5_40651-159
+supercontig:AaegL1:supercont1.122:1:2401221:1	activeTE	target_site_duplication	676802	676803	.	.	.	Derives_from=Aedes_L1_5_40651-159
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	terminal_inverted_repeat_element	1030410	1030553	.	plus	.	ID=Aedes_L1_5_40651-285;Name=Aedes_L1_5_40651 Copy285;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	five_prime_terminal_inverted_repeat	1030410	1030420	.	.	.	Parent=Aedes_L1_5_40651-285
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	three_prime_terminal_inverted_repeat	1030543	1030553	.	.	.	Parent=Aedes_L1_5_40651-285
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	target_site_duplication	1030408	1030409	.	.	.	Derives_from=Aedes_L1_5_40651-285
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	target_site_duplication	1030554	1030555	.	.	.	Derives_from=Aedes_L1_5_40651-285
+supercontig:AaegL1:supercont1.107:1:2543601:1	activeTE	terminal_inverted_repeat_element	316231	316374	.	plus	.	ID=Aedes_L1_5_40651-335;Name=Aedes_L1_5_40651 Copy335;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.107:1:2543601:1	activeTE	five_prime_terminal_inverted_repeat	316231	316241	.	.	.	Parent=Aedes_L1_5_40651-335
+supercontig:AaegL1:supercont1.107:1:2543601:1	activeTE	three_prime_terminal_inverted_repeat	316364	316374	.	.	.	Parent=Aedes_L1_5_40651-335
+supercontig:AaegL1:supercont1.107:1:2543601:1	activeTE	target_site_duplication	316229	316230	.	.	.	Derives_from=Aedes_L1_5_40651-335
+supercontig:AaegL1:supercont1.107:1:2543601:1	activeTE	target_site_duplication	316375	316376	.	.	.	Derives_from=Aedes_L1_5_40651-335
+supercontig:AaegL1:supercont1.119:1:2438940:1	activeTE	terminal_inverted_repeat_element	89497	89640	.	plus	.	ID=Aedes_L1_5_40651-473;Name=Aedes_L1_5_40651 Copy473;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.119:1:2438940:1	activeTE	five_prime_terminal_inverted_repeat	89497	89507	.	.	.	Parent=Aedes_L1_5_40651-473
+supercontig:AaegL1:supercont1.119:1:2438940:1	activeTE	three_prime_terminal_inverted_repeat	89630	89640	.	.	.	Parent=Aedes_L1_5_40651-473
+supercontig:AaegL1:supercont1.119:1:2438940:1	activeTE	target_site_duplication	89495	89496	.	.	.	Derives_from=Aedes_L1_5_40651-473
+supercontig:AaegL1:supercont1.119:1:2438940:1	activeTE	target_site_duplication	89641	89642	.	.	.	Derives_from=Aedes_L1_5_40651-473
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	terminal_inverted_repeat_element	1681809	1681952	.	plus	.	ID=Aedes_L1_5_40651-290;Name=Aedes_L1_5_40651 Copy290;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	five_prime_terminal_inverted_repeat	1681809	1681819	.	.	.	Parent=Aedes_L1_5_40651-290
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	three_prime_terminal_inverted_repeat	1681942	1681952	.	.	.	Parent=Aedes_L1_5_40651-290
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	target_site_duplication	1681807	1681808	.	.	.	Derives_from=Aedes_L1_5_40651-290
+supercontig:AaegL1:supercont1.31:1:3687466:1	activeTE	target_site_duplication	1681953	1681954	.	.	.	Derives_from=Aedes_L1_5_40651-290
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	terminal_inverted_repeat_element	74601	74744	.	plus	.	ID=Aedes_L1_5_40651-212;Name=Aedes_L1_5_40651 Copy212;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	five_prime_terminal_inverted_repeat	74601	74611	.	.	.	Parent=Aedes_L1_5_40651-212
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	three_prime_terminal_inverted_repeat	74734	74744	.	.	.	Parent=Aedes_L1_5_40651-212
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	target_site_duplication	74599	74600	.	.	.	Derives_from=Aedes_L1_5_40651-212
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	target_site_duplication	74745	74746	.	.	.	Derives_from=Aedes_L1_5_40651-212
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	terminal_inverted_repeat_element	997327	997470	.	minus	.	ID=Aedes_L1_5_40651-250;Name=Aedes_L1_5_40651 Copy250;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	five_prime_terminal_inverted_repeat	997327	997337	.	.	.	Parent=Aedes_L1_5_40651-250
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	three_prime_terminal_inverted_repeat	997460	997470	.	.	.	Parent=Aedes_L1_5_40651-250
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	target_site_duplication	997325	997326	.	.	.	Derives_from=Aedes_L1_5_40651-250
+supercontig:AaegL1:supercont1.386:1:1156810:1	activeTE	target_site_duplication	997471	997472	.	.	.	Derives_from=Aedes_L1_5_40651-250
+supercontig:AaegL1:supercont1.666:1:638219:1	activeTE	terminal_inverted_repeat_element	371409	371552	.	plus	.	ID=Aedes_L1_5_40651-273;Name=Aedes_L1_5_40651 Copy273;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.666:1:638219:1	activeTE	five_prime_terminal_inverted_repeat	371409	371419	.	.	.	Parent=Aedes_L1_5_40651-273
+supercontig:AaegL1:supercont1.666:1:638219:1	activeTE	three_prime_terminal_inverted_repeat	371542	371552	.	.	.	Parent=Aedes_L1_5_40651-273
+supercontig:AaegL1:supercont1.666:1:638219:1	activeTE	target_site_duplication	371407	371408	.	.	.	Derives_from=Aedes_L1_5_40651-273
+supercontig:AaegL1:supercont1.666:1:638219:1	activeTE	target_site_duplication	371553	371554	.	.	.	Derives_from=Aedes_L1_5_40651-273
+supercontig:AaegL1:supercont1.506:1:866177:1	activeTE	terminal_inverted_repeat_element	155776	155919	.	minus	.	ID=Aedes_L1_5_40651-493;Name=Aedes_L1_5_40651 Copy493;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.506:1:866177:1	activeTE	five_prime_terminal_inverted_repeat	155776	155786	.	.	.	Parent=Aedes_L1_5_40651-493
+supercontig:AaegL1:supercont1.506:1:866177:1	activeTE	three_prime_terminal_inverted_repeat	155909	155919	.	.	.	Parent=Aedes_L1_5_40651-493
+supercontig:AaegL1:supercont1.506:1:866177:1	activeTE	target_site_duplication	155774	155775	.	.	.	Derives_from=Aedes_L1_5_40651-493
+supercontig:AaegL1:supercont1.506:1:866177:1	activeTE	target_site_duplication	155920	155921	.	.	.	Derives_from=Aedes_L1_5_40651-493
+supercontig:AaegL1:supercont1.19:1:4221289:1	activeTE	terminal_inverted_repeat_element	361480	361623	.	minus	.	ID=Aedes_L1_5_40651-388;Name=Aedes_L1_5_40651 Copy388;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.19:1:4221289:1	activeTE	five_prime_terminal_inverted_repeat	361480	361490	.	.	.	Parent=Aedes_L1_5_40651-388
+supercontig:AaegL1:supercont1.19:1:4221289:1	activeTE	three_prime_terminal_inverted_repeat	361613	361623	.	.	.	Parent=Aedes_L1_5_40651-388
+supercontig:AaegL1:supercont1.19:1:4221289:1	activeTE	target_site_duplication	361478	361479	.	.	.	Derives_from=Aedes_L1_5_40651-388
+supercontig:AaegL1:supercont1.19:1:4221289:1	activeTE	target_site_duplication	361624	361625	.	.	.	Derives_from=Aedes_L1_5_40651-388
+supercontig:AaegL1:supercont1.398:1:1090722:1	activeTE	terminal_inverted_repeat_element	856615	856758	.	minus	.	ID=Aedes_L1_5_40651-238;Name=Aedes_L1_5_40651 Copy238;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.398:1:1090722:1	activeTE	five_prime_terminal_inverted_repeat	856615	856625	.	.	.	Parent=Aedes_L1_5_40651-238
+supercontig:AaegL1:supercont1.398:1:1090722:1	activeTE	three_prime_terminal_inverted_repeat	856748	856758	.	.	.	Parent=Aedes_L1_5_40651-238
+supercontig:AaegL1:supercont1.398:1:1090722:1	activeTE	target_site_duplication	856613	856614	.	.	.	Derives_from=Aedes_L1_5_40651-238
+supercontig:AaegL1:supercont1.398:1:1090722:1	activeTE	target_site_duplication	856759	856760	.	.	.	Derives_from=Aedes_L1_5_40651-238
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	terminal_inverted_repeat_element	484289	484432	.	minus	.	ID=Aedes_L1_5_40651-325;Name=Aedes_L1_5_40651 Copy325;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	five_prime_terminal_inverted_repeat	484289	484299	.	.	.	Parent=Aedes_L1_5_40651-325
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	three_prime_terminal_inverted_repeat	484422	484432	.	.	.	Parent=Aedes_L1_5_40651-325
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	target_site_duplication	484287	484288	.	.	.	Derives_from=Aedes_L1_5_40651-325
+supercontig:AaegL1:supercont1.29:1:3855786:1	activeTE	target_site_duplication	484433	484434	.	.	.	Derives_from=Aedes_L1_5_40651-325
+supercontig:AaegL1:supercont1.83:1:2974912:1	activeTE	terminal_inverted_repeat_element	2736525	2736668	.	minus	.	ID=Aedes_L1_5_40651-255;Name=Aedes_L1_5_40651 Copy255;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.83:1:2974912:1	activeTE	five_prime_terminal_inverted_repeat	2736525	2736535	.	.	.	Parent=Aedes_L1_5_40651-255
+supercontig:AaegL1:supercont1.83:1:2974912:1	activeTE	three_prime_terminal_inverted_repeat	2736658	2736668	.	.	.	Parent=Aedes_L1_5_40651-255
+supercontig:AaegL1:supercont1.83:1:2974912:1	activeTE	target_site_duplication	2736523	2736524	.	.	.	Derives_from=Aedes_L1_5_40651-255
+supercontig:AaegL1:supercont1.83:1:2974912:1	activeTE	target_site_duplication	2736669	2736670	.	.	.	Derives_from=Aedes_L1_5_40651-255
+supercontig:AaegL1:supercont1.321:1:1317566:1	activeTE	terminal_inverted_repeat_element	671908	672051	.	minus	.	ID=Aedes_L1_5_40651-336;Name=Aedes_L1_5_40651 Copy336;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.321:1:1317566:1	activeTE	five_prime_terminal_inverted_repeat	671908	671918	.	.	.	Parent=Aedes_L1_5_40651-336
+supercontig:AaegL1:supercont1.321:1:1317566:1	activeTE	three_prime_terminal_inverted_repeat	672041	672051	.	.	.	Parent=Aedes_L1_5_40651-336
+supercontig:AaegL1:supercont1.321:1:1317566:1	activeTE	target_site_duplication	671906	671907	.	.	.	Derives_from=Aedes_L1_5_40651-336
+supercontig:AaegL1:supercont1.321:1:1317566:1	activeTE	target_site_duplication	672052	672053	.	.	.	Derives_from=Aedes_L1_5_40651-336
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	terminal_inverted_repeat_element	73336	73479	.	plus	.	ID=Aedes_L1_5_40651-437;Name=Aedes_L1_5_40651 Copy437;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	five_prime_terminal_inverted_repeat	73336	73346	.	.	.	Parent=Aedes_L1_5_40651-437
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	three_prime_terminal_inverted_repeat	73469	73479	.	.	.	Parent=Aedes_L1_5_40651-437
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	target_site_duplication	73334	73335	.	.	.	Derives_from=Aedes_L1_5_40651-437
+supercontig:AaegL1:supercont1.393:1:1106998:1	activeTE	target_site_duplication	73480	73481	.	.	.	Derives_from=Aedes_L1_5_40651-437
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	terminal_inverted_repeat_element	57271	57414	.	minus	.	ID=Aedes_L1_5_40651-327;Name=Aedes_L1_5_40651 Copy327;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	five_prime_terminal_inverted_repeat	57271	57281	.	.	.	Parent=Aedes_L1_5_40651-327
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	three_prime_terminal_inverted_repeat	57404	57414	.	.	.	Parent=Aedes_L1_5_40651-327
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	target_site_duplication	57269	57270	.	.	.	Derives_from=Aedes_L1_5_40651-327
+supercontig:AaegL1:supercont1.632:1:653225:1	activeTE	target_site_duplication	57415	57416	.	.	.	Derives_from=Aedes_L1_5_40651-327
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	terminal_inverted_repeat_element	156397	156540	.	plus	.	ID=Aedes_L1_5_40651-92;Name=Aedes_L1_5_40651 Copy92;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	five_prime_terminal_inverted_repeat	156397	156407	.	.	.	Parent=Aedes_L1_5_40651-92
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	three_prime_terminal_inverted_repeat	156530	156540	.	.	.	Parent=Aedes_L1_5_40651-92
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	target_site_duplication	156395	156396	.	.	.	Derives_from=Aedes_L1_5_40651-92
+supercontig:AaegL1:supercont1.366:1:1160760:1	activeTE	target_site_duplication	156541	156542	.	.	.	Derives_from=Aedes_L1_5_40651-92
+supercontig:AaegL1:supercont1.72:1:2994197:1	activeTE	terminal_inverted_repeat_element	1711800	1711943	.	plus	.	ID=Aedes_L1_5_40651-455;Name=Aedes_L1_5_40651 Copy455;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.72:1:2994197:1	activeTE	five_prime_terminal_inverted_repeat	1711800	1711810	.	.	.	Parent=Aedes_L1_5_40651-455
+supercontig:AaegL1:supercont1.72:1:2994197:1	activeTE	three_prime_terminal_inverted_repeat	1711933	1711943	.	.	.	Parent=Aedes_L1_5_40651-455
+supercontig:AaegL1:supercont1.72:1:2994197:1	activeTE	target_site_duplication	1711798	1711799	.	.	.	Derives_from=Aedes_L1_5_40651-455
+supercontig:AaegL1:supercont1.72:1:2994197:1	activeTE	target_site_duplication	1711944	1711945	.	.	.	Derives_from=Aedes_L1_5_40651-455
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	terminal_inverted_repeat_element	1415071	1415214	.	plus	.	ID=Aedes_L1_5_40651-72;Name=Aedes_L1_5_40651 Copy72;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	five_prime_terminal_inverted_repeat	1415071	1415081	.	.	.	Parent=Aedes_L1_5_40651-72
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	three_prime_terminal_inverted_repeat	1415204	1415214	.	.	.	Parent=Aedes_L1_5_40651-72
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	target_site_duplication	1415069	1415070	.	.	.	Derives_from=Aedes_L1_5_40651-72
+supercontig:AaegL1:supercont1.193:1:1877301:1	activeTE	target_site_duplication	1415215	1415216	.	.	.	Derives_from=Aedes_L1_5_40651-72
+supercontig:AaegL1:supercont1.489:1:994692:1	activeTE	terminal_inverted_repeat_element	9116	9259	.	minus	.	ID=Aedes_L1_5_40651-483;Name=Aedes_L1_5_40651 Copy483;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.489:1:994692:1	activeTE	five_prime_terminal_inverted_repeat	9116	9126	.	.	.	Parent=Aedes_L1_5_40651-483
+supercontig:AaegL1:supercont1.489:1:994692:1	activeTE	three_prime_terminal_inverted_repeat	9249	9259	.	.	.	Parent=Aedes_L1_5_40651-483
+supercontig:AaegL1:supercont1.489:1:994692:1	activeTE	target_site_duplication	9114	9115	.	.	.	Derives_from=Aedes_L1_5_40651-483
+supercontig:AaegL1:supercont1.489:1:994692:1	activeTE	target_site_duplication	9260	9261	.	.	.	Derives_from=Aedes_L1_5_40651-483
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	terminal_inverted_repeat_element	129871	130014	.	plus	.	ID=Aedes_L1_5_40651-259;Name=Aedes_L1_5_40651 Copy259;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	five_prime_terminal_inverted_repeat	129871	129881	.	.	.	Parent=Aedes_L1_5_40651-259
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	three_prime_terminal_inverted_repeat	130004	130014	.	.	.	Parent=Aedes_L1_5_40651-259
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	target_site_duplication	129869	129870	.	.	.	Derives_from=Aedes_L1_5_40651-259
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	target_site_duplication	130015	130016	.	.	.	Derives_from=Aedes_L1_5_40651-259
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	terminal_inverted_repeat_element	6356	6499	.	plus	.	ID=Aedes_L1_5_40651-157;Name=Aedes_L1_5_40651 Copy157;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	five_prime_terminal_inverted_repeat	6356	6366	.	.	.	Parent=Aedes_L1_5_40651-157
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	three_prime_terminal_inverted_repeat	6489	6499	.	.	.	Parent=Aedes_L1_5_40651-157
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	target_site_duplication	6354	6355	.	.	.	Derives_from=Aedes_L1_5_40651-157
+supercontig:AaegL1:supercont1.389:1:1133771:1	activeTE	target_site_duplication	6500	6501	.	.	.	Derives_from=Aedes_L1_5_40651-157
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	terminal_inverted_repeat_element	123242	123385	.	plus	.	ID=Aedes_L1_5_40651-266;Name=Aedes_L1_5_40651 Copy266;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	five_prime_terminal_inverted_repeat	123242	123252	.	.	.	Parent=Aedes_L1_5_40651-266
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	three_prime_terminal_inverted_repeat	123375	123385	.	.	.	Parent=Aedes_L1_5_40651-266
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	target_site_duplication	123240	123241	.	.	.	Derives_from=Aedes_L1_5_40651-266
+supercontig:AaegL1:supercont1.250:1:1628417:1	activeTE	target_site_duplication	123386	123387	.	.	.	Derives_from=Aedes_L1_5_40651-266
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	terminal_inverted_repeat_element	389871	390014	.	minus	.	ID=Aedes_L1_5_40651-428;Name=Aedes_L1_5_40651 Copy428;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	five_prime_terminal_inverted_repeat	389871	389881	.	.	.	Parent=Aedes_L1_5_40651-428
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	three_prime_terminal_inverted_repeat	390004	390014	.	.	.	Parent=Aedes_L1_5_40651-428
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	target_site_duplication	389869	389870	.	.	.	Derives_from=Aedes_L1_5_40651-428
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	target_site_duplication	390015	390016	.	.	.	Derives_from=Aedes_L1_5_40651-428
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	terminal_inverted_repeat_element	389725	389868	.	minus	.	ID=Aedes_L1_5_40651-427;Name=Aedes_L1_5_40651 Copy427;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	five_prime_terminal_inverted_repeat	389725	389735	.	.	.	Parent=Aedes_L1_5_40651-427
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	three_prime_terminal_inverted_repeat	389858	389868	.	.	.	Parent=Aedes_L1_5_40651-427
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	target_site_duplication	389723	389724	.	.	.	Derives_from=Aedes_L1_5_40651-427
+supercontig:AaegL1:supercont1.805:1:594860:1	activeTE	target_site_duplication	389869	389870	.	.	.	Derives_from=Aedes_L1_5_40651-427
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	terminal_inverted_repeat_element	4086092	4086235	.	plus	.	ID=Aedes_L1_5_40651-373;Name=Aedes_L1_5_40651 Copy373;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	five_prime_terminal_inverted_repeat	4086092	4086102	.	.	.	Parent=Aedes_L1_5_40651-373
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	three_prime_terminal_inverted_repeat	4086225	4086235	.	.	.	Parent=Aedes_L1_5_40651-373
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	target_site_duplication	4086090	4086091	.	.	.	Derives_from=Aedes_L1_5_40651-373
+supercontig:AaegL1:supercont1.17:1:4314454:1	activeTE	target_site_duplication	4086236	4086237	.	.	.	Derives_from=Aedes_L1_5_40651-373
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	terminal_inverted_repeat_element	966354	966497	.	minus	.	ID=Aedes_L1_5_40651-284;Name=Aedes_L1_5_40651 Copy284;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	five_prime_terminal_inverted_repeat	966354	966364	.	.	.	Parent=Aedes_L1_5_40651-284
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	three_prime_terminal_inverted_repeat	966487	966497	.	.	.	Parent=Aedes_L1_5_40651-284
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	target_site_duplication	966352	966353	.	.	.	Derives_from=Aedes_L1_5_40651-284
+supercontig:AaegL1:supercont1.101:1:2937510:1	activeTE	target_site_duplication	966498	966499	.	.	.	Derives_from=Aedes_L1_5_40651-284
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	terminal_inverted_repeat_element	130017	130160	.	plus	.	ID=Aedes_L1_5_40651-260;Name=Aedes_L1_5_40651 Copy260;element_id=95.104601479553;element_classification=PIF/harbinger_2;tir_id=95.0903715648727;tsd_fraction=1;tsd_consensus=AT
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	five_prime_terminal_inverted_repeat	130017	130027	.	.	.	Parent=Aedes_L1_5_40651-260
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	three_prime_terminal_inverted_repeat	130150	130160	.	.	.	Parent=Aedes_L1_5_40651-260
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	target_site_duplication	130015	130016	.	.	.	Derives_from=Aedes_L1_5_40651-260
+supercontig:AaegL1:supercont1.820:1:471406:1	activeTE	target_site_duplication	130161	130162	.	.	.	Derives_from=Aedes_L1_5_40651-260
