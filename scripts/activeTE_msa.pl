@@ -1503,14 +1503,12 @@ $element_info{"classification"} = $classification;
 print "Element classification finished\n";
 my $element_info_out_path = File::Spec->catpath($volume, $out_path, $filename . ".element_info");
 open(my $element_info_out, ">", $element_info_out_path) or die "Error creating $element_info_out_path. $!\n";
-
 print $element_info_out "$fname_fin\t$element_info{'copy_num'}\t$element_id\t$element_info{'left_tir_seq'}\t$element_info{'left_tir_id'}\t$element_info{'right_tir_seq'}\t$element_info{'left_tir_id'}\t$element_info{'TSD_len'}\t$element_info{'TSD_seq'}\t$element_info{'TSD_fraction'}\t$classification";
 close($element_info_out);
+
 my $out_fix = $out_path . "/";
-if ($insertion_num >= 6) {
-    my $Blogo_config_path = $FindBin::Bin . "/blogo/Blogo.conf";
-    system("perl Dropbox/perl/work/blogo/Blogo_batch.pl file_path=$out_fix file_names=$insertion_site_file img_abs_dir=$out_fix conf_file=$Blogo_config_path");
-}
+my $Blogo_config_path = $FindBin::Bin . "/blogo/Blogo.conf";
+system("Blogo_batch.pl file_path=$out_fix file_names=$insertion_site_file img_abs_dir=$out_fix conf_file=$Blogo_config_path");
 
 print "Setting up gff path\n";
 my $gff_path = File::Spec->catpath($volume, $out_path, $filename . ".gff");
