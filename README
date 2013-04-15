@@ -1,2 +1,19 @@
 mTEA - Mosquito Transposable Element Annotation pipeline
 
+
+activeTE_msa.pl
+
+Prerequisites:
+  Bioperl version 1.006902 (bioperl-live as of 3/15/2013)
+
+  Blogo (included modified version fixes case sensitivity and font problems) 
+  All three blogo folders must be added to your sytem path and Perl5 library.
+
+usage:
+
+activeTE_msa.pl <alignment file> -a -f <int>
+
+-a keep all intermediate files  DEFAULT = remove
+-f length of sequence flanks  DEFAULT = 100
+
+The test alignments all have f = 100.
