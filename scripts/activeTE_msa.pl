@@ -32,10 +32,10 @@ if ($len != 1) {
 }
 my $infile = shift @ARGV;
 if (!-f $infile) {
-        die "Supplied filepath is not valid";
+        die "Supplied filepath is not valid: $!\n";
 }
 if ($flank <= 25) {
-    die "Please use alignments with flanks  >25 nucleotides long";
+    die "Please use alignments with flanks  >25 nucleotides long\n";
 }
  
 #breakdown directory and filename, create output directory
@@ -484,8 +484,8 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
     my $sub_seq;
     my $first;
     my $last;
-    my $first_path = File::Spec->catpath($volume, $out_path, $filename . "first_half.txt");
-    my $last_path = File::Spec->catpath($volume, $out_path, $filename . "last_half.txt");
+    my $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
+    my $last_path = File::Spec->catpath($volume, $out_path, "last_half.txt");
     
     #get end  sequences
     $first = substr($seq, $trim_left_pos_hash{$seq_name}-1, 50);
