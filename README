@@ -6,6 +6,8 @@ activeTE_msa.pl
 Prerequisites:
   Bioperl version 1.006902 (bioperl-live as of 3/15/2013)
 
+  Trimal v1.4.rev7 & v1.4.rev9 tested
+
   Blogo (included modified version fixes case sensitivity and font problems) 
   All three blogo folders must be added to your sytem path and Perl5 library.
 
