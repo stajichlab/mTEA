@@ -10,6 +10,7 @@ use Bio::Tools::IUPAC;
 use FindBin;
 use File::Spec;
 use Getopt::Long;
+use Data::Dumper;
 
 #set default flank length and reset if option is given
 my $flank = 100;
@@ -40,13 +41,13 @@ if ($flank <= 25) {
  
 #breakdown directory and filename, create output directory
 my ($volume, $in_dir, $filename) = File::Spec->splitpath($infile);
-my $out_dir_name = "activeTE_out_" . $filename;
+my @fname_split = split('\\.', $filename);
+my $fname_fin = $fname_split[0];
+my $out_dir_name = "activeTE_out_" . $fname_fin;
 my $out_path = File::Spec->catdir(($in_dir, $out_dir_name));
 if (!-d $out_path) {
     system("mkdir $out_path");
 }
-my @fname_split = split('\\.', $filename);
-my $fname_fin = $fname_split[0];
 my %element_info;
 
 #generate trimal alignment gap summary file, using sed to remove the header info
@@ -62,9 +63,7 @@ my @in_array;
 open(my $in, "<", $infile);
 while (my $line = <$in>){
     chomp $line;
-    if ($line =~ /^([0-9]*).+ Query:(.*) Sbjct:(.*) Length.+Location:\(([0-9]*) \- ([0-9]*)\) Direction:(.+)/) {
-        $line =~ s/ /_/g;
-    }
+    $line =~ s/ /_/g;
     push @in_array, $line;
 }
 close($in);
@@ -119,7 +118,7 @@ foreach my $row_ref (@full_id_array) {
     my @pos = @{$row_ref};
     print $id_out "$pos[0]\t$pos[1]\t$pos[2]\n";
 }
-close($full_id_out_path);
+close($id_out);
 
 #open and parse the trimal output file with the gap %  of each position in the full alignment
 open(my $gap_id, "<", $gap_summary_out);
@@ -129,6 +128,7 @@ while (my $line = <$gap_id>){
     my @info = $line =~ /\S+\s+(\S+)\s+\S+/;
     push @gap_id_array, @info
 }
+close($gap_id);
 
 #remove gap causing sequences from the full alignment based on high percentage of gaps at a position and either low sequence %ID or low fraction of sequences with sequence at that position
 my %gap_seq_remove;
@@ -141,7 +141,7 @@ for (my $i = 0; $i < $full_aln_len; $i++){
     my @gap_col_array = @{$gap_cols};
     my $gap_col_hashref = $gap_col_array[$i];
     my %gap_col_hash = %{$gap_col_hashref};
-    if ($gap_id_array[$i] >= 90.0 and ($id_info[1] <= 40 or $id_info[2] <= 30)) {
+    if ($gap_id_array[$i] >= 80.0 and ($id_info[1] <= 50 or $id_info[2] <= .1)) {
         foreach my $key (keys %gap_col_hash) {
             if ($gap_col_hash{$key} != 1){
                 my $seq_obj = $full_aln_obj->get_seq_by_id($key);
@@ -157,7 +157,6 @@ for (my $i = 0; $i < $full_aln_len; $i++){
 }
 foreach my $key (keys %gap_seq_remove) {
     my $seq_obj = $gap_seq_remove{$key};
-    #print Dumper(\$seq_obj);
     $full_aln_obj->remove_seq($seq_obj);
 }
 
@@ -165,8 +164,17 @@ $full_aln_obj = $full_aln_obj->remove_gaps('-',1);
 my $trim_aln_out = File::Spec->catpath($volume, $out_path, $filename . ".trim");
 my $out = Bio::AlignIO->new(-file => ">$trim_aln_out", -format => 'fasta');
 $out->write_aln($full_aln_obj);
-
-my $trimmed_aln_obj = $full_aln_obj;
+my $aln_copy_num = $full_aln_obj->num_sequences;
+my $trimmed_aln_obj;
+if ($aln_copy_num > 5) {
+    my $realign_path = File::Spec->catpath($volume, $out_path, $filename . ".realign");
+    system("muscle -in $trim_aln_out -out $realign_path -diags");
+    my $realign_in_obj = Bio::AlignIO->new(-file => $realign_path, -format => 'fasta');
+    $trimmed_aln_obj = $realign_in_obj->next_aln();
+}
+else {
+    $trimmed_aln_obj = $full_aln_obj;
+}
 my @trim_id_array;
 my $trim_gap_cols = $trimmed_aln_obj->gap_col_matrix();
 my $trim_aln_len = $trimmed_aln_obj->length();
@@ -189,7 +197,7 @@ for (my $i = 1;  $i <= $trim_aln_len; $i++ ) {
     push @trim_id_array, [@info];
 }
 
-my $trim_id_out_path = File::Spec->catpath($volume, $out_path, $filename . ".trim_id");
+my $trim_id_out_path = File::Spec->catpath($volume, $out_path, $filename . ".realign_id");
 open(my $trim_id_out, ">", $trim_id_out_path);
 foreach my $row_ref (@trim_id_array) {
     my @pos = @{$row_ref};
@@ -201,10 +209,11 @@ my $left_tir_start1 = 0;
 my $left_tir_count = 0;
 my $left_mm = 0;
 for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
-    my $pos = $trimmed_aln_obj->slice($i,$i,1);
-    my $pos_id = $pos->percentage_identity;
+    my @pos_info = @{$trim_id_array[$i-1]};
+    my $pos_id = $pos_info[1];
+    my $pos_present = $pos_info[2];
     if ($left_tir_count == 0) {
-        if ($pos_id >= 80.0) {
+        if ($pos_id >= 85.0 and $pos_present >= .6) {
             $left_tir_start1 = $i;
             $left_tir_count++;
             next;
@@ -214,7 +223,7 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
         }
     }
     elsif ($left_tir_count >= 1 and $left_tir_count <= 4) {
-        if ($pos_id >= 80.0) {
+        if ($pos_id >= 85.0) {
             $left_tir_count++;
             next;
         }
@@ -240,11 +249,24 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
 my $right_tir_start1 = 0;
 my $right_tir_count = 0;
 my $right_mm = 0;
-for (my $i = 0;  $i < $trim_aln_len; $i++ ) {
+for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
+    #print "Entered";
     my $pos = $trimmed_aln_obj->slice($trim_aln_len-$i,$trim_aln_len-$i,1);
     my $pos_id = $pos->percentage_identity;
+    my @gap_col_array = @{$trim_gap_cols};
+    my $gap_col_hashref = $gap_col_array[$trim_aln_len-$i];
+    my %gap_col_hash = %{$gap_col_hashref};
+    my $total_count;
+    my $base_count;
+    foreach my $key (keys %gap_col_hash) {
+        if ($gap_col_hash{$key} != 1) {
+            $base_count++;
+        }
+        $total_count++;
+    }
+    my $pos_present = $base_count/$total_count;
     if ($right_tir_count == 0) {
-        if ($pos_id >= 80.0) {
+        if ($pos_id >= 85.0 and $pos_present >= .6) {
             $right_tir_start1 = $trim_aln_len-$i;
             $right_tir_count++;
             next;
@@ -254,7 +276,7 @@ for (my $i = 0;  $i < $trim_aln_len; $i++ ) {
         }
     }
     elsif ($right_tir_count >= 1 and $right_tir_count <= 4) {
-        if ($pos_id >= 80.0) {
+        if ($pos_id >= 85.0) {
             $right_tir_count++;
             next;
         }
@@ -276,6 +298,21 @@ for (my $i = 0;  $i < $trim_aln_len; $i++ ) {
         last;
     }
 }
+print "First Left TIR start column: $left_tir_start1\n";
+print "First Right TIR start column: $right_tir_start1\n";
+if ($left_tir_start1 == 0 or $right_tir_start1 == 0) {
+    #open a file to store info on why analysis of an element was aborted
+    my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
+    open(my $bad_out, ">", $bad_out_path);
+    print $bad_out "$filename\tTIRs not found in MSA by initial search\n";
+    close($bad_out);
+    
+    if (!defined $all) {
+        clean_files($out_path);
+        print "TIRs not found in MSA, cleaning up files then exiting\n";
+    }
+    exit 0;
+}
 
 #check whether any sequences have gaps in the TIRSs and remove them
 my %trim_gap_seq_remove;
@@ -287,17 +324,16 @@ for (my $i = 0; $i < $trim_aln_len; $i++){
         my @trim_gap_col_array = @{$trim_gap_cols};
         my $trim_gap_col_hashref = $trim_gap_col_array[$i];
         my %trim_gap_col_hash = %{$trim_gap_col_hashref};
-        my $pos_gaps = 0;
-        my $pos_base = 0;
+        my $base_count = 0;
+        my $total_count = 0;
         foreach my $key (keys %trim_gap_col_hash) {
-            if ($trim_gap_col_hash{$key} == 1){
-                $pos_gaps++;
+            if ($trim_gap_col_hash{$key} != 1){
+                $base_count++;
             }
-            else {
-                $pos_base++;
-            }
+            $total_count++;
         }
-        if ($pos_gaps/($pos_gaps+$pos_base)>= 0.6) {
+        my $present_fraction = $base_count/$total_count;
+        if ($present_fraction < 0.5) {
             foreach my $key (keys %trim_gap_col_hash) {
                 if ($trim_gap_col_hash{$key} != 1){
                     my $seq_obj = $trimmed_aln_obj->get_seq_by_id($key);
@@ -328,7 +364,6 @@ for (my $i = 0; $i < $trim_aln_len; $i++){
 
 foreach my $key (keys %trim_gap_seq_remove) {
     my $seq_obj = $trim_gap_seq_remove{$key};
-    #print Dumper(\$seq_obj);
     $trimmed_aln_obj->remove_seq($seq_obj);
 }
 my $test_len = $trimmed_aln_obj->length();
@@ -336,11 +371,11 @@ if ($test_len == 0) {
     #open a file to store info on why analysis of an element was aborted
     my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
     open(my $bad_out, ">", $bad_out_path);
-    print $bad_out "$filename\tTIRs not found in MSA\n";
+    print $bad_out "$filename\tTIRs not found in MSA. All sequences filtered out.\n";
     close($bad_out);
-    print "TIRs not found in MSA, cleaning up files then exiting\n";
     if (!defined $all) {
         clean_files($out_path);
+        print "Cleaning up files then exiting\n";
     }
     exit 0;
 }
@@ -348,8 +383,10 @@ if ($test_len == 0) {
 my $trim_aln_out2 = File::Spec->catpath($volume, $out_path, $filename . ".trim2");
 my $out2 = Bio::AlignIO->new(-file => ">$trim_aln_out2", -format => 'fasta');
 $out2->write_aln($trimmed_aln_obj);
+print "Trim2 Left TIR start column: $left_tir_start1\n";
+print "Trim2 Right TIR start column: $right_tir_start1\n";
 
-#Store the column positions of the potential TIRs in the trimmed alignment and get the coulumns of them in the original alignminent to remove only sequences that cause gaps in the tirs
+#Store the column positions of the potential TIRs in the trimmed alignment and get the columns of them in the original alignminent to remove sequences that cause gaps in the tirs
 my %trim_pos_hash;
 my %trim_left_pos_hash;
 my %trim_right_pos_hash;
@@ -373,11 +410,15 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
     $trim_right_pos_hash{$seq_name} = $right_res_pos;
     $left_tir_start_check_counts{$left_res_pos}++;
     $right_tir_start_check_counts{$right_flank_pos}++;
+    print "TIR starts for $seq_name:  Left - $left_res_pos  Right - $right_res_pos\n";
 }
 
 #sort the left and right TIR starts by largest count to smallest
 my @sorted_left_tir_start_keys =  sort { $left_tir_start_check_counts{$b} <=> $left_tir_start_check_counts{$a} } keys (%left_tir_start_check_counts);
 my @sorted_right_tir_start_keys =  sort { $right_tir_start_check_counts{$b} <=> $right_tir_start_check_counts{$a} } keys (%right_tir_start_check_counts);
+
+print "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
+print "This is after the .trim to .trim2 transition\n";
 
 #check if TIRs start in flanks, indicating the flanks are highly similar
 my $left_flank_catch = 0;
@@ -501,7 +542,7 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
     
     #create fasta output filename then call ggsearch
     my $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".ggsearch.out");
-    system("ggsearch36 -n -i -T 8 -d 1 $last_path $first_path > $out_opt");
+    system("ggsearch36 -n -i -T 1 -d 1 $last_path $first_path > $out_opt");
     
     my @tir_match_result = match_tirs($seq_obj, $out_opt, 1);
     
@@ -520,8 +561,10 @@ my %hit_column_counts;
 my %hit_match_len;
 my %query_column_counts;
 my %query_match_len;
-my $query_aln_pos;
-my $hit_aln_pos;
+my @sorted_hitcolumn_keys;
+my @sorted_querycolumn_keys;
+my @sorted_hit_len_keys;
+my @sorted_query_len_keys;
 my @entry;
 my $good_aln_len = @good_aln;
 
@@ -530,26 +573,30 @@ if ($good_aln_len == 0) {
 }
 else {
     print "Found TIRs in MSA: 1st round\n";
-}
 
-#go through each entry of @good_aln array
-foreach my $row_ref (@good_aln) {
-    @entry = @{$row_ref};
-    #get column position in alignment of left (hit) TIR, using sequence name and index position of TIR in full sequence. Increment the count of that column position in %hit_column_counts. Also, increment the count of TIR length in %hit_match_len
-    $hit_aln_pos = $trimmed_aln_obj->column_from_residue_number( $entry[0], ${entry[1]{"hit"}}[0]);
-    $hit_column_counts{$hit_aln_pos}++;
-    $hit_match_len{${entry[1]{"hit"}}[1]}++;
-    #do the same for the query (left) TIR
-    $query_aln_pos = $trimmed_aln_obj->column_from_residue_number( $entry[0], ${entry[1]{"query"}}[0]);
-    $query_column_counts{$query_aln_pos}++;
-    $query_match_len{${entry[1]{"query"}}[1]}++;
-}
+    #go through each entry of @good_aln array
+    foreach my $row_ref (@good_aln) {
+        my $query_aln_pos;
+        my $hit_aln_pos;
+        @entry = @{$row_ref};
+        #get column position in alignment of left (hit) TIR, using sequence name and index position of TIR in full sequence. Increment the count of that column position in %hit_column_counts. Also, increment the count of TIR length in %hit_match_len
+        $hit_aln_pos = $trimmed_aln_obj->column_from_residue_number( $entry[0], ${entry[1]{"hit"}}[0]);
+        $hit_column_counts{$hit_aln_pos}++;
+        $hit_match_len{${entry[1]{"hit"}}[1]}++;
+        #do the same for the query TIR
+        $query_aln_pos = $trimmed_aln_obj->column_from_residue_number( $entry[0], ${entry[1]{"query"}}[0]);
+        $query_column_counts{$query_aln_pos}++;
+        $query_match_len{${entry[1]{"query"}}[1]}++;
+        print "Storing column info for $entry[0] in first ggsearch round\nLeft TIR start: \${entry[1]{'hit'}}[0]\tRight TIR start: \${entry[1]{'query'}}[0]\n";
+    }
 
-#sort the hit and query column and match length hashes by largest count to smallest
-my @sorted_hitcolumn_keys =  sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys (%hit_column_counts);
-my @sorted_querycolumn_keys =  sort { $query_column_counts{$b} <=> $query_column_counts{$a} } keys (%query_column_counts);
-my @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys (%hit_match_len);
-my @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys (%query_match_len);
+    #sort the hit and query column and match length hashes by largest count to smallest
+    @sorted_hitcolumn_keys =  sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys (%hit_column_counts);
+    @sorted_querycolumn_keys =  sort { $query_column_counts{$b} <=> $query_column_counts{$a} } keys (%query_column_counts);
+    @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys (%hit_match_len);
+    @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys (%query_match_len);
+    print "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+}
 
 #repeat above but shifted out 3bp on each end to catch cases where found TIR is slightly off
 my %trim_pos_hash2;
@@ -600,8 +647,8 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
     my $sub_seq;
     my $first;
     my $last;
-    my $first_path = File::Spec->catpath($volume, $out_path, $filename . "first_half.txt");
-    my $last_path = File::Spec->catpath($volume, $out_path, $filename . "last_half.txt");
+    my $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
+    my $last_path = File::Spec->catpath($volume, $out_path, "last_half.txt");
     
     #get end  sequences
     $first = substr($seq, $trim_left_pos_hash2{$seq_name}-1, 50);
@@ -617,7 +664,7 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
     
     #create fasta output filename then call ggsearch
     my $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".ggsearch.out2");
-    system("ggsearch36 -n -i -T 8 -d 1 $last_path $first_path > $out_opt");
+    system("ggsearch36 -n -i -T 1 -d 1 $last_path $first_path > $out_opt");
     
     my @tir_match_result = match_tirs($seq_obj, $out_opt, 2);
     
@@ -638,6 +685,10 @@ my %query_column_counts2;
 my %query_match_len2;
 my $query_aln_pos2;
 my $hit_aln_pos2;
+my @sorted_hitcolumn_keys2;
+my @sorted_querycolumn_keys2;
+my @sorted_hit_len_keys2;
+my @sorted_query_len_keys2;
 my @entry2;
 
 my $good_aln2_len = @good_aln2;
@@ -647,26 +698,29 @@ if ($good_aln2_len == 0) {
 }
 else {
     print "Found TIRs in MSA: 2nd round\n";
-}
 
-#go through each entry of @good_aln2 array
-foreach my $row_ref (@good_aln2) {
-    @entry2 = @{$row_ref};
-    #get column position in alignment of left (hit) TIR, using sequence name and index position of TIR in full sequence. Increment the count of that column position in %hit_column_counts. Also, increment the count of TIR length in %hit_match_len
-    $hit_aln_pos2 = $trimmed_aln_obj->column_from_residue_number( $entry2[0], ${entry2[1]{"hit"}}[0]);
-    $hit_column_counts2{$hit_aln_pos}++;
-    $hit_match_len2{${entry2[1]{"hit"}}[1]}++;
-    #do the same for the query (left) TIR
-    $query_aln_pos2 = $trimmed_aln_obj->column_from_residue_number( $entry2[0], ${entry2[1]{"query"}}[0]);
-    $query_column_counts2{$query_aln_pos}++;
-    $query_match_len2{${entry2[1]{"query"}}[1]}++;
-}
+    #go through each entry of @good_aln2 array
+    foreach my $row_ref (@good_aln2) {
+        @entry2 = @{$row_ref};
+        #get column position in alignment of left (hit) TIR, using sequence name and index position of TIR in full sequence. Increment the count of that column position in %hit_column_counts. Also, increment the count of TIR length in %hit_match_len
+        $hit_aln_pos2 = $trimmed_aln_obj->column_from_residue_number( $entry2[0], ${entry2[1]{"hit"}}[0]);
+        $hit_column_counts2{$hit_aln_pos2}++;
+        $hit_match_len2{${entry2[1]{"hit"}}[1]}++;
+        #do the same for the query (left) TIR
+        $query_aln_pos2 = $trimmed_aln_obj->column_from_residue_number( $entry2[0], ${entry2[1]{"query"}}[0]);
+        $query_column_counts2{$query_aln_pos2}++;
+        $query_match_len2{${entry2[1]{"query"}}[1]}++;
+        
+        print "Storing column info for $entry[0] in second ggsearch round\nLeft TIR start: \${entry2[1]{'hit'}}[0]\tRight TIR start: \${entry2[1]{'query'}}[0]\n";
+    }
 
-#sort the hit and query column and match length hashes by largest count to smallest
-my @sorted_hitcolumn_keys2 =  sort { $hit_column_counts2{$b} <=> $hit_column_counts2{$a} } keys (%hit_column_counts2);
-my @sorted_querycolumn_keys2 =  sort { $query_column_counts2{$b} <=> $query_column_counts2{$a} } keys (%query_column_counts2);
-my @sorted_hit_len_keys2 = sort { $hit_match_len2{$b} <=> $hit_match_len2{$a} } keys (%hit_match_len2);
-my @sorted_query_len_keys2 = sort { $query_match_len2{$b} <=> $query_match_len2{$a} } keys (%query_match_len2);
+    #sort the hit and query column and match length hashes by largest count to smallest
+    @sorted_hitcolumn_keys2 =  sort { $hit_column_counts2{$b} <=> $hit_column_counts2{$a} } keys (%hit_column_counts2);
+    @sorted_querycolumn_keys2 =  sort { $query_column_counts2{$b} <=> $query_column_counts2{$a} } keys (%query_column_counts2);
+    @sorted_hit_len_keys2 = sort { $hit_match_len2{$b} <=> $hit_match_len2{$a} } keys (%hit_match_len2);
+    @sorted_query_len_keys2 = sort { $query_match_len2{$b} <=> $query_match_len2{$a} } keys (%query_match_len2);
+    print "\@sorted_hitcolumn_keys2: $sorted_hitcolumn_keys2[0]  \@sorted_hit_len_keys2: $sorted_hit_len_keys2[0]\n\@sorted_querycolumn_keys2: $sorted_querycolumn_keys2[0]  \@sorted_hit_len_keys2: $sorted_hit_len_keys2[0]\n";
+}
 
 my $good_aln_len2 = @good_aln2;
 my $bad_aln_len = @bad_aln;
@@ -676,8 +730,20 @@ print "Good aln len:  $good_aln_len  Good aln len2: $good_aln_len2\n";
 print "Bad aln len:  $bad_aln_len  Bad aln len2: $bad_aln_len2\n";
 
 #check which run generated the longer TIRs
-if ( ($good_aln_len2 > $good_aln_len) and ($bad_aln_len2 < $bad_aln_len) ){
-    if ( ($sorted_hit_len_keys2[0] > $sorted_hit_len_keys[0] and $sorted_query_len_keys2[0] > $sorted_query_len_keys[0]) and ($sorted_hitcolumn_keys2[0] > $sorted_hitcolumn_keys[0] and $sorted_querycolumn_keys2[0] > $sorted_querycolumn_keys[0]) ) {
+if ($good_aln_len2 == 0 and  $good_aln_len == 0) {
+    my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
+    open(my $bad_out, ">", $bad_out_path);
+    print $bad_out "$filename\tThe two ggsearch runs failed to find TIRs\n";
+    close($bad_out);
+    if (!defined $all) {
+        print "Cleaning up files\n";
+        clean_files($out_path);
+    }
+    exit 0;
+}
+
+elsif ($good_aln_len2 != 0 and $good_aln_len2 > $good_aln_len) {
+    if ( ($sorted_hit_len_keys2[0] > $sorted_hit_len_keys[0] and $sorted_query_len_keys2[0] > $sorted_query_len_keys[0]) and ($sorted_hitcolumn_keys2[0] >= $sorted_hitcolumn_keys[0] and $sorted_querycolumn_keys2[0] >= $sorted_querycolumn_keys[0]) ) {
         print "Alignment set 2 better\n";
         @sorted_hitcolumn_keys = @sorted_hitcolumn_keys2;
         @sorted_querycolumn_keys = @sorted_querycolumn_keys2;
@@ -700,59 +766,32 @@ else {
     print "Alignment set 1 better\n\n";
 }
 
-#open a file to store info on why analysis of an element was aborted
-my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
-open(my $bad_out, ">", $bad_out_path);
+#open a file to store info on why analysis of a copy was aborted
+my $removed_out_path = File::Spec->catpath($volume, $out_path, $filename . ".removed_sequences");
+open(my $removed_out, ">", $removed_out_path);
 foreach my $seq_obj (@bad_remove) {
     my $seq_name = $seq_obj->id();
-    print $bad_out "$seq_name\tNo TIRs found\n";
+    print $removed_out "$seq_name\tNo TIRs found by first two ggsearch runs\n";
     $trimmed_aln_obj->remove_seq($seq_obj);
 }
 
-#check whether potential TIRs were found
-if ($left_tir_start1 == 0) {
-    if ($right_tir_start1 == 0) {
-        print $bad_out, "$filename\tTIRs not found in MSA";
-        close($bad_out);
-        if (!defined $all) {
-            print "Cleaning up files\n";
-            clean_files($out_path);
-        }
-        exit 0;
-    }
-    print $bad_out, "$filename\tLeft TIR not found";
-    close($bad_out);
-    if (!defined $all) {
-        print "Cleaning up files\n";
-        clean_files($out_path);
-    }
-    exit 0;
-}
-elsif ($right_tir_start1 == 0) {
-    print $bad_out, "$filename\tRight TIR not found";
-    close($bad_out);
-    if (!defined $all) {
-        print "Cleaning up files\n";
-        clean_files($out_path);
-    }
-    exit 0;
-}
-
-#get the end residue positions for the tirs from one sequence in the trimmed alignment that will be used to find the tir interval in the full alignment. Then sequences that were excluded can be added back if they don't cause gaps in the tirs
+#get the end residue positions for the tirs from each sequence in the trimmed alignment that will be used to find the tir interval in the full alignment.
 my %tir_positions;
 foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
     my $seq_name = $seq_obj->id();
     my $trim_seq = $seq_obj->seq();
+    my $left_tir_start_obj = $seq_obj->location_from_column($sorted_hitcolumn_keys[0]);
     my $left_tir_start_pos = $trim_left_pos_hash{$seq_name};
     my $left_tir_end_pos =  $trim_left_pos_hash{$seq_name}+$sorted_hit_len_keys[0]-1;
     my $right_tir_start_pos = $trim_right_pos_hash{$seq_name};
-    my $right_tir_end_pos_obj = $seq_obj->location_from_column($sorted_querycolumn_keys[0]);
-    my $right_tir_end_pos = $right_tir_end_pos_obj->start();
+    my $right_tir_end_pos = $trim_right_pos_hash{$seq_name} - $sorted_query_len_keys[0]-1;
+    print "Storing nucleotide position info before reimporting the original alignment\nLeft TIR start position: $left_tir_start_pos\tLeft TIR end position: $left_tir_end_pos\nRight TIR start column: $right_tir_start_pos\tRight TIR end position: $right_tir_end_pos\n";
     $tir_positions{$seq_name}{'left_tir_start'} = $left_tir_start_pos;
     $tir_positions{$seq_name}{'left_tir_end'} = $left_tir_end_pos;
     $tir_positions{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
     $tir_positions{$seq_name}{'right_tir_end'} = $right_tir_end_pos;
 }
+
 
 #reread the original alignment file
 my $in_obj2 = Bio::AlignIO->new(-file => $infile, -format => 'fasta');
@@ -779,19 +818,30 @@ foreach my $seq_obj ($ori_aln_obj->each_seq()) {
     }
 }
 my $tir_length = $left_tir_end - $left_tir_start;
+print "First column grab just after reimporting the original alignment\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
+print "Starting MSA length = $ori_aln_len TIR length = $tir_length\n";
 
-#go back through the full alignment and remove only the sequences that create gaps in the tirs or that failed the first tir search
+#go back through the full alignment and remove only the sequences that create gaps in the TIRs or that failed the first two TIR searches
 my %gap_seq_remove2;
 my %search_tirs;
 
 for (my $i = 0; $i < $ori_aln_len; $i++){
-    if (($i >= $left_tir_start-1 and $i <= $left_tir_end-1) or  ($i >= $right_tir_start-1 and $i <= $right_tir_end-1)) {
+    if (($i >= $left_tir_start-1 and $i <= $left_tir_end-1) or  ($i >= $right_tir_end-1 and $i <= $right_tir_start-1)) {
         my $id_row_ref = $full_id_array[$i];
         my @id_info = @{$id_row_ref};
         my @gap_col_array = @{$gap_cols};
         my $gap_col_hashref = $gap_col_array[$i];
         my %gap_col_hash = %{$gap_col_hashref};
-        if ($gap_id_array[$i] >= 60.0 and $id_info[1] <= 40){
+        my $base_count = 0;
+        my $total_count = 0;
+        foreach my $key (keys %gap_col_hash) {
+            if ($gap_col_hash{$key} != 1){
+                $base_count++;
+            }
+            $total_count++;
+        }
+        my $pos_present = $base_count/$total_count;
+        if ($gap_id_array[$i] >= 60.0 and $id_info[1] <= 50 or $pos_present < .33){
             foreach my $key (keys %gap_col_hash) {
                 if ($gap_col_hash{$key} != 1){
                     $gap_seq_remove2{$key}++;
@@ -827,36 +877,21 @@ foreach my $key (keys %gap_seq_remove) {
 }
 
 #keep track of removed sequences to print to file
-my @removed_sequences;
-
+my %removed_seq_hash;
 foreach my $key (keys %gap_seq_remove2) {
     my $remove = $ori_aln_obj->get_seq_by_id($key);
     my $seq_id = $remove->id();
-    push @removed_sequences, $seq_id;
-    $ori_aln_obj->remove_seq($remove);
-}
-
-foreach my $seq_name (@bad_aln) {
-    my $seq_obj = $ori_aln_obj->get_seq_by_id($seq_name);
-    if (defined $seq_obj) {
-        push @removed_sequences, $seq_name;
-        $ori_aln_obj->remove_seq($seq_obj);
-    }
-}
-
-#print list of removed sequences to file
-my $removed_seq_path = File::Spec->catpath($volume, $out_path, $filename . ".removed_sequences.txt");
-open(my $removed_seq, ">", $removed_seq_path);
-my %removed_seq_hash;
-foreach my $seq_id (@removed_sequences) {
+    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs";
     $removed_seq_hash{$seq_id}++;
-    print $removed_seq "$seq_id\n";
+    $ori_aln_obj->remove_seq($remove);
 }
 
 my $final_aln_obj = $ori_aln_obj->remove_gaps('-',1);
 my $int_aln_out = File::Spec->catpath($volume, $out_path, $filename . ".intermediate");
 $out = Bio::AlignIO->new(-file => ">$int_aln_out", -format => 'fasta');
 $out->write_aln($final_aln_obj);
+my $final_len = $final_aln_obj->length();
+print "MSA length is $final_len now\n";
 
 #get the column positions of tirs in the intermediate alignment
 foreach my $seq_obj ($final_aln_obj->each_seq()) {
@@ -872,27 +907,26 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         last;
     }
 }
+print "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 
 my $new_gap_cols = $final_aln_obj->gap_col_matrix();
-my $final_len = $final_aln_obj->length();
 my %new_gap_seq_remove;
 
 for (my $i = 0; $i < $final_len; $i++){
-    if (($i >= $left_tir_start-1 and $i <= $left_tir_end-1) or  ($i >= $right_tir_start-1 and $i <= $right_tir_end-1)) {
+    if (($i >= $left_tir_start-1 and $i <= $left_tir_end-1) or  ($i >= $right_tir_end-1 and $i <= $right_tir_start-1)) {
         my @trim_gap_col_array = @{$new_gap_cols};
         my $trim_gap_col_hashref = $trim_gap_col_array[$i];
         my %trim_gap_col_hash = %{$trim_gap_col_hashref};
-        my $pos_gaps = 0;
-        my $pos_base = 0;
+        my $base_count = 0;
+        my $total_count = 0;
         foreach my $key (keys %trim_gap_col_hash) {
-            if ($trim_gap_col_hash{$key} == 1){
-                $pos_gaps++;
+            if ($trim_gap_col_hash{$key} != 1){
+                $base_count++;
             }
-            else {
-                $pos_base++;
-            }
+            $total_count++;
         }
-        if ($pos_gaps/($pos_gaps+$pos_base)> 0.5) {
+        my $pos_present = $base_count/$total_count;
+        if ($pos_present < 0.5) {
             foreach my $key (keys %trim_gap_col_hash) {
                 if ($trim_gap_col_hash{$key} != 1){
                     my $seq_obj = $final_aln_obj->get_seq_by_id($key);
@@ -913,10 +947,29 @@ for (my $i = 0; $i < $final_len; $i++){
 
 foreach my $key (keys %new_gap_seq_remove) {
     my $seq_obj = $new_gap_seq_remove{$key};
+    my $seq_id = $seq_obj->id();
+    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
     $final_aln_obj->remove_seq($seq_obj);
 }
-my $check_len = $final_aln_obj->length();
 $final_aln_obj = $final_aln_obj->remove_gaps('-',1);
+my $check_len = $final_aln_obj->length();
+print "MSA length now: $check_len\n";
+#get the column positions of tirs in the intermediate alignment
+foreach my $seq_obj ($final_aln_obj->each_seq()) {
+    my $seq_name = $seq_obj->id();
+    if (!defined $tir_positions{$seq_name}) {
+        next;
+    }
+    else {
+        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
+        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
+        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
+        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
+        last;
+    }
+}
+print "3rd column grab after removing more copies with TIR isssues\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
+
 my %left_tsd_info;
 my %right_tsd_info;
 
@@ -935,13 +988,16 @@ foreach my $seq_name (keys %search_tirs) {
     my $fname_start = $seqn_part[0];
     my $seq = $seq_obj->seq();
     my $seq_len = length($seq);
-    if ($seq =~ m/NNNN/g) {
+    print "Length of $seq_name = $seq_len\n";
+    if ($seq =~ m/N{15}/g) {
         $final_aln_obj->remove_seq($seq_obj);
+        print $removed_out "$seq_name\tContains an N at >=15 positions in a row. The copy may be OK and, if so, should be addded back if the repeat family is a valid DNA TE that may be active\n";
         next;
     }
     my $left_test_pos = substr($seq, $left_tir_start-1, 1);
     my $right_test_pos = substr($seq, $right_tir_start-1, 1);
     if ($left_test_pos eq "-"  or $right_test_pos eq "-") {
+        print $removed_out "$seq_name\tContains a gap at the start of one or both TIRs\n";
         $final_aln_obj->remove_seq($seq_obj);
         next;
     }
@@ -974,12 +1030,14 @@ foreach my $seq_name (keys %search_tirs) {
     print $last_out ">last\n$last\n";
     close($first_out);
     close($last_out);
-    my $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".fasta.out");
+    my $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".ggsearch3.out");
     system("ggsearch36 -n -i -T 8 -d 1 $last_path $first_path > $out_opt");
     
     my @tir_match_result = match_tirs($seq_obj, $out_opt, 1);
     if ($tir_match_result[0] == 0) {
+        my $seq_id = $seq_obj->id();
         $final_aln_obj->remove_seq($seq_obj);
+        print $removed_out "$seq_id\tNo TIR matches found by last ggsearch run\n";
     }
     else {
         $left_tsd_info{$seq_name} = [$left_tsd, $left_tsd_substr, $starting_left_flank];
@@ -1008,102 +1066,12 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
     }
 }
 
-#Extract the left and right TIRs as new alignment objects, starting at the most common starting column until that column plus the most common TIR length
+print "Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start\n";
+
+#Extract the left and right TIRs as new alignment objects
 my $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end,1);
 my $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start,1);
 my $element_aln_obj = $final_aln_obj->slice($left_tir_start,$right_tir_start,1);
-
-my $gap_summary_out2 = File::Spec->catpath($volume, $out_path, $filename . ".final_gap_summary");
-system("trimal -in $int_aln_out2 -sgc | sed -n '4,\$p' > $gap_summary_out2");
-
-#open and parse the trimal output file with the % gap ID of each position in the full alignment
-open(my $gap_id2, "<", $gap_summary_out2);
-my @gap_id_array2;
-while (my $line = <$gap_id2>){
-    chomp $line;
-    my @info = $line =~ /\S+\s+(\S+)\s+\S+/;
-    #my @info = split(/\s+/, $line);
-    push @gap_id_array2, @info
-}
-#generate a gap column matrix from the full alignment
-my $final_gap_cols = $final_aln_obj->gap_col_matrix();
-
-my @final_id_array;
-$final_len = $final_aln_obj->length();
-#calculate the % identity of each position in the full alignment and print to file
-print "Starting Final ID calculation\n";
-for (my $i = 1;  $i <= $final_len; $i++ ) {
-    my $pos = $final_aln_obj->slice($i,$i,1);
-    my $pos_id = $pos->percentage_identity;
-    my @info = ($i, $pos_id);
-    push @final_id_array, [@info];
-}
-print "Finished Final ID calculation\n";
-
-#remove gap causing sequences in the TIRs from the full alignment based on high % gap ID and low sequence % ID
-my %final_gap_seq_remove;
-my %final_gap_seq_count;
-my @final_gap_seq_pos_remove;
-
-for (my $i = 0; $i < $last_len; $i++){
-    for (($i >= $left_tir_start-1 and $i <= $left_tir_end-1) or ($i >= $right_tir_end-1 and $i <= $right_tir_start-1)) {
-        my $id_row_ref = $final_id_array[$i];
-        my @id_info = @{$id_row_ref};
-        my @gap_col_array = @{$final_gap_cols};
-        my $gap_col_hashref = $gap_col_array[$i];
-        my %gap_col_hash = %{$gap_col_hashref};
-        if ($gap_id_array2[$i] >= 90.0 and $id_info[1] <= 40){
-            foreach my $key (keys %gap_col_hash) {
-                if ($gap_col_hash{$key} != 1){
-                    my $seq_obj = $final_aln_obj->get_seq_by_id($key);
-                    my $seq = $seq_obj->seq();
-                    my $seq_pos = $seq_obj->location_from_column($i+1);
-                    my @info = ($key, $i+1, $seq_obj);
-                    push @final_gap_seq_pos_remove, [@info];
-                    $final_gap_seq_count{$key}++;
-                    $final_gap_seq_remove{$key} = $seq_obj;
-                }
-            }
-        }
-        elsif ($gap_id_array2[$i] <= 5 and $id_info[1] >= 90) {
-            foreach my $key (keys %gap_col_hash) {
-                if ($gap_col_hash{$key} == 1){
-                    my $seq_obj = $final_aln_obj->get_seq_by_id($key);
-                    my $seq = $seq_obj->seq();
-                    my $seq_pos = $seq_obj->location_from_column($i+1);
-                    my @info = ($key, $i+1, $seq_obj);
-                    push @final_gap_seq_pos_remove, [@info];
-                    $final_gap_seq_count{$key}++;
-                    $final_gap_seq_remove{$key} = $seq_obj;
-                }
-            }
-        }
-    }
-}
-foreach my $key (keys %final_gap_seq_remove) {
-    my $seq_obj = $final_gap_seq_remove{$key};
-    $final_aln_obj->remove_seq($seq_obj);
-}
-my $test_len2 = $final_aln_obj->length();
-$final_aln_obj = $final_aln_obj->remove_gaps('-',1);
-my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
-$out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta');
-$out->write_aln($final_aln_obj);
-
-#get the column positions of tirs in the final alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
 
 #find TSDs based off column # of TIRs. Must check for 2-bp TSD included in TIRS and then a longer TSD. Longer TSDs that start and finish with same 2-bp as the 2-bp TSD supersede the 2-bp TSD. Also, grab flanks and save them to files to be used by CD-Hit to cluster them.
 my @putative_TSD;
@@ -1312,10 +1280,13 @@ $element_info{"right_tir_id"} = $right_tir_id;
 my %TSD_counts;
 my $TSD_array_length = @put_TSD_names;
 if ($TSD_array_length == 0) {
-    print "No TSDs found, cleaning up files then exiting program\n";
+    print "No TSDs found\n";
+    my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
+    open(my $bad_out, ">", $bad_out_path);
     print $bad_out "$filename\tNo TSDs found for any copy";
     close($bad_out);
     if (!defined $all) {
+        print "Cleaning up files then exiting program\n";
         clean_files($out_path);
     } 
     exit 0;
@@ -1539,7 +1510,7 @@ sub match_tirs {
     my $seq_name = $self->id();
     my $fa_aln_obj = Bio::SearchIO->new(-format => 'fasta', -file   => $input_path);
     my @result;
-
+    print "ggsearch results path: $input_path\n";
     #go through the FASTA input object . . down to the HSP
     while( my $result = $fa_aln_obj->next_result ) {
         while( my $hit = $result->next_hit ) {
@@ -1569,12 +1540,13 @@ sub match_tirs {
                     my $homo_char =  substr($homo_string, $count, 1);
                     my $query_char =  substr($query_str, $count, 1);
                     my $hit_char =  substr($hit_str, $count, 1);
-                    if ($count == 6 and $total_mis_aln >= 3) {
+                    if ($count == 8 and $total_mis_aln >= 4) {
                         $match_len = 0;
                                 $start_pos = '';
                                 $match_query = '';
                                 $match_hit = '';
                                 $end_pos = '';
+                                print "No TIRs found near start of sequences, resetting counts and ending\n";
                                 last;
                     }
                     if ($round == 2) {
@@ -1600,6 +1572,7 @@ sub match_tirs {
                             $match_len++;
                             $match_query .= $query_char;
                             $match_hit .= $hit_char;
+                            print "Initial match at $start_pos\n";
                             next;
                         }
                     }
@@ -1614,6 +1587,7 @@ sub match_tirs {
                                 $last_good = $count;
                                 $match_query .= $query_char;
                                 $match_hit .= $hit_char;
+                                print "First Mismatch at $count\n";
                                 next;
                             }
                             #more than one mismatch, reset counters and other info, continue
@@ -1623,6 +1597,7 @@ sub match_tirs {
                                 $match_query = '';
                                 $match_hit = '';
                                 $match_mis_aln = 0;
+                                print "Another Mismatch at $count, resetting counts\n";
                                 next;
                             }
                             elsif ($total_mis_aln >= 3) {
@@ -1631,6 +1606,7 @@ sub match_tirs {
                                 $match_query = '';
                                 $match_hit = '';
                                 $end_pos = '';
+                                print "Another Mismatch at $count, resetting counts and ending\n";
                                 last;
                             }
                         }
@@ -1640,6 +1616,7 @@ sub match_tirs {
                             $match_len++;
                             $match_query .= $query_char;
                             $match_hit .= $hit_char;
+                            print "Another match at $count. Length is $match_len\n";
                             next;
                         }
                     }
@@ -1649,21 +1626,23 @@ sub match_tirs {
                             $match_mis_aln++;
                             $total_mis_aln++;
                             #mismatches under 3, store info and continue
-                            if ($match_mis_aln < 3) {
+                            if ($match_mis_aln <= 3) {
                                 $match_len++;
                                 $last_good = $count;
                                 $match_query .= $query_char;
                                 $match_hit .= $hit_char;
+                                print "Another Mismatch at $count, proceeding\n";
                                 next;
                             }
-                            elsif($total_mis_aln >= 4) {
-                                $match_len = 0;
-                                $start_pos = '';
-                                $match_query = '';
-                                $match_hit = '';
-                                $end_pos = '';
-                                last;
-                            }
+                            #elsif($total_mis_aln >= 4) {
+                            #    $match_len = 0;
+                            #    $start_pos = '';
+                            #    $match_query = '';
+                            #    $match_hit = '';
+                            #    $end_pos = '';
+                            #    print "Another Mismatch at $count, total misalignment is $total_mis_aln, resetting counts and ending\n";
+                            #    last;
+                            #}
                             #mismatches 3 or more, store final info for alignment match and end parsing
                             elsif($match_mis_aln >= 3){
                                 $end_pos = $last_good;
@@ -1682,6 +1661,7 @@ sub match_tirs {
                                 #store sequence name and the hit and query info
                                 my @match = ($seq_name, {"hit" =>[$hit_pos, $match_hit_len],"query" => [$query_pos, $match_query_len]});
                                 push @result, (1, [@match]);
+                                print "Another Mismatch at $count. Match is long, pushing match info for output\n";
                                 last;
                             }
                         }
@@ -1691,6 +1671,7 @@ sub match_tirs {
                             $match_len++;
                             $match_query .= $query_char;
                             $match_hit .= $hit_char;
+                            print "Another match at $count. Length is $match_len\n";
                             next;
                         }
                     }
@@ -1732,7 +1713,7 @@ sub generate_gff {
             my $start;
             my $end;
             my $strand;
-            if ($seq_name =~ /^([0-9]*).+[ |_]Query:(.*)[ |_]Sbjct:(.*)[ |_]Length.+Location:\(([0-9]*)[ |_]\-[ |_]([0-9]*)\)[ |_]Direction:(.+)/) {
+            if ($seq_name =~ /^([0-9]*).+_Query:(.*)_Sbjct:(.*)_Length.+Location:\(([0-9]*)_\-_([0-9]*)\)_Direction:(.+)/) {
                 $copy_num = $1;
                 $eleid = $2;
                 $seqid = $3;
