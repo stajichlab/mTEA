@@ -8,14 +8,16 @@ Prerequisites:
 
   Trimal v1.4.rev7 & v1.4.rev9 tested
 
-   FASTA program package v36
+  FASTA program package v36
+
+  MUSCLE v3.8.31
 
   Blogo (included modified version fixes case sensitivity and font problems) 
   All three blogo folders must be added to your system path and Perl5 library.
 
 usage:
 
-activeTE_msa.pl <alignment file> -a -f <int>
+activeTE_msa.pl -a -f <int> <multiple alignment file> 
 
 -a keep all intermediate files  DEFAULT = remove
 -f length of sequence flanks  DEFAULT = 100
