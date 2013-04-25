@@ -235,7 +235,7 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
         last;
     }
 }
-undef @trim_id_array;
+#undef @trim_id_array;
 
 my $right_tir_start1 = 0;
 my $right_tir_count = 0;
@@ -346,14 +346,14 @@ for (my $i = 0; $i < $trim_aln_len; $i++){
         }
     }
 }
-undef $trim_gap_cols;
-undef $trim_aln_len;
+#undef $trim_gap_cols;
+#undef $trim_aln_len;
 
 foreach my $key (keys %trim_gap_seq_remove) {
     my $seq_obj = $trim_gap_seq_remove{$key};
     $trimmed_aln_obj->remove_seq($seq_obj);
 }
-undef %trim_gap_seq_remove;
+#undef %trim_gap_seq_remove;
 
 my $test_len = $trimmed_aln_obj->length();
 if ($test_len == 0) {
@@ -454,8 +454,8 @@ if ($sorted_left_tir_start_keys[0] <= $flank-25) {
 if ($sorted_right_tir_start_keys[0] <= $flank-25) {
     $right_flank_catch++;
 }
-undef @sorted_left_tir_start_keys;
-undef @sorted_right_tir_start_keys;
+#undef @sorted_left_tir_start_keys;
+#undef @sorted_right_tir_start_keys;
 
 if ($left_flank_catch != 0) {
     if ($right_flank_catch != 0) {
@@ -542,8 +542,8 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
         push @bad_remove, $seq_obj;
     }
 }
-undef %trim_left_pos_hash;
-undef %trim_right_pos_hash;
+#undef %trim_left_pos_hash;
+#undef %trim_right_pos_hash;
 
 #find the TIRs in the trimmed alignment using the index positions of each TIR stored above
 #initialize variables
@@ -654,8 +654,8 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
         push @bad_remove2, $seq_obj;
     }
 }
-undef %trim_left_pos_hash2;
-undef %trim_right_pos_hash2;
+#undef %trim_left_pos_hash2;
+#undef %trim_right_pos_hash2;
 
 #find the TIRs in the trimmed alignment using the index positions of each TIR stored above
 #initialize variables
@@ -708,8 +708,8 @@ my $bad_aln_len2 = @bad_aln2;
 
 print "Good aln len:  $good_aln_len  Good aln len2: $good_aln_len2\n";
 print "Bad aln len:  $bad_aln_len  Bad aln len2: $bad_aln_len2\n";
-undef @bad_aln;
-undef @bad_aln2;
+#undef @bad_aln;
+#undef @bad_aln2;
 #check which run generated the longer TIRs
 if ($good_aln_len2 == 0 and  $good_aln_len == 0) {
     my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
@@ -739,8 +739,8 @@ elsif ($good_aln_len2 != 0 and $good_aln_len2 > $good_aln_len) {
 else {
     print "Alignment set 1 better\n\n";
 }
-undef @good_aln;
-undef @good_aln2;
+#undef @good_aln;
+#undef @good_aln2;
 
 #open a file to store info on why analysis of a copy was aborted
 my $removed_out_path = File::Spec->catpath($volume, $out_path, $filename . ".removed_sequences");
@@ -750,7 +750,7 @@ foreach my $seq_obj (@bad_remove) {
     print $removed_out "$seq_name\tNo TIRs found by first two ggsearch runs\n";
     $trimmed_aln_obj->remove_seq($seq_obj);
 }
-undef @bad_remove;
+#undef @bad_remove;
 
 #get the end residue positions for the tirs from each sequence in the trimmed alignment that will be used to find the tir interval in the full alignment.
 my %tir_positions;
@@ -770,15 +770,15 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
     $tir_positions{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
     $tir_positions{$seq_name}{'right_tir_end'} = $right_tir_end_pos;
 }
-undef $trimmed_aln_obj;
-undef @sorted_hitcolumn_keys;
-undef @sorted_querycolumn_keys;
-undef @sorted_hitcolumn_keys2;
-undef @sorted_querycolumn_keys2;
-undef @sorted_hit_len_keys;
-undef @sorted_hit_len_keys2;
-undef @sorted_query_len_keys;
-undef @sorted_query_len_keys2;
+#undef $trimmed_aln_obj;
+#undef @sorted_hitcolumn_keys;
+#undef @sorted_querycolumn_keys;
+#undef @sorted_hitcolumn_keys2;
+#undef @sorted_querycolumn_keys2;
+#undef @sorted_hit_len_keys;
+#undef @sorted_hit_len_keys2;
+#undef @sorted_query_len_keys;
+#ndef @sorted_query_len_keys2;
 
 #reread the original alignment file
 my $in_obj2 = Bio::AlignIO->new(-file => $infile, -format => 'fasta');
@@ -844,8 +844,7 @@ for (my $i = 0; $i < $ori_aln_len; $i++){
         }
     }
 }
-undef @full_id_array;
-undef @gap_id_array;
+
 
 foreach my $row_ref (@gap_seq_pos_remove) {
     @entry = @{$row_ref};
@@ -856,7 +855,6 @@ foreach my $row_ref (@gap_seq_pos_remove) {
         $search_tirs{$entry[0]}++;
     }
 }
-undef @gap_seq_pos_remove;
 
 foreach my $key (keys %gap_seq_remove) {
     if (exists $gap_seq_remove2{$key}) {
@@ -866,7 +864,6 @@ foreach my $key (keys %gap_seq_remove) {
         $search_tirs{$key}++;
     }
 }
-undef %gap_seq_remove;
 
 #keep track of removed sequences to print to file
 my %removed_seq_hash;
@@ -936,7 +933,6 @@ for (my $i = 0; $i < $final_len; $i++){
         }
     }
 }
-undef $new_gap_cols;
 
 foreach my $key (keys %new_gap_seq_remove) {
     my $seq_obj = $new_gap_seq_remove{$key};
@@ -1016,15 +1012,15 @@ foreach my $seq_name (keys %search_tirs) {
     system("ggsearch36 -n -i -T 8 -d 1 $last_path $first_path > $out_opt");
     
     my @tir_match_result = match_tirs($seq_obj, $out_opt, 1);
-    if ($tir_match_result[0] == 0) {
+    if ($tir_match_result[0] == 0 or ! @tir_match_result) {
         my $seq_id = $seq_obj->id();
         $final_aln_obj->remove_seq($seq_obj);
         print $removed_out "$seq_id\tNo TIR matches found by last ggsearch run\n";
     }
 }
-undef %gap_seq_remove2;
-undef %removed_seq_hash;
-undef %new_gap_seq_remove;
+#undef %gap_seq_remove2;
+#undef %removed_seq_hash;
+#undef %new_gap_seq_remove;
 
 $final_aln_obj = $final_aln_obj->remove_gaps('-',1);
 my $int_aln_out2 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate2");
@@ -1304,7 +1300,7 @@ if ($no_TSD_found_len >= 1) {
         print $no_TSD_found_out "$item\tNo TSDs found\n";
     }
 }
-undef @no_TSD_found;
+#undef @no_TSD_found;
 
 #if necessary, change TIRS to remove the 2bp TSD that are included in them & calculate the overall percent identity of each TIR
 if ($tsd1_count > $tsd2_count and $tsd1_count > $tsd3_count) {
@@ -1394,7 +1390,7 @@ foreach my $row_ref (@put_TSD_names) {
     $TSD_counts{$pos[1]}++;
     $element_info{$pos[0]}{"TSD"} = $pos[1];
 }
-undef @put_TSD_names;
+#undef @put_TSD_names;
 my @sorted_TSD_keys =  sort { $TSD_counts{$b} <=> $TSD_counts{$a} } keys (%TSD_counts);
 
 #check whether the same TSD sequence was found in >80% of the copies. If not, count the occurances of TSD length, sort by highest occurances, and check if the length of the TSD is the same in >80% of the copies
@@ -1424,7 +1420,7 @@ else {
     $element_info{"TSD_len"} = $final_TSD_length;
     $element_info{"TSD_fraction"} = $TSD_fraction;
 }
-undef @putative_TSD;
+#undef @putative_TSD;
 
 my $insertion_site_file = $filename . ".insertion-site.fa";
 my $insertion_site_out_path = File::Spec->catpath($volume, $out_path, $insertion_site_file);
@@ -1446,7 +1442,7 @@ foreach my $row_ref (@TSD_info) {
 close($insertion_site_out);
 close($tsd_info_out);
 close($no_TSD_found_out);
-undef @TSD_info;
+#undef @TSD_info;
 
 if ($need_consensus == 1) {
     #read in tsd file as MSA to generate IUPAC consensus
@@ -1531,16 +1527,16 @@ my %element_hits;
 foreach my $ele_name (keys %element_char_hash) {
     if ($element_info{'TSD_len'} =~ m/$element_char_hash{$ele_name}{"tsd_length"}/) {
         $element_hits{$ele_name}++;
-    }
-    if ($element_char_hash{$ele_name}{"tsd_con"} ne '' and $element_info{'TSD_seq'} =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
-        $element_hits{$ele_name}++;
-    }
-    if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
-        if ($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) {
+        if ($element_char_hash{$ele_name}{"tsd_con"} ne '' and $element_info{'TSD_seq'} =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
             $element_hits{$ele_name}++;
         }
-        else {
-            delete $element_hits{$ele_name};
+        if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
+            if ($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) {
+                $element_hits{$ele_name}++;
+            }
+            #else {
+            #    delete $element_hits{$ele_name};
+            #}
         }
     }
 }
@@ -1720,7 +1716,7 @@ sub match_tirs {
                         }
                     }
                     elsif ($match_len >= 4) {
-                        #match length is 5 or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatch has occurred. If a match, continue.
+                        #match length is 5 or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatches have occurred. If a match, continue.
                         if ($homo_char eq " ") {
                             $match_mis_aln++;
                             $total_mis_aln++;
