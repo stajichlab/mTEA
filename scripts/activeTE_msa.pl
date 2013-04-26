@@ -1433,7 +1433,9 @@ foreach my $row_ref (@TSD_info) {
     my @pos = @{$row_ref};
     if (length($pos[2]) == $element_info{"TSD_len"}) {
         print $tsd_info_out ">$pos[0]\n$pos[2]\n";
-        print $insertion_site_out ">$pos[0]\n$pos[1]\n";
+        if ($pos[1] !~ g/n/i) {
+            print $insertion_site_out ">$pos[0]\n$pos[1]\n";
+        }
     }
     else {
         print $no_TSD_found_out "$pos[0]\tTSD length different than >=80% of other copies\n";
