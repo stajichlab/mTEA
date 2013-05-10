@@ -1,0 +1,119 @@
+=====================
+1. Create your website runing Blogo
+2. Use Blogo_batch.pl in a Unix-like platform
+3. Use Blogo_batch.pl in windows
+4. Running Blogo using a web pipeline
+5. Website
+6. LICENSE
+======================
+1. Create your website runing Blogo:
+
+1.1, before start, be sure that these packages were installed:
+Perl (http://www.perl.org/),
+ImageMagick (http://www.imagemagick.org/script/index.php),
+PerlMagick (http://www.imagemagick.org/script/perl-magick.php) 
+
+1.2, Extract the Blogo package blogo_1.0.tar.gz.
+
+1.3, Open the httpd.conf file of Apache server in your computer. Find the cgi-bin derectory and the document root of your website. For example, the following two lines have defined these directory.
+ScriptAlias /cgi-bin/ "/home/website/cgi-bin/"
+DocumentRoot "/home/website"
+
+1.4, Copy all the files and folders in cgi-bin directory of the Blogo package to /home/website/cgi-bin/, and copy the blogo folder (outside cgi-bin directory) to /home/website/. If you copy this folder to some deeper sub-directory, i.e. /home/website/aaa/bbb/, please go to the cgi-bin/Blogo/ directory and edit the setwebpath.pl file following the instructions there at the same time. 
+
+1.5, In a web browser, enter http://your domain name/blogo/ to test the website.
+
+1.6, If the Blogoform.pl and Blogo.pl does not run well, please check whether or not it it excutable by apache. Using command like "chmod a+x Blogo.pl" to change the properties of these files. The /home/website/Blogo/img folder shoule also be writable by apache. 
+
+
+===================
+2. Use Blogo_batch.pl in a Unix-like platform:
+
+If your want to treat a lot of sequences using Blogo in your own computer, It's a good idea to run Blogo_batch.pl.
+
+2.1, before you run Blogo_batch.pl, be sure that these packages were installed:
+Perl (http://www.perl.org/),
+ImageMagick (http://www.imagemagick.org/script/index.php),
+PerlMagick (http://www.imagemagick.org/script/perl-magick.php) 
+
+2.2, Extract the Blogo package in a directory (i.e. /home/username/), and goto to the cgi-bin directory (/home/username/Blogo_1.0/cgi-bin/Blogo/) in the Blogo package. These files/directories should be (and needed) in the directory: Blogo_batch.pl,  Blogo.conf, Blogo.pm, Statistics/ChisqIndep.pm, Statistics/Distributions.pm, Statistics/Fisher/. (The two files ChisqIndep.pm and Distributions.pm were downloaded from http://search.cpan.org/~yunfang/Statistics-ChisqIndep-0.02/ and http://search.cpan.org/~mikek/Statistics-Distributions-1.02/. The files in fisher folder were from http://search.cpan.org/~tpederse/Text-NSP-1.09/)
+
+
+2.3, Blogo_batch.pl need you to read your sequences in one or several files, and create Blogo images in a directory. For example, your protein sequences files are test1.seq and test2.seq in plain text format in /home/username/Blogo_1.0/blogo/seq/, and you want to output Blogo images to /home/username/Blogo_1.0/blogo/img/ (Be sure that you have permission to write files in this directory). Edit the Blogo.conf file in /home/username/Blogo_1.0/cgi-bin and change some settings like this:
+
+file_path=/home/username/Blogo_1.0/blogo/seq/
+file_names=test1.seq, test2.seq
+img_abs_dir=/home/username/Blogo_1.0/blogo/img/
+
+2.4, Then you may change some other settings in  Blogo.conf file to define the properties of your input sequences and output logo format. All words after a "#" in a line are comments and are used to guide your settings.
+
+2.5, After you have finished all the settings, save Blogo.conf file. Check the first line in Blogo_batch.pl. It tell the system where Perl is installed. If you have installed Perl in another place, please change this line. Open the terminal, use the following commands to create Blogo images. 
+
+cd /home/username/Blogo_1.0/cgi-bin/Blogo
+./Blogo_batch.pl
+
+2.6, Go to /home/username/Blogo_1.0/web/img/ and there will be two new image files created.
+
+2.7, Blogo_batch.pl also receive references from command line. This was used when you want to change some setting of Blogo output, however you don't want to change the value in the Blogo.conf file, or you have build a new configue file yourself. For example, when you have build a new configue file my.conf in the same folder with Blogo_batch.pl, you could use the following command to run Blogo_batch.pl:
+
+./Blogo_batch.pl conf_file=my.conf
+
+you can use these commands to change part of the default setting of Blogo.conf or my.conf:
+
+./Blogo_batch.pl logo_type=type1 
+./Blogo_batch.pl file_names=new1.seq,new2.seq
+./Blogo_batch.pl conf_file=my.conf reg_start=20 reg_length=100
+
+
+Note that there MUST be NO blank beside the equal sign. These command are wrong:
+./Blogo_batch.pl conf_file = my.conf reg_start=20 reg_length=100
+./Blogo_batch.pl file_names=new1.seq, new2.seq
+
+=======================================
+3. Use Blogo_batch.pl in windows
+
+It's simalar to use blogo in windows except that you use these kinds of command to run Blogo_batch.pl in a command line:
+
+perl Blogo_batch.pl file_names=new1.seq,new2.seq
+perl Blogo_batch.pl conf_file=my.conf
+
+=========================================
+4. Running Blogo using a web pipeline
+
+We recommend you to install Blogo in your own computer and you can also intergrate Blogo into your own program. However, if you don't want to do these, you can also visit the website of Blogo or run Blogo using a web pipeline (It will burden the server): 
+
+You need a terminal in windows or linux and a link to internet. Please see the example code "cgi-bin\Blogo\webpipeline.pl", a Perl source code to link to the Blogo server,  treat your input and return the results. You can change webpipeline.pl If you need. cd to the directory of where webpipeline.pl is in and run it by 
+./webpipeline.pl     (in linux)
+perl webpipeline.pl  (in windows)
+
+The results returned by webpipeline.pl is like this:
+
+logo_type=type2
+Blogoimg=http://acephpx.cropdb.org/blogo/img/temp25_AAs_B_type2.1214976041.jpg
+bg_fre_str=(AAs) G S T Y C Q N K R H D E A V L I P W F M, 0.0674, 0.0885, 0.0429
+, 0.0697, 0.0135, 0.0382, 0.0415, 0.0544, 0.0512, 0.0212, 0.0703, 0.0912, 0.0591
+, 0.0538, 0.0629, 0.0344, 0.0779, 0.0074, 0.0274, 0.0271,
+jobname=temp25
+
+
+========================================
+5. Website
+
+http://acephpx.cropdb.org/blogo/
+http://www.bioinformatics.org/blogo/
+
+========================================
+6. LICENSE
+
+<Blogo, display bias of biological sequences> Copyright (C) <2008> <Wencheng Li, lwcbio@yahoo.com.cn> 
+
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License (http://www.gnu.org/licenses/lgpl.html) for more details.
+
+Note: a copy of the GNU Lesser General Public License is available on the web
+at <http://www.gnu.org/licenses/lgpl.html> and is included in this
+distribution as GNU_Lesser_General_Public_License.txt.
+
+
+Enjoy this program!
