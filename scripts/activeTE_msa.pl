@@ -1386,7 +1386,7 @@ foreach my $row_ref (@TSD_info) {
     my @pos = @{$row_ref};
     if (length($pos[2]) == $element_info{"TSD_len"}) {
         print $tsd_info_out ">$pos[0]\n$pos[2]\n";
-        if ($pos[1] !~ m/n/gi) {
+        if ($pos[1] !~ m/n/i) {
             print $insertion_site_out ">$pos[0]\n$pos[1]\n";
         }
     }
@@ -1503,6 +1503,7 @@ foreach my $key ( sort { $element_hits{$b} <=> $element_hits{$a} } keys (%elemen
 } 
 
 my $classification = '';
+#store all classifications and the number of hits to each
 foreach my $row_ref (@sorted) {
     my @info = @{$row_ref};
     if ($info[1] == ${$sorted[0]}[1]) {
@@ -1739,13 +1740,13 @@ sub match_tirs {
 }
 
 sub generate_gff {
-    my $self = shift; #whatever state the msa object is in at time of call
+    my $self = shift; 
     my $path = shift;
     my $round = shift;
     print "Entered .gff printer\n";
     $self->throw("Need Bio::Align::AlignI argument")
         unless ref $self && $self->isa( 'Bio::Align::AlignI');
-    
+    #not implemented: round changes the output based on when the call is made
     if ($round eq 'final') {
         open(my $out, ">", $path) or die "Error creating $path. $!\n";
         print "Round = final\n";
@@ -1765,6 +1766,7 @@ sub generate_gff {
             my $start;
             my $end;
             my $strand;
+            #grab copy information from TARGeT output
             if ($seq_name =~ /^([0-9]*).+_Query:(.*)_Sbjct:(.*)_Length.+Location:\(([0-9]*)_\-_([0-9]*)\)_Direction:(.+)/) {
                 $copy_num = $1;
                 $eleid = $2;
@@ -1773,6 +1775,7 @@ sub generate_gff {
                 $end = $5+$right_comp;
                 $strand = $6;
             }
+            #grab copy information from RSPB output
             elsif ($seq_name =~ /^([0-9]*)_(.+)_(.+)-(.+)_(.+)/) {
                 $copy_num = $1;
                 $seqid = $2;
@@ -1828,6 +1831,9 @@ sub clean_files {
 }
 
 sub get_columns {
+    #This will get the column numbers of the start and stop position of both TIRs using their nucleotide positions from a hash.
+    #Initially, the hash contains information for the sequences present after TIR matching. Sequences may be added subsequently.
+    #This is needed after sequences and any resulting gap only columns have been removed from the alignment
     my $self = shift;
     $self->throw("Need Bio::Align::AlignI argument")
         unless ref $self && $self->isa( 'Bio::Align::AlignI');
@@ -1835,6 +1841,7 @@ sub get_columns {
     
     foreach my $seq_obj ($self->each_seq()) {
         my $seq_name = $seq_obj->id();
+        #skip sequences not in the hash
         if (!defined $tir_positions{$seq_name}) {
             next;
         }
