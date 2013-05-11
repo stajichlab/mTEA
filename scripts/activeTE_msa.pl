@@ -132,7 +132,7 @@ for (my $i = 0; $i < $full_aln_len; $i++){
     my @gap_col_array = @{$gap_cols};
     my $gap_col_hashref = $gap_col_array[$i];
     my %gap_col_hash = %{$gap_col_hashref};
-    if ($gap_id_array[$i] >= 80.0 and ($id_info[1] <= 50 or $id_info[2] <= .1)) {
+    if ($gap_id_array[$i] > 80.0 and ($id_info[1] <= 50 or $id_info[2] < .1)) {
         foreach my $key (keys %gap_col_hash) {
             if ($gap_col_hash{$key} != 1){
                 my $seq_obj = $full_aln_obj->get_seq_by_id($key);
@@ -203,7 +203,7 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
     my $pos_id = $pos_info[1];
     my $pos_present = $pos_info[2];
     if ($left_tir_count == 0) {
-        if ($pos_id >= 85.0 and $pos_present >= .6) {
+        if ($pos_id >= 80.0 and $pos_present >= .6) {
             $left_tir_start1 = $i;
             $left_tir_count++;
             next;
@@ -257,7 +257,7 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
     }
     my $pos_present = $base_count/$total_count;
     if ($right_tir_count == 0) {
-        if ($pos_id >= 85.0 and $pos_present >= .6) {
+        if ($pos_id >= 80.0 and $pos_present >= .6) {
             $right_tir_start1 = $trim_aln_len-$i;
             $right_tir_count++;
             next;
@@ -791,19 +791,8 @@ my $left_tir_end;
 my $right_tir_start;
 my $right_tir_end;
 
-foreach my $seq_obj ($ori_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($ori_aln_obj, \%tir_positions);
+
 my $tir_length = $left_tir_end - $left_tir_start;
 print "First column grab just after reimporting the original alignment\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 print "Starting MSA length = $ori_aln_len TIR length = $tir_length\n";
@@ -883,19 +872,7 @@ my $final_len = $final_aln_obj->length();
 print "MSA length is $final_len now\n";
 
 #get the column positions of tirs in the intermediate alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions);
 print "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 
 my $new_gap_cols = $final_aln_obj->gap_col_matrix();
@@ -943,20 +920,9 @@ foreach my $key (keys %new_gap_seq_remove) {
 $final_aln_obj = $final_aln_obj->remove_gaps('-',1);
 my $check_len = $final_aln_obj->length();
 print "MSA length now: $check_len\n";
+
 #get the column positions of tirs in the intermediate alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions);
 print "3rd column grab after removing more copies with TIR isssues\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 
 foreach my $seq_name (keys %search_tirs) {
@@ -1029,20 +995,7 @@ $out->write_aln($final_aln_obj);
 my $last_len = $final_aln_obj->length();
 
 #get the column positions of tirs in the final alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
-
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions);
 print "Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start\n";
 
 #Extract the left and right TIRs as new alignment objects
@@ -1433,7 +1386,7 @@ foreach my $row_ref (@TSD_info) {
     my @pos = @{$row_ref};
     if (length($pos[2]) == $element_info{"TSD_len"}) {
         print $tsd_info_out ">$pos[0]\n$pos[2]\n";
-        if ($pos[1] !~ g/n/i) {
+        if ($pos[1] !~ m/n/gi) {
             print $insertion_site_out ">$pos[0]\n$pos[1]\n";
         }
     }
@@ -1637,17 +1590,19 @@ sub match_tirs {
                     my $homo_char =  substr($homo_string, $count, 1);
                     my $query_char =  substr($query_str, $count, 1);
                     my $hit_char =  substr($hit_str, $count, 1);
-                    if ($count == 8 and $total_mis_aln >= 4) {
-                        $match_len = 0;
-                                $start_pos = '';
-                                $match_query = '';
-                                $match_hit = '';
-                                $end_pos = '';
-                                print "No TIRs found near start of sequences, resetting counts and ending\n";
-                                last;
+                    if ($count == 8 and $total_mis_aln >= 5) {
+						if ($match_len < 3) {
+							$match_len = 0;
+							$start_pos = '';
+							$match_query = '';
+							$match_hit = '';
+							$end_pos = '';
+							print "No TIRs found near start of sequences, resetting counts and ending\n";
+							last;
+						}
                     }
                     if ($round == 2) {
-                        if ($count == 4 and $total_mis_aln >=2) {
+                        if ($count == 6 and $total_mis_aln >=4) {
                             $match_len = 0;
                             $start_pos = '';
                             $match_query = '';
@@ -1870,4 +1825,26 @@ sub clean_files {
         }
     }
     closedir($in_DIR);
+}
+
+sub get_columns {
+    my $self = shift;
+    $self->throw("Need Bio::Align::AlignI argument")
+        unless ref $self && $self->isa( 'Bio::Align::AlignI');
+    my $tir_positions = shift;
+    
+    foreach my $seq_obj ($self->each_seq()) {
+        my $seq_name = $seq_obj->id();
+        if (!defined $tir_positions{$seq_name}) {
+            next;
+        }
+        else {
+            $left_tir_start = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'left_tir_start'});
+            $left_tir_end = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'left_tir_end'});
+            $right_tir_start = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'right_tir_start'});
+            $right_tir_end = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'right_tir_end'});
+            last;
+        }
+    }
+    return ($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end);
 }
