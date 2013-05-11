@@ -81,7 +81,8 @@ my %element_info; # this hash is for storing element information
 #generate trimal alignment gap summary file, using sed to remove the header info
 #my $gap_summary_out = File::Spec->catpath($volume, $out_path, $filename . ".full_gap_summary");
 
-open(my $trimal_run = "$trimal -in $infile -sgc | sed -n '4,\$p' |");
+
+open(my $trimal_run => "$trimal -in $infile -sgc | sed -n '4,\$p' |") || die "Cannot run trimal!";
 # parse the trimal output file with the gap %  of each position in the full alignment
 my @gap_id_array;
 while (<$trimal_run>){
@@ -102,7 +103,7 @@ open(my $in => "<$infile");
 while (<$in>){
     s/ /_/g;
     # did you want to skip lines that don't have any whitespace? 
-    push @in_array, $line;
+    push @in_array, $_;
 }
 close($in);
 open(my $fix_out => ">$infile");
@@ -136,7 +137,7 @@ warn "Starting Full ID calculation\n";
 for (my $i = 1;  $i <= $full_aln_len; $i++ ) {
     my $pos = $full_aln_obj->slice($i,$i,1);
     my $pos_id = $pos->percentage_identity;
-    my $gap_col_hashref = $gap_col->[$i-1];
+    my $gap_col_hashref = $gap_cols->[$i-1];
     my $total_count = 0;
     my $base_count = 0;
     foreach my $key (keys %{$gap_col_hashref}) {
@@ -147,7 +148,7 @@ for (my $i = 1;  $i <= $full_aln_len; $i++ ) {
     }
     # may have to worry about divide by 0 ?
     if ( $total_count == 0 ) {
-      warn("column has NO entries, skipping\n");
+      warn("column [$i] has NO entries, skipping\n");
       next;
     }
     my $pos_present = $base_count / $total_count; # position present ratio of bases to total bases
@@ -163,7 +164,7 @@ my @gap_seq_pos_remove;
 
 for (my $i = 0; $i < $full_aln_len; $i++){
     my $id_row_ref = $full_id_array[$i];
-    my $gap_col_hashref = $gap_col->[$i];
+    my $gap_col_hashref = $gap_cols->[$i];
     my %gap_col_hash = %{$gap_col_hashref};
     if ($gap_id_array[$i] >= 80.0 and ($id_row_ref->[1] <= 50 or $id_row_ref->[2] <= .1)) {
         foreach my $key (keys %gap_col_hash) {
@@ -198,9 +199,11 @@ if ($aln_copy_num > 5) {
 else {
     $trimmed_aln_obj = $full_aln_obj;
 }
+
 my @trim_id_array;
 my $trim_gap_cols = $trimmed_aln_obj->gap_col_matrix();
 my $trim_aln_len = $trimmed_aln_obj->length();
+
 for (my $i = 1;  $i <= $trim_aln_len; $i++ ) {
     my $pos = $trimmed_aln_obj->slice($i,$i,1);
     my $pos_id = $pos->percentage_identity;
@@ -209,14 +212,14 @@ for (my $i = 1;  $i <= $trim_aln_len; $i++ ) {
     my $total_count;
     my $base_count;
     foreach my $key (keys %{$gap_col_hashref}) {
-      if ($gap_col_hash->{$key} != 1) {
+      if ($gap_col_hashref->{$key} != 1) {
 	$base_count++;
       }
       $total_count++;
     }
     # may have to worry about divide by 0 ?
     if ( $total_count == 0 ) {
-      warn("column has NO entries, skipping\n");
+      warn("column [$i] has NO entries, skipping\n");
       next;
     }
 
@@ -944,7 +947,7 @@ for (my $i = 0; $i < $final_len; $i++) {
     my $base_count = 0;
     my $total_count = 0;
     foreach my $key (keys %{$trim_gap_col_hashref}) {
-      if ($trim_gap_col_hash->{$key} != 1) {
+      if ($trim_gap_col_hashref->{$key} != 1) {
 	$base_count++;
       }
       $total_count++;
@@ -952,14 +955,14 @@ for (my $i = 0; $i < $final_len; $i++) {
     my $pos_present = $base_count/$total_count;
     if ($pos_present < 0.5) {
       foreach my $key (keys %{$trim_gap_col_hashref}) {
-	if ($trim_gap_col_hash->{$key} != 1) {
+	if ($trim_gap_col_hashref->{$key} != 1) {
 	  my $seq_obj = $final_aln_obj->get_seq_by_id($key);
 	  $new_gap_seq_remove{$key} = $seq_obj;
 	}
       }
     } else {
-      foreach my $key (keys %{$trim_gap_col_hash}) {
-	if ($trim_gap_col_hash->{$key} == 1) {
+      foreach my $key (keys %{$trim_gap_col_hashref}) {
+	if ($trim_gap_col_hashref->{$key} == 1) {
 	  my $seq_obj = $final_aln_obj->get_seq_by_id($key);
 	  $new_gap_seq_remove{$key} = $seq_obj;
 	}
@@ -1454,7 +1457,8 @@ foreach my $row_ref (@TSD_info) {
     my @pos = @{$row_ref};
     if (length($pos[2]) == $element_info{"TSD_len"}) {
         print $tsd_info_out ">$pos[0]\n$pos[2]\n";
-        if ($pos[1] !~ g/n/i) {
+#        if ($pos[1] !~ g/n/i) {
+        if ($pos[1] !~ /n/i) {
             print $insertion_site_out ">$pos[0]\n$pos[1]\n";
         }
     }
