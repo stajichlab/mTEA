@@ -859,7 +859,7 @@ my %removed_seq_hash;
 foreach my $key (keys %gap_seq_remove2) {
     my $remove = $ori_aln_obj->get_seq_by_id($key);
     my $seq_id = $remove->id();
-    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs";
+    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
     $removed_seq_hash{$seq_id}++;
     $ori_aln_obj->remove_seq($remove);
 }
