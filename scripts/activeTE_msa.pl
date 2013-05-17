@@ -41,6 +41,8 @@ my $flank = 100;
 my $trimal = 'trimal'; # specify the full path to this if it can't be found automatically
 my $all;
 
+my $PROGRAM_NAME = "activeTE";
+
 GetOptions (
 	    'flank:i' => \$flank,
 	    'all'     => \$all,
@@ -1821,16 +1823,26 @@ sub generate_gff {
             my $tir_id = $ele_info_ref->{"left_tir_id"};
             my $tsd_frac = $ele_info_ref->{"TSD_fraction"};
             my $tsd_con = $ele_info_ref->{"TSD_seq"};
-            print $out "$seqid\tactiveTE\t$type\t$start\t$end\t.\t$strand\t.\tID=$eleid-$copy_num;Name=$eleid Copy$copy_num;element_id=$ele_id;element_classification=$ele_class;tir_id=$tir_id;tsd_fraction=$tsd_frac;tsd_consensus=$tsd_con\n";
-            print $out "$seqid\tactiveTE\tfive_prime_terminal_inverted_repeat\t$start\t$ltir_end\t.\t.\t.\tParent=$eleid-$copy_num\n";
-            print $out "$seqid\tactiveTE\tthree_prime_terminal_inverted_repeat\t$rtir_start\t$end\t.\t.\t.\tParent=$eleid-$copy_num\n";
-            if (defined $ele_info_ref->{$seq_name}{"TSD"}) {
+            print $out join("\t",
+			    $seqid,$PROGRAM_NAME,$type,$start,$end,'.',
+			    $strand,'.',
+			    join(";","ID=$eleid-$copy_num",
+				 "Name=$eleid Copy$copy_num",
+				 "element_id=$ele_id","element_classification=$ele_class",
+				 "tir_id=$tir_id",
+				 "tsd_fraction=$tsd_frac",
+				 "tsd_consensus=$tsd_con")),"\n"
+            print $out join("\t",$seqid,$PROGRAM_NAME,"five_prime_terminal_inverted_repeat",
+			    $start,$ltir_end,".",".",".",
+			    "Parent=$eleid-$copy_num"), "\n";
+	    print $out join("\t",$seqid,$PROGRAM_NAME,"three_prime_terminal_inverted_repeat",$rtir_start,$end,".",".",".","Parent=$eleid-$copy_num"),"\n";
+	    if (defined $ele_info_ref->{$seq_name}{"TSD"}) {
                 my $ltsd_start = $start-length($ele_info_ref->{$seq_name}{"TSD"});
                 my $ltsd_end = $start-1;
                 my $rtsd_start = $end+1;
                 my $rtsd_end = $end+length($ele_info_ref->{$seq_name}{"TSD"});
-                print $out "$seqid\tactiveTE\ttarget_site_duplication\t$ltsd_start\t$ltsd_end\t.\t.\t.\tDerives_from=$eleid-$copy_num\n";
-                print $out "$seqid\tactiveTE\ttarget_site_duplication\t$rtsd_start\t$rtsd_end\t.\t.\t.\tDerives_from=$eleid-$copy_num\n";
+                print $out join("\t",$seqid,$PROGRAM_NAME,"target_site_duplication",,$ltsd_start,$ltsd_end,".",".",".","Derives_from=$eleid-$copy_num"),"\n";
+                print $out join("\t",$seqid,$PROGRAM_NAME,"target_site_duplication",$rtsd_start,$rtsd_end,".",".",".","Derives_from=$eleid-$copy_num"),"\n";
             }
         }
         close($out);
@@ -1863,7 +1875,6 @@ sub get_columns {
     $self->throw("Need Bio::Align::AlignI argument")
         unless ref $self && $self->isa( 'Bio::Align::AlignI');
     my $tir_positions = shift;
-    
     foreach my $seq_obj ($self->each_seq()) {
         my $seq_name = $seq_obj->id();
         #skip sequences not in the hash
