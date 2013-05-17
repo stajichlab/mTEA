@@ -244,7 +244,7 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
     my $pos_id = $pos_info[1];
     my $pos_present = $pos_info[2];
     if ($left_tir_count == 0) {
-        if ($pos_id >= 85.0 and $pos_present >= .6) {
+        if ($pos_id >= 80.0 and $pos_present >= .6) {
             $left_tir_start1 = $i;
             $left_tir_count++;
             next;
@@ -298,7 +298,7 @@ for (my $i = 1;  $i < $trim_aln_len; $i++ ) {
     }
     my $pos_present = $base_count/$total_count;
     if ($right_tir_count == 0) {
-        if ($pos_id >= 85.0 and $pos_present >= .6) {
+        if ($pos_id >= 80.0 and $pos_present >= .6) {
             $right_tir_start1 = $trim_aln_len-$i;
             $right_tir_count++;
             next;
@@ -831,19 +831,8 @@ my $left_tir_end;
 my $right_tir_start;
 my $right_tir_end;
 
-foreach my $seq_obj ($ori_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $ori_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($ori_aln_obj, \%tir_positions);
+
 my $tir_length = $left_tir_end - $left_tir_start;
 print "First column grab just after reimporting the original alignment\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 print "Starting MSA length = $ori_aln_len TIR length = $tir_length\n";
@@ -910,7 +899,7 @@ my %removed_seq_hash;
 foreach my $key (keys %gap_seq_remove2) {
     my $remove = $ori_aln_obj->get_seq_by_id($key);
     my $seq_id = $remove->id();
-    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs";
+    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
     $removed_seq_hash{$seq_id}++;
     $ori_aln_obj->remove_seq($remove);
 }
@@ -923,19 +912,7 @@ my $final_len = $final_aln_obj->length();
 print "MSA length is $final_len now\n";
 
 #get the column positions of tirs in the intermediate alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions);
 print "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 
 my $new_gap_cols = $final_aln_obj->gap_col_matrix();
@@ -980,20 +957,9 @@ foreach my $key (keys %new_gap_seq_remove) {
 $final_aln_obj = $final_aln_obj->remove_gaps('-',1);
 my $check_len = $final_aln_obj->length();
 print "MSA length now: $check_len\n";
+
 #get the column positions of tirs in the intermediate alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions);
 print "3rd column grab after removing more copies with TIR isssues\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
 
 foreach my $seq_name (keys %search_tirs) {
@@ -1066,20 +1032,7 @@ $out->write_aln($final_aln_obj);
 my $last_len = $final_aln_obj->length();
 
 #get the column positions of tirs in the final alignment
-foreach my $seq_obj ($final_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (!defined $tir_positions{$seq_name}) {
-        next;
-    }
-    else {
-        $left_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_start'});
-        $left_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'left_tir_end'});
-        $right_tir_start = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_start'});
-        $right_tir_end = $final_aln_obj->column_from_residue_number($seq_name, $tir_positions{$seq_name}{'right_tir_end'});
-        last;
-    }
-}
-
+($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions);
 print "Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start\n";
 
 #Extract the left and right TIRs as new alignment objects
@@ -1457,8 +1410,7 @@ foreach my $row_ref (@TSD_info) {
     my @pos = @{$row_ref};
     if (length($pos[2]) == $element_info{"TSD_len"}) {
         print $tsd_info_out ">$pos[0]\n$pos[2]\n";
-#        if ($pos[1] !~ g/n/i) {
-        if ($pos[1] !~ /n/i) {
+        if ($pos[1] !~ m/n/i) {
             print $insertion_site_out ">$pos[0]\n$pos[1]\n";
         }
     }
@@ -1575,6 +1527,7 @@ foreach my $key ( sort { $element_hits{$b} <=> $element_hits{$a} } keys (%elemen
 } 
 
 my $classification = '';
+#store all classifications and the number of hits to each
 foreach my $row_ref (@sorted) {
     my @info = @{$row_ref};
     if ($info[1] == ${$sorted[0]}[1]) {
@@ -1644,129 +1597,134 @@ sub match_tirs {
 	my $len_query = length($query_str);
 	my $len_hit = length($hit_str);
 
-	#initialize variables
-	my $match_len = 0;
-	my $start_pos = '';
-	my $end_pos = '';
-	my $match_query = '';
-	my $match_hit = '';
-	my $match_mis_aln = 0;
-	my $total_mis_aln = 0;
-	my $last_good = 0;
-	my $hit_pos;
-	my $query_pos;
-
-	#parse homology string, keeping track of match length and mismatches or gaps
-	for (my $count = 0; $count < length($homo_string); $count++) {
-	  my $homo_char =  substr($homo_string, $count, 1);
-	  my $query_char =  substr($query_str, $count, 1);
-	  my $hit_char =  substr($hit_str, $count, 1);
-	  if ($count == 8 and $total_mis_aln >= 4) {
-	    $match_len = 0;
-	    $start_pos = '';
-	    $match_query = '';
-	    $match_hit = '';
-	    $end_pos = '';
-	    print "No TIRs found near start of sequences, resetting counts and ending\n";
-	    last;
-	  }
-	  if ($round == 2) {
-	    if ($count == 4 and $total_mis_aln >=2) {
-	      $match_len = 0;
-	      $start_pos = '';
-	      $match_query = '';
-	      $match_hit = '';
-	      $end_pos = '';
-	      last;
-	    }
-	  }
-	  if ($match_len == 0) {
-	    #if match length equals 0 and position is not a match, continue to next position
-	    if ($homo_char eq " ") {
-	      $total_mis_aln++;
-	      next;
-	    }
-	    #if position is a match, store info, continue to next position
-	    elsif ($homo_char eq ":") {
-	      $start_pos = $count;
-	      $last_good = $count;
-	      $match_len++;
-	      $match_query .= $query_char;
-	      $match_hit .= $hit_char;
-	      print "Initial match at $start_pos\n";
-	      next;
-	    }
-	  } elsif ($match_len >= 1 and $match_len < 4) {
-	    #if match length is 1-3 and position is not a match, increment mismatch counter and check if more than one mismatch has occurred
-	    if ($homo_char eq " ") {
-	      $match_mis_aln++;
-	      $total_mis_aln++;
-	      #allow one mismatch, store info and continue
-	      if ($match_mis_aln <= 1) {
-		$match_len++;
-		$last_good = $count;
-		$match_query .= $query_char;
-		$match_hit .= $hit_char;
-		print "First Mismatch at $count\n";
-		next;
-	      }
-	      #more than one mismatch, reset counters and other info, continue
-	      elsif ($match_mis_aln > 1) { 
-		$match_len = 0;
-		$start_pos = '';
-		$match_query = '';
-		$match_hit = '';
-		$match_mis_aln = 0;
-		print "Another Mismatch at $count, resetting counts\n";
-		next;
-	      } elsif ($total_mis_aln >= 3) {
-		$match_len = 0;
-		$start_pos = '';
-		$match_query = '';
-		$match_hit = '';
-		$end_pos = '';
-		print "Another Mismatch at $count, resetting counts and ending\n";
-		last;
-	      }
-	    }
-	    #position is a match, store info and continue
-	    elsif ($homo_char eq ":") {
-	      $last_good = $count;
-	      $match_len++;
-	      $match_query .= $query_char;
-	      $match_hit .= $hit_char;
-	      print "Another match at $count. Length is $match_len\n";
-	      next;
-	    }
-	  } elsif ($match_len >= 4) {
-	    #match length is 5 or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatches have occurred. If a match, continue.
-	    if ($homo_char eq " ") {
-	      $match_mis_aln++;
-	      $total_mis_aln++;
-	      #mismatches under 3, store info and continue
-	      if ($match_mis_aln <= 3) {
-		$match_len++;
-		$last_good = $count;
-		$match_query .= $query_char;
-		$match_hit .= $hit_char;
-		print "Another Mismatch at $count, proceeding\n";
-		next;
-	      }
-	      #elsif($total_mis_aln >= 4) {
-	      #    $match_len = 0;
-	      #    $start_pos = '';
-	      #    $match_query = '';
-	      #    $match_hit = '';
-	      #    $end_pos = '';
-	      #    print "Another Mismatch at $count, total misalignment is $total_mis_aln, resetting counts and ending\n";
-	      #    last;
-	      #}
-	      #mismatches 3 or more, store final info for alignment match and end parsing
-	      elsif ($match_mis_aln >= 3) {
-		$end_pos = $last_good;
-		$match_query =~ s/-//g;
-		$match_hit =~ s/-//g;
-
+                #initialize variables
+                my $match_len = 0;
+                my $start_pos = '';
+                my $end_pos = '';
+                my $match_query = '';
+                my $match_hit = '';
+                my $match_mis_aln = 0;
+                my $total_mis_aln = 0;
+                my $last_good = 0;
+                my $hit_pos;
+                my $query_pos;
+                
+                #parse homology string, keeping track of match length and mismatches or gaps
+                for (my $count = 0; $count < length($homo_string); $count++) {
+                    my $homo_char =  substr($homo_string, $count, 1);
+                    my $query_char =  substr($query_str, $count, 1);
+                    my $hit_char =  substr($hit_str, $count, 1);
+                    if ($count == 8 and $total_mis_aln >= 5) {
+						if ($match_len < 3) {
+							$match_len = 0;
+							$start_pos = '';
+							$match_query = '';
+							$match_hit = '';
+							$end_pos = '';
+							print "No TIRs found near start of sequences, resetting counts and ending\n";
+							last;
+						}
+                    }
+                    if ($round == 2) {
+                        if ($count == 6 and $total_mis_aln >=4) {
+                            $match_len = 0;
+                            $start_pos = '';
+                            $match_query = '';
+                            $match_hit = '';
+                            $end_pos = '';
+                            last;
+                        }
+                    }
+                    if ($match_len == 0){
+                        #if match length equals 0 and position is not a match, continue to next position
+                        if ($homo_char eq " ") {
+                            $total_mis_aln++;
+                            next;
+                        }
+                        #if position is a match, store info, continue to next position
+                        elsif ($homo_char eq ":") {
+                            $start_pos = $count;
+                            $last_good = $count;
+                            $match_len++;
+                            $match_query .= $query_char;
+                            $match_hit .= $hit_char;
+                            print "Initial match at $start_pos\n";
+                            next;
+                        }
+                    }
+                    elsif ($match_len >= 1 and $match_len < 4) {
+                        #if match length is 1-3 and position is not a match, increment mismatch counter and check if more than one mismatch has occurred
+                        if ($homo_char eq " ") {
+                            $match_mis_aln++;
+                            $total_mis_aln++;
+                            #allow one mismatch, store info and continue
+                            if ($match_mis_aln <= 1) {
+                                $match_len++;
+                                $last_good = $count;
+                                $match_query .= $query_char;
+                                $match_hit .= $hit_char;
+                                print "First Mismatch at $count\n";
+                                next;
+                            }
+                            #more than one mismatch, reset counters and other info, continue
+                            elsif ($match_mis_aln > 1){ 
+                                $match_len = 0;
+                                $start_pos = '';
+                                $match_query = '';
+                                $match_hit = '';
+                                $match_mis_aln = 0;
+                                print "Another Mismatch at $count, resetting counts\n";
+                                next;
+                            }
+                            elsif ($total_mis_aln >= 3) {
+                                $match_len = 0;
+                                $start_pos = '';
+                                $match_query = '';
+                                $match_hit = '';
+                                $end_pos = '';
+                                print "Another Mismatch at $count, resetting counts and ending\n";
+                                last;
+                            }
+                        }
+                        #position is a match, store info and continue
+                        elsif ($homo_char eq ":") {
+                            $last_good = $count;
+                            $match_len++;
+                            $match_query .= $query_char;
+                            $match_hit .= $hit_char;
+                            print "Another match at $count. Length is $match_len\n";
+                            next;
+                        }
+                    }
+                    elsif ($match_len >= 4) {
+                        #match length is 5 or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatches have occurred. If a match, continue.
+                        if ($homo_char eq " ") {
+                            $match_mis_aln++;
+                            $total_mis_aln++;
+                            #mismatches under 3, store info and continue
+                            if ($match_mis_aln <= 3) {
+                                $match_len++;
+                                $last_good = $count;
+                                $match_query .= $query_char;
+                                $match_hit .= $hit_char;
+                                print "Another Mismatch at $count, proceeding\n";
+                                next;
+                            }
+                            #elsif($total_mis_aln >= 4) {
+                            #    $match_len = 0;
+                            #    $start_pos = '';
+                            #    $match_query = '';
+                            #    $match_hit = '';
+                            #    $end_pos = '';
+                            #    print "Another Mismatch at $count, total misalignment is $total_mis_aln, resetting counts and ending\n";
+                            #    last;
+                            #}
+                            #mismatches 3 or more, store final info for alignment match and end parsing
+                            elsif($match_mis_aln >= 3){
+                                $end_pos = $last_good;
+                                $match_query =~ s/-//g;
+                                $match_hit =~ s/-//g;
+                                
                                 #reverse complement the match query sequence
 		$match_query =~ tr/ATGC/TACG/;
 		$match_query = reverse($match_query);
@@ -1805,71 +1763,77 @@ sub match_tirs {
 }
 
 sub generate_gff {
-  my $self = shift; #whatever state the msa object is in at time of call
-  my $path = shift;
-  my $round = shift;
-  print "Entered .gff printer\n";
-  $self->throw("Need Bio::Align::AlignI argument")
-    unless ref $self && $self->isa( 'Bio::Align::AlignI');
-    
-  if ($round eq 'final') {
-    open(my $out, ">", $path) or die "Error creating $path. $!\n";
-    print "Round = final\n";
-    my $ele_info_ref = shift;
-    foreach my $seq_obj ($self->each_seq()) {
-      my $seq_name = $seq_obj->id();
-      my $seq = $seq_obj->seq();
-      $seq =~ s/-//g;
-      my $seq_len = length($seq);
-      my $ori_end = $seq_len - $flank;
-      my $left_comp = $ele_info_ref->{$seq_name}{"left_tir_start"} - 101;
-      my $right_comp = $ele_info_ref->{$seq_name}{"right_tir_start"} - $ori_end;
-      my $copy_num;
-      my $eleid;
-      my $seqid;
-      my $type = 'terminal_inverted_repeat_element'; 
-      my $start;
-      my $end;
-      my $strand;
-      if ($seq_name =~ /^([0-9]*).+_Query:(.*)_Sbjct:(.*)_Length.+Location:\(([0-9]*)_\-_([0-9]*)\)_Direction:(.+)/) {
-	$copy_num = $1;
-	$eleid = $2;
-	$seqid = $3;
-	$start = $4+$left_comp;
-	$end = $5+$right_comp;
-	$strand = $6;
-      } elsif ($seq_name =~ /^([0-9]*)_(.+)_(.+)-(.+)_(.+)/) {
-	$copy_num = $1;
-	$seqid = $2;
-	$start = $3+$left_comp;
-	$end = $4+$right_comp;
-	$eleid = $5;
-	$strand = "?";
-      } else {
-	print "Header doesn't match TARGeT or RSPB:  $seq_name\n";
-	next;
-      }
-      if ($eleid =~ m/(.+)_TSD/ or $eleid =~ m/(.+)_Unknow/) {
-	$eleid = $1;
-      }
-      my $ltir_end = $start+length($ele_info_ref->{"left_tir_seq"})-1;
-      my $rtir_start = $end-(length($ele_info_ref->{"right_tir_seq"})-1);
-      my $ele_id = $ele_info_ref->{"element_id"};
-      my $ele_class = $ele_info_ref->{"classification"};
-      my $tir_id = $ele_info_ref->{"left_tir_id"};
-      my $tsd_frac = $ele_info_ref->{"TSD_fraction"};
-      my $tsd_con = $ele_info_ref->{"TSD_seq"};
-      print $out "$seqid\tactiveTE\t$type\t$start\t$end\t.\t$strand\t.\tID=$eleid-$copy_num;Name=$eleid Copy$copy_num;element_id=$ele_id;element_classification=$ele_class;tir_id=$tir_id;tsd_fraction=$tsd_frac;tsd_consensus=$tsd_con\n";
-      print $out "$seqid\tactiveTE\tfive_prime_terminal_inverted_repeat\t$start\t$ltir_end\t.\t.\t.\tParent=$eleid-$copy_num\n";
-      print $out "$seqid\tactiveTE\tthree_prime_terminal_inverted_repeat\t$rtir_start\t$end\t.\t.\t.\tParent=$eleid-$copy_num\n";
-      if (defined $ele_info_ref->{$seq_name}{"TSD"}) {
-	my $ltsd_start = $start-length($ele_info_ref->{$seq_name}{"TSD"});
-	my $ltsd_end = $start-1;
-	my $rtsd_start = $end+1;
-	my $rtsd_end = $end+length($ele_info_ref->{$seq_name}{"TSD"});
-	print $out "$seqid\tactiveTE\ttarget_site_duplication\t$ltsd_start\t$ltsd_end\t.\t.\t.\tDerives_from=$eleid-$copy_num\n";
-	print $out "$seqid\tactiveTE\ttarget_site_duplication\t$rtsd_start\t$rtsd_end\t.\t.\t.\tDerives_from=$eleid-$copy_num\n";
-      }
+    my $self = shift; 
+    my $path = shift;
+    my $round = shift;
+    print "Entered .gff printer\n";
+    $self->throw("Need Bio::Align::AlignI argument")
+        unless ref $self && $self->isa( 'Bio::Align::AlignI');
+    #not implemented: round changes the output based on when the call is made
+    if ($round eq 'final') {
+        open(my $out, ">", $path) or die "Error creating $path. $!\n";
+        print "Round = final\n";
+        my $ele_info_ref = shift;
+        foreach my $seq_obj ($self->each_seq()) {
+            my $seq_name = $seq_obj->id();
+            my $seq = $seq_obj->seq();
+            $seq =~ s/-//g;
+            my $seq_len = length($seq);
+            my $ori_end = $seq_len - $flank;
+            my $left_comp = $ele_info_ref->{$seq_name}{"left_tir_start"} - 101;
+            my $right_comp = $ele_info_ref->{$seq_name}{"right_tir_start"} - $ori_end;
+            my $copy_num;
+            my $eleid;
+            my $seqid;
+            my $type = 'terminal_inverted_repeat_element'; 
+            my $start;
+            my $end;
+            my $strand;
+            #grab copy information from TARGeT output
+            if ($seq_name =~ /^([0-9]*).+_Query:(.*)_Sbjct:(.*)_Length.+Location:\(([0-9]*)_\-_([0-9]*)\)_Direction:(.+)/) {
+                $copy_num = $1;
+                $eleid = $2;
+                $seqid = $3;
+                $start = $4+$left_comp;
+                $end = $5+$right_comp;
+                $strand = $6;
+            }
+            #grab copy information from RSPB output
+            elsif ($seq_name =~ /^([0-9]*)_(.+)_(.+)-(.+)_(.+)/) {
+                $copy_num = $1;
+                $seqid = $2;
+                $start = $3+$left_comp;
+                $end = $4+$right_comp;
+                $eleid = $5;
+                $strand = "?";
+            }
+            else {
+                print "Header doesn't match TARGeT or RSPB:  $seq_name\n";
+                next;
+            }
+            if ($eleid =~ m/(.+)_TSD/ or $eleid =~ m/(.+)_Unknow/) {
+                $eleid = $1;
+            }
+            my $ltir_end = $start+length($ele_info_ref->{"left_tir_seq"})-1;
+            my $rtir_start = $end-(length($ele_info_ref->{"right_tir_seq"})-1);
+            my $ele_id = $ele_info_ref->{"element_id"};
+            my $ele_class = $ele_info_ref->{"classification"};
+            my $tir_id = $ele_info_ref->{"left_tir_id"};
+            my $tsd_frac = $ele_info_ref->{"TSD_fraction"};
+            my $tsd_con = $ele_info_ref->{"TSD_seq"};
+            print $out "$seqid\tactiveTE\t$type\t$start\t$end\t.\t$strand\t.\tID=$eleid-$copy_num;Name=$eleid Copy$copy_num;element_id=$ele_id;element_classification=$ele_class;tir_id=$tir_id;tsd_fraction=$tsd_frac;tsd_consensus=$tsd_con\n";
+            print $out "$seqid\tactiveTE\tfive_prime_terminal_inverted_repeat\t$start\t$ltir_end\t.\t.\t.\tParent=$eleid-$copy_num\n";
+            print $out "$seqid\tactiveTE\tthree_prime_terminal_inverted_repeat\t$rtir_start\t$end\t.\t.\t.\tParent=$eleid-$copy_num\n";
+            if (defined $ele_info_ref->{$seq_name}{"TSD"}) {
+                my $ltsd_start = $start-length($ele_info_ref->{$seq_name}{"TSD"});
+                my $ltsd_end = $start-1;
+                my $rtsd_start = $end+1;
+                my $rtsd_end = $end+length($ele_info_ref->{$seq_name}{"TSD"});
+                print $out "$seqid\tactiveTE\ttarget_site_duplication\t$ltsd_start\t$ltsd_end\t.\t.\t.\tDerives_from=$eleid-$copy_num\n";
+                print $out "$seqid\tactiveTE\ttarget_site_duplication\t$rtsd_start\t$rtsd_end\t.\t.\t.\tDerives_from=$eleid-$copy_num\n";
+            }
+        }
+        close($out);
     }
     close($out);
   }
@@ -1889,4 +1853,30 @@ sub clean_files {
         }
     }
     closedir($in_DIR);
+}
+
+sub get_columns {
+    #This will get the column numbers of the start and stop position of both TIRs using their nucleotide positions from a hash.
+    #Initially, the hash contains information for the sequences present after TIR matching. Sequences may be added subsequently.
+    #This is needed after sequences and any resulting gap only columns have been removed from the alignment
+    my $self = shift;
+    $self->throw("Need Bio::Align::AlignI argument")
+        unless ref $self && $self->isa( 'Bio::Align::AlignI');
+    my $tir_positions = shift;
+    
+    foreach my $seq_obj ($self->each_seq()) {
+        my $seq_name = $seq_obj->id();
+        #skip sequences not in the hash
+        if (!defined $tir_positions{$seq_name}) {
+            next;
+        }
+        else {
+            $left_tir_start = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'left_tir_start'});
+            $left_tir_end = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'left_tir_end'});
+            $right_tir_start = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'right_tir_start'});
+            $right_tir_end = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'right_tir_end'});
+            last;
+        }
+    }
+    return ($left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end);
 }
