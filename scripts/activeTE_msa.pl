@@ -375,7 +375,7 @@ $out2->write_aln($trimmed_aln_obj);
 print "Trim2 Left TIR start column: $left_tir_start1\n";
 print "Trim2 Right TIR start column: $right_tir_start1\n";
 
-#Store the column positions of the potential TIRs in the trimmed alignment and get the columns of them in the original alignminent to remove sequences that cause gaps in the tirs
+#Use column positions of the potential TIRs to get sequence position from each copy to see if TIRs start in expected flanking sequence
 my %trim_left_pos_hash;
 my %trim_right_pos_hash;
 my %left_tir_start_check_counts;
@@ -462,7 +462,7 @@ if ($left_flank_catch != 0) {
         #open a file to store info on why analysis of an element was aborted
         my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
         open(my $bad_out, ">", $bad_out_path);
-        print $bad_out "$filename\tBoth flanks similar\n";
+        print $bad_out "$filename\tBoth flanks similar, flanking sequence length is not as expected, and/or flank length value is incorrect\n";
         close($bad_out);
         if (!defined $all) {
             print "Cleaning up files\n";
@@ -474,7 +474,7 @@ if ($left_flank_catch != 0) {
         #open a file to store info on why analysis of an element was aborted
         my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
         open(my $bad_out, ">", $bad_out_path);
-        print $bad_out "$filename\tLeft flank similar\n";
+        print $bad_out "$filename\tLeft flank similar, flanking sequence length is not as expected, and/or flank length value is incorrect\n";
         close($bad_out);
         if (!defined $all) {
             print "Cleaning up files\n";
@@ -487,7 +487,7 @@ elsif ($right_flank_catch != 0) {
     #open a file to store info on why analysis of an element was aborted
     my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".bad");
     open(my $bad_out, ">", $bad_out_path);
-    print $bad_out "$filename\tRight flank similar\n";
+    print $bad_out "$filename\tRight flank similar, flanking sequence length is not as expected, and/or flank length value is incorrect\n";
     close($bad_out);
     if (!defined $all) {
         print "Cleaning up files\n";
