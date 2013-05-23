@@ -1765,14 +1765,14 @@ sub match_tirs {
 }
 
 sub generate_gff {
-    my $self = shift; 
-    my $path = shift;
-    my $round = shift;
-    print "Entered .gff printer\n";
-    $self->throw("Need Bio::Align::AlignI argument")
-        unless ref $self && $self->isa( 'Bio::Align::AlignI');
-    #not implemented: round changes the output based on when the call is made
-    if ($round eq 'final') {
+  my $self = shift;
+  my $path = shift;
+  my $round = shift;
+  print "Entered .gff printer\n";
+  $self->throw("Need Bio::Align::AlignI argument")
+    unless ref $self && $self->isa( 'Bio::Align::AlignI');
+  #not implemented: round changes the output based on when the call is made
+  if ($round eq 'final') {
         open(my $out, ">", $path) or die "Error creating $path. $!\n";
         print "Round = final\n";
         my $ele_info_ref = shift;
@@ -1831,24 +1831,26 @@ sub generate_gff {
 				 "element_id=$ele_id","element_classification=$ele_class",
 				 "tir_id=$tir_id",
 				 "tsd_fraction=$tsd_frac",
-				 "tsd_consensus=$tsd_con")),"\n"
+				 "tsd_consensus=$tsd_con")),"\n";
             print $out join("\t",$seqid,$PROGRAM_NAME,"five_prime_terminal_inverted_repeat",
 			    $start,$ltir_end,".",".",".",
 			    "Parent=$eleid-$copy_num"), "\n";
-	    print $out join("\t",$seqid,$PROGRAM_NAME,"three_prime_terminal_inverted_repeat",$rtir_start,$end,".",".",".","Parent=$eleid-$copy_num"),"\n";
+	    print $out join("\t",$seqid,$PROGRAM_NAME,"three_prime_terminal_inverted_repeat",
+			    $rtir_start,$end,".",".",".","Parent=$eleid-$copy_num"),"\n";
 	    if (defined $ele_info_ref->{$seq_name}{"TSD"}) {
                 my $ltsd_start = $start-length($ele_info_ref->{$seq_name}{"TSD"});
                 my $ltsd_end = $start-1;
                 my $rtsd_start = $end+1;
                 my $rtsd_end = $end+length($ele_info_ref->{$seq_name}{"TSD"});
-                print $out join("\t",$seqid,$PROGRAM_NAME,"target_site_duplication",,$ltsd_start,$ltsd_end,".",".",".","Derives_from=$eleid-$copy_num"),"\n";
-                print $out join("\t",$seqid,$PROGRAM_NAME,"target_site_duplication",$rtsd_start,$rtsd_end,".",".",".","Derives_from=$eleid-$copy_num"),"\n";
+                print $out join("\t",$seqid,$PROGRAM_NAME,"target_site_duplication",
+				$ltsd_start,$ltsd_end,".",".",".","Derives_from=$eleid-$copy_num"),"\n";
+                print $out join("\t",$seqid,$PROGRAM_NAME,"target_site_duplication",
+				$rtsd_start,$rtsd_end,".",".",".","Derives_from=$eleid-$copy_num"),"\n";
             }
         }
         close($out);
     }
     close($out);
-  }
 }
 
 sub clean_files {
@@ -1858,9 +1860,10 @@ sub clean_files {
         next if ($file =~ m/^\./);
         if ($file =~ m/\.(final|info|fa|element_info|bad|gff|tif|jpg)$/) {
             next ;
-        }
-        else{
+        } else{
             my $remove_path = File::Spec->catpath($volume, $out_path, $file);
+	    # let's make this not system dependent
+	    # unlink will remove a file, but we need to do a recursive
             system("rm $remove_path");
         }
     }
