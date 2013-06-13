@@ -51,10 +51,10 @@ GetOptions(
 );
 
 if ( defined $all ) {
-  warn "Intermediate files will be kept\n";
+  print "Intermediate files will be kept\n";
 }
 else {
-  warn "Intermediate files will be removed\n";
+  print "Intermediate files will be removed\n";
 }
 
 # make sure only one valid input file is specified
@@ -103,7 +103,6 @@ if ( !-d $out_path ) {
 my %element_info;    # this hash is for storing element information
 
 #generate trimal alignment gap summary file, using sed to remove the header infmal -in $infile -sgco
-#my $gap_summary_out = File::Spec->catpath($volume, $out_path, $filename . ".full_gap_summary");
 
 open( my $trimal_run => "$trimal -in $infile -sgc | sed -n '4,\$p' |" )
   || die "Cannot run trimal!";
@@ -113,7 +112,7 @@ my @gap_id_array;
 while ( my $line = <$trimal_run> ) {
   chomp $line;       # probably not necessary
   if ( $line =~ /\S+\s+(\S+)\s+\S+/ )
-  {                  # should you test this more, and/or just use split ?
+  {  
     push @gap_id_array, $1;
   }
 }
@@ -157,13 +156,9 @@ my $gap_cols = $full_aln_obj->gap_col_matrix();
 
 my $full_id_out_path =
   File::Spec->catpath( $volume, $out_path, $filename . ".full_id" );
-warn "test ---- $full_id_out_path\n";
 
 my @full_id_array;
 
-##head 169.msa.full_id
-##1       0       0.000893655049151028
-##2       0       0.000893655049151028
 if ( !-e $full_id_out_path ) {
   open( my $id_out => ">$full_id_out_path" );
   warn "Starting Full ID calculation\n";
@@ -197,6 +192,9 @@ if ( !-e $full_id_out_path ) {
 }
 else {
   open( my $id_out, '<', "$full_id_out_path" );
+  ##head 169.msa.full_id
+  ##1       0       0.000893655049151028
+  ##2       0       0.000893655049151028
   while ( my $line = <$id_out> ) {
     chomp $line;
     my ( $i, $pos_id, $pos_present ) = split /\t/, $line;
@@ -218,7 +216,6 @@ for ( my $i = 0 ; $i < $full_aln_len ; $i++ ) {
   my %gap_col_hash    = %{$gap_col_hashref};
   ## remove entire seq if %gaps in column is >= 80
   ## and (%id <= 50 or %nt_aligned <= 10%)
-  ## shouldn't $id_row_ref->[2] be equal to 100 - $gap_id_array[$i] ??
   if ( $gap_id_array[$i] >= 80.0
     and ( $id_row_ref->[1] <= 50 or $id_row_ref->[2] <= .1 ) )
   {
@@ -228,10 +225,6 @@ for ( my $i = 0 ; $i < $full_aln_len ; $i++ ) {
       ## we will make a note to remove this seq
       if ( $gap_col_hash{$key} != 1 ) {
         my $seq_obj = $full_aln_obj->get_seq_by_id($key);
-        ## you dont use either of these
-        #my $seq = $seq_obj->seq();
-        #my $seq_pos = $seq_obj->location_from_column($i+1);
-        ##
         my @info = ( $key, $i + 1, $seq_obj );
         push @gap_seq_pos_remove, [@info];
         $gap_seq_remove{$key} = $seq_obj;
@@ -248,34 +241,46 @@ foreach my $key ( keys %gap_seq_remove ) {
 ## removes any columns that are now all gaps
 $full_aln_obj = $full_aln_obj->remove_gaps( '-', 1 );
 
+
+
 ## printing out the new cleaned up alignments
 ## if more than 5 sequences, make a new alignment with muscle
 my $trim_aln_out =
   File::Spec->catpath( $volume, $out_path, $filename . ".trim" );
-my $out = Bio::AlignIO->new( -file => ">$trim_aln_out", -format => 'fasta' );
+my $out = Bio::AlignIO->new( -file => ">$trim_aln_out", -format => 'fasta' , -displayname_flat => 0);
 $out->write_aln($full_aln_obj);
-open( IN,  $trim_aln_out ),          or die "Can't open $trim_aln_out\n";
-open( OUT, ">$trim_aln_out.fixed" ), or die "Can't open $trim_aln_out.fixed\n";
-while ( my $line = <IN> ) {
-  chomp $line;
-  $line =~ s/\/\d+\-\d+$//;
-  print OUT $line, "\n";
-}
-my $aln_copy_num = $full_aln_obj->num_sequences;
-my $trimmed_aln_obj;
-if ( $aln_copy_num > 5 ) {
-  my $realign_path =
-    File::Spec->catpath( $volume, $out_path, $filename . ".realign" );
-  system("muscle -in $trim_aln_out.fixed -out $realign_path -diags");
-  my $realign_in_obj =
-    Bio::AlignIO->new( -file => $realign_path, -format => 'fasta' );
-  $trimmed_aln_obj = $realign_in_obj->next_aln();
-}
-else {
-  $trimmed_aln_obj = $full_aln_obj;
-}
+#open( IN,  $trim_aln_out ),          or die "Can't open $trim_aln_out\n";
+#open( OUT, ">$trim_aln_out.fixed" ), or die "Can't open $trim_aln_out.fixed\n";
+#while ( my $line = <IN> ) {
+#  chomp $line;
+#  $line =~ s/\/\d+\-\d+$//;
+#  print OUT $line, "\n";
+#}
 
-## do everything again with the new alignment??
+
+##### start skip of realign
+##=cut
+##my $aln_copy_num = $full_aln_obj->num_sequences;
+##my $trimmed_aln_obj;
+##if ( $aln_copy_num > 5 ) {
+##  my $realign_path =
+##    File::Spec->catpath( $volume, $out_path, $filename . ".realign" );
+##  system("muscle -in $trim_aln_out -out $realign_path -diags");
+##  #system("muscle -in $trim_aln_out.fixed -out $realign_path -diags");
+##  my $realign_in_obj =
+##    Bio::AlignIO->new( -file => $realign_path, -format => 'fasta' );
+##  $trimmed_aln_obj = $realign_in_obj->next_aln();
+##}
+##else {
+##  $trimmed_aln_obj = $full_aln_obj;
+##}
+##=cut
+
+my $trimmed_aln_obj = $full_aln_obj;
+
+## below is processing of the .trim aln obj
+## this the the orig aln minus any first round gap inducing
+## seqs
 my @trim_id_array;
 my $trim_gap_cols = $trimmed_aln_obj->gap_col_matrix();
 my $trim_aln_len  = $trimmed_aln_obj->length();
@@ -433,12 +438,39 @@ if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 ) {
 }
 
 #check whether any sequences have gaps within 50bp of start of putative TIRSs and remove them
-my %trim_gap_seq_remove;
 
+
+my %trim_gap_seq_remove;
+my $consensus = $trimmed_aln_obj->consensus_string(60); 
+#print "consen: " ,$consensus , "\n";
+my %con_mm;
 for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
-  if ( ( $i >= $left_tir_start1 - 1 and $i <= $left_tir_start1 + 49 )
-    or ( $i >= $right_tir_start1 - 51 and $i <= $right_tir_start1 - 1 ) )
+  if ( ( $i >= $left_tir_start1 - 1 and $i <= $left_tir_start1 + 19 )
+    or ( $i >= $right_tir_start1 - 21 and $i <= $right_tir_start1 - 1 ) )
   {
+    ## check each col for seqs that have a run of too many mismatches
+    my $col_aln_obj = $trimmed_aln_obj->slice($i+1,$i+1,1);
+    foreach my $seq_obj ($col_aln_obj->each_seq()){
+      my $seq_name = $seq_obj->id;
+      my $nt = $seq_obj->seq;
+      my $con_nt = substr ($consensus, $i, 1);
+      next if $con_nt =~ /N/i;
+      if ($nt ne $con_nt){
+#print substr($seq_name,0,5) ,": ($nt ne $con_nt)\n";
+        $con_mm{$seq_name}++;
+      }else {
+#print substr($seq_name,0,5) ,": ($nt === $con_nt)\n";
+
+      }
+    }
+    foreach my $key (keys %con_mm){
+      next if $con_mm{$key} < 5 ;
+#print substr($key,0,5), ": ",$con_mm{$key},"\n";
+      my $seq_obj_to_remove = $trimmed_aln_obj->get_seq_by_id($key);
+      $trim_gap_seq_remove{$key} = $seq_obj_to_remove;
+    }
+
+
     my @trim_gap_col_array   = @{$trim_gap_cols};
     my $trim_gap_col_hashref = $trim_gap_col_array[$i];
     my %trim_gap_col_hash    = %{$trim_gap_col_hashref};
@@ -457,8 +489,6 @@ for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
       foreach my $key ( keys %trim_gap_col_hash ) {
         if ( $trim_gap_col_hash{$key} != 1 ) {
           my $seq_obj = $trimmed_aln_obj->get_seq_by_id($key);
-          my $seq     = $seq_obj->seq();
-          my $seq_pos = $seq_obj->location_from_column( $i + 1 );
           my @info    = ( $key, $i + 1, $seq_obj );
           $trim_gap_seq_remove{$key} = $seq_obj;
         }
@@ -509,7 +539,7 @@ if ( $test_len == 0 ) {
 
 my $trim_aln_out2 =
   File::Spec->catpath( $volume, $out_path, $filename . ".trim2" );
-my $out2 = Bio::AlignIO->new( -file => ">$trim_aln_out2", -format => 'fasta' );
+my $out2 = Bio::AlignIO->new( -file => ">$trim_aln_out2", -format => 'fasta' ,-displayname_flat => 0);
 $out2->write_aln($trimmed_aln_obj);
 print "Trim2 Left TIR start column: $left_tir_start1\n";
 print "Trim2 Right TIR start column: $right_tir_start1\n";
@@ -530,11 +560,11 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
   my $left_res          = substr( $seq, $left_res_pos, 1 );
   my $right_res_pos     = $right_res_pos_obj->start();
   my $right_res         = substr( $seq, $right_res_pos, 1 );
-  my $right_flank_pos   = $seq_len - $right_res_pos;
+  #my $right_flank_pos   = $seq_len - $right_res_pos;
   $trim_left_pos_hash{$seq_name}  = $left_res_pos;
   $trim_right_pos_hash{$seq_name} = $right_res_pos;
   $left_tir_start_check_counts{$left_res_pos}++;
-  $right_tir_start_check_counts{$right_flank_pos}++;
+  $right_tir_start_check_counts{$right_res_pos}++;
 
 #print "TIR starts for $seq_name:  Left - $left_res_pos  Right - $right_res_pos\n";
 }
@@ -737,16 +767,16 @@ else {
 #get column position in alignment of left (hit) TIR, using sequence name and index position of TIR in full sequence. Increment the count of that column position in %hit_column_counts. Also, increment the count of TIR length in %hit_match_len
     $hit_aln_pos =
       $trimmed_aln_obj->column_from_residue_number( $entry[0],
-      ${ entry [1]{"hit"} }[0] );
+      ${ $entry [1]{"hit"} }[0] );
     $hit_column_counts{$hit_aln_pos}++;
-    $hit_match_len{ ${ entry [1]{"hit"} }[1] }++;
+    $hit_match_len{ ${ $entry [1]{"hit"} }[1] }++;
 
     #do the same for the query TIR
     $query_aln_pos =
       $trimmed_aln_obj->column_from_residue_number( $entry[0],
       ${ entry [1]{"query"} }[0] );
     $query_column_counts{$query_aln_pos}++;
-    $query_match_len{ ${ entry [1]{"query"} }[1] }++;
+    $query_match_len{ ${ $entry [1]{"query"} }[1] }++;
 
 #Storing column info for $entry[0] in first ggsearch round\nLeft TIR start: \${entry[1]{'hit'}}[0]\tRight TIR start: \${entry[1]{'query'}}[0]\n";
   }
@@ -2067,8 +2097,8 @@ sub match_tirs {
                 my $match_hit_len   = length($match_hit);
 
     #find the position in the full sequence of the hit and query match sequences
-                $hit_pos = index( $seq, $match_hit, 40 ) + 1;
-                $query_pos = rindex( $seq, $match_query ) + 1;
+                $hit_pos = index( uc($seq), uc($match_hit), 40 ) + 1;
+                $query_pos = rindex( uc($seq), uc($match_query) ) + 1;
 
                 #store sequence name and the hit and query info
                 my @match = (
@@ -2078,9 +2108,12 @@ sub match_tirs {
                     "query" => [ $query_pos, $match_query_len ]
                   }
                 );
+                ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
                 push @result, ( 1, [@match] );
                 print
 "Another Mismatch at $count. Match is long, pushing match info for output\n";
+print "test ",substr($seq_name,0,5),"hit_pos_pre:",index( uc($seq), uc($match_hit), 40 ) ," hit_pos:$hit_pos, match_hit:$match_hit\n";
+print "\t",substr($seq,0,50),"\n";
                 last;
               }
             }
