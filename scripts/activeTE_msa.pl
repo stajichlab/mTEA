@@ -448,6 +448,7 @@ for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
   if ( ( $i >= $left_tir_start1 - 1 and $i <= $left_tir_start1 + 19 )
     or ( $i >= $right_tir_start1 - 21 and $i <= $right_tir_start1 - 1 ) )
   {
+
     ## check each col for seqs that have a run of too many mismatches
     my $col_aln_obj = $trimmed_aln_obj->slice($i+1,$i+1,1);
     foreach my $seq_obj ($col_aln_obj->each_seq()){
@@ -456,19 +457,18 @@ for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
       my $con_nt = substr ($consensus, $i, 1);
       next if $con_nt =~ /N/i;
       if ($nt ne $con_nt){
-#print substr($seq_name,0,5) ,": ($nt ne $con_nt)\n";
         $con_mm{$seq_name}++;
-      }else {
-#print substr($seq_name,0,5) ,": ($nt === $con_nt)\n";
-
       }
     }
+
     foreach my $key (keys %con_mm){
       next if $con_mm{$key} < 5 ;
-#print substr($key,0,5), ": ",$con_mm{$key},"\n";
       my $seq_obj_to_remove = $trimmed_aln_obj->get_seq_by_id($key);
       $trim_gap_seq_remove{$key} = $seq_obj_to_remove;
+      my @info    = ( $key, $i + 1, $seq_obj_to_remove );
+      push @gap_seq_pos_remove, [@info];
     }
+    ## end check each col for too many mismatches
 
 
     my @trim_gap_col_array   = @{$trim_gap_cols};
@@ -489,8 +489,9 @@ for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
       foreach my $key ( keys %trim_gap_col_hash ) {
         if ( $trim_gap_col_hash{$key} != 1 ) {
           my $seq_obj = $trimmed_aln_obj->get_seq_by_id($key);
-          my @info    = ( $key, $i + 1, $seq_obj );
           $trim_gap_seq_remove{$key} = $seq_obj;
+          my @info    = ( $key, $i + 1, $seq_obj );
+          push @gap_seq_pos_remove, [@info];
         }
       }
     }
@@ -502,8 +503,9 @@ for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
           my $seq_obj = $trimmed_aln_obj->get_seq_by_id($key);
           my $seq     = $seq_obj->seq();
           my $seq_pos = $seq_obj->location_from_column( $i + 1 );
-          my @info    = ( $key, $i + 1, $seq_obj );
           $trim_gap_seq_remove{$key} = $seq_obj;
+          my @info    = ( $key, $i + 1, $seq_obj );
+          push @gap_seq_pos_remove, [@info];
         }
       }
     }
@@ -1250,7 +1252,7 @@ foreach my $seq_name ( keys %search_tirs ) {
     File::Spec->catpath( $volume, $out_path, $fname_start . ".ggsearch3.out" );
   system("ggsearch36 -n -i -T 8 -d 1 $last_path $first_path > $out_opt");
 
-  my @tir_match_result = match_tirs( $seq_obj, $out_opt, 1 );
+  my @tir_match_result = match_tirs( $seq_obj, $out_opt, 3 );
   if ( $tir_match_result[0] == 0 or !@tir_match_result ) {
     my $seq_id = $seq_obj->id();
     $final_aln_obj->remove_seq($seq_obj);
@@ -1990,6 +1992,18 @@ sub match_tirs {
               last;
             }
           }
+          ## skip any seqs that have more than 2 mismatches in the first 3 bases of the TIR
+          if ( $round == 3 or $round == 1) {
+            if ( $count == 3 and $total_mis_aln >= 2 ) {
+ 	      $match_len   = 0;
+              $start_pos   = '';
+              $match_query = '';
+              $match_hit   = '';
+              $end_pos     = '';
+              last;
+            }
+          }
+
           if ( $match_len == 0 ) {
 
 #if match length equals 0 and position is not a match, continue to next position
