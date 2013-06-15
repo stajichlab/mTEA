@@ -389,7 +389,7 @@ for ( my $i = 1 ; $i < $trim_aln_len ; $i++ ) {
   my $pos_present = $base_count / $total_count;
   if ( $right_tir_count == 0 ) {
     if ( $pos_id >= 80.0 and $pos_present >= .6 ) {
-      $right_tir_start1 = $trim_aln_len - $i;
+      $right_tir_start1 = $trim_aln_len - $i + 1;
       $right_tir_count++;
       next;
     }
@@ -422,6 +422,7 @@ for ( my $i = 1 ; $i < $trim_aln_len ; $i++ ) {
 }
 print "First Left TIR start column: $left_tir_start1\n";
 print "First Right TIR start column: $right_tir_start1\n";
+
 if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 ) {
 
   #open a file to store info on why analysis of an element was aborted
@@ -436,7 +437,19 @@ if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 ) {
   }
   exit 0;
 }
+my ($org_right_tir_start1, $org_left_tir_start1) =  ($right_tir_start1, $left_tir_start1); 
+($right_tir_start1 , $left_tir_start1) = adjust_tir_starts($trimmed_aln_obj,$right_tir_start1,$left_tir_start1);  
 
+## create new align and print
+my $aln_out_mod =
+  File::Spec->catpath( $volume, $out_path, $filename . ".mod" );
+my $out_mod = Bio::AlignIO->new(
+  -file             => ">$aln_out_mod",
+  -format           => 'fasta',
+  -displayname_flat => 0
+);
+$out_mod->write_aln($trimmed_aln_obj);
+  
 #check whether any sequences have gaps within 50bp of start of putative TIRSs and remove them
 
 
@@ -946,6 +959,7 @@ print "Bad aln len:  $bad_aln_len  Bad aln len2: $bad_aln_len2\n";
 #undef @bad_aln;
 #undef @bad_aln2;
 #check which run generated the longer TIRs
+print "test len: $good_aln_len2 ?? $good_aln_len\n";
 if ( $good_aln_len2 == 0 and $good_aln_len == 0 ) {
   my $bad_out_path =
     File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
@@ -958,8 +972,30 @@ if ( $good_aln_len2 == 0 and $good_aln_len == 0 ) {
   }
   exit 0;
 }
-
-elsif ( $good_aln_len2 != 0 and $good_aln_len2 > $good_aln_len ) {
+elsif ($good_aln_len2 == 0 and $good_aln_len != 0){
+  print "Alignment set 1 better\n\n";
+}
+elsif ($good_aln_len2 != 0 and $good_aln_len == 0){
+  print "Alignment set 2 better\n\n";
+  @sorted_hitcolumn_keys   = @sorted_hitcolumn_keys2;
+  @sorted_querycolumn_keys = @sorted_querycolumn_keys2;
+  @sorted_hit_len_keys     = @sorted_hit_len_keys2;
+  @sorted_query_len_keys   = @sorted_query_len_keys2;
+  @bad_remove              = @bad_remove2;
+}
+elsif ( $good_aln_len2 > $good_aln_len) {
+    print "Alignment set 2 better\n";
+    @sorted_hitcolumn_keys   = @sorted_hitcolumn_keys2;
+    @sorted_querycolumn_keys = @sorted_querycolumn_keys2;
+    @sorted_hit_len_keys     = @sorted_hit_len_keys2;
+    @sorted_query_len_keys   = @sorted_query_len_keys2;
+    @bad_remove              = @bad_remove2;
+  #}
+  #else {
+  #  print "Alignment set 1 better\n\n";
+  #}
+}
+elsif ( $good_aln_len2 == $good_aln_len) {
   if (
     (
           $sorted_hit_len_keys2[0] > $sorted_hit_len_keys[0]
@@ -975,9 +1011,8 @@ elsif ( $good_aln_len2 != 0 and $good_aln_len2 > $good_aln_len ) {
     @sorted_hit_len_keys     = @sorted_hit_len_keys2;
     @sorted_query_len_keys   = @sorted_query_len_keys2;
     @bad_remove              = @bad_remove2;
-  }
-  else {
-    print "Alignment set 1 better\n\n";
+  }else{
+    print "Alignment set 1 better\n";
   }
 }
 else {
@@ -1032,25 +1067,23 @@ foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
 #undef @sorted_query_len_keys;
 #ndef @sorted_query_len_keys2;
 
+
+
 #reread the original alignment file
 my $in_obj2     = Bio::AlignIO->new( -file => $infile, -format => 'fasta' );
 my $ori_aln_obj = $in_obj2->next_aln();
 my $ori_aln_len = $ori_aln_obj->length();
 
+
 #get the column positions of tirs in the original alignment
-my $left_tir_start;
-my $left_tir_end;
-my $right_tir_start;
-
-#print "TEST 1!!\n";
-#print Dumper \%tir_positions;
-#print "TEST 1!!\n";
-
-my $right_tir_end;
-( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
+my ( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
   get_columns( $ori_aln_obj, \%tir_positions );
 
-#print "TEST 3!!( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end )\n";
+
+## cleaning up aln using tir_starts found with get_columns 
+## and overwriting the tir_starts with the adj values
+($right_tir_start , $left_tir_start) = adjust_tir_starts($ori_aln_obj,$right_tir_start,$left_tir_start);  
+
 
 my $tir_length = $left_tir_end - $left_tir_start;
 print
@@ -1123,7 +1156,7 @@ foreach my $key ( keys %gap_seq_remove2 ) {
   my $remove = $ori_aln_obj->get_seq_by_id($key);
   my $seq_id = $remove->id();
   print $removed_out
-    "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
+    "$seq_id\tStep2:Sequence caused or contained gaps in at least one of the TIRs\n";
   $removed_seq_hash{$seq_id}++;
   $ori_aln_obj->remove_seq($remove);
 }
@@ -1131,7 +1164,7 @@ foreach my $key ( keys %gap_seq_remove2 ) {
 my $final_aln_obj = $ori_aln_obj->remove_gaps( '-', 1 );
 my $int_aln_out =
   File::Spec->catpath( $volume, $out_path, $filename . ".intermediate" );
-$out = Bio::AlignIO->new( -file => ">$int_aln_out", -format => 'fasta' );
+$out = Bio::AlignIO->new( -file => ">$int_aln_out", -format => 'fasta' ,-displayname_flat => 0);
 $out->write_aln($final_aln_obj);
 my $final_len = $final_aln_obj->length();
 print "MSA length is $final_len now\n";
@@ -1194,18 +1227,21 @@ print "MSA length now: $check_len\n";
   get_columns( $final_aln_obj, \%tir_positions );
 print
 "3rd column grab after removing more copies with TIR isssues\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
-
+my %to_remove_from_final;
 foreach my $seq_name ( keys %search_tirs ) {
+  my $seq_obj     = $final_aln_obj->get_seq_by_id($seq_name);
   if ( exists $gap_seq_remove2{$seq_name} ) {
+    $to_remove_from_final{$seq_name}=$seq_obj;
     next;
   }
   if ( exists $removed_seq_hash{$seq_name} ) {
+    $to_remove_from_final{$seq_name}=$seq_obj;
     next;
   }
   if ( exists $new_gap_seq_remove{$seq_name} ) {
+    $to_remove_from_final{$seq_name}=$seq_obj;
     next;
   }
-  my $seq_obj     = $final_aln_obj->get_seq_by_id($seq_name);
   my @seqn_part   = split( ":", $seq_name );
   my $fname_start = $seqn_part[0];
   my $seq         = $seq_obj->seq();
@@ -1223,6 +1259,7 @@ foreach my $seq_name ( keys %search_tirs ) {
     print $removed_out
       "$seq_name\tContains a gap at the start of one or both TIRs\n";
     $final_aln_obj->remove_seq($seq_obj);
+    delete  $to_remove_from_final{$seq_name} if exists  $to_remove_from_final{$seq_name};
     next;
   }
 
@@ -1256,10 +1293,19 @@ foreach my $seq_name ( keys %search_tirs ) {
   if ( $tir_match_result[0] == 0 or !@tir_match_result ) {
     my $seq_id = $seq_obj->id();
     $final_aln_obj->remove_seq($seq_obj);
+    delete  $to_remove_from_final{$seq_name} if exists  $to_remove_from_final{$seq_name};
     print $removed_out "$seq_id\tNo TIR matches found by last ggsearch run\n";
   }
 }
-
+foreach my $seq_id (keys %to_remove_from_final){
+  #my $seq_obj = $to_remove_from_final{$seq_id};
+  my $seq_obj = $final_aln_obj->get_seq_by_id($seq_id);
+  if (defined $seq_obj){
+    $final_aln_obj->remove_seq($seq_obj) if defined $seq_obj;
+  }else {
+    print "$seq_id in final_aln_obj is not defined\n";
+  }
+}
 #undef %gap_seq_remove2;
 #undef %removed_seq_hash;
 #undef %new_gap_seq_remove;
@@ -1267,7 +1313,7 @@ foreach my $seq_name ( keys %search_tirs ) {
 $final_aln_obj = $final_aln_obj->remove_gaps( '-', 1 );
 my $int_aln_out2 =
   File::Spec->catpath( $volume, $out_path, $filename . ".intermediate2" );
-$out = Bio::AlignIO->new( -file => ">$int_aln_out2", -format => 'fasta' );
+$out = Bio::AlignIO->new( -file => ">$int_aln_out2", -format => 'fasta' ,-displayname_flat => 0);
 $out->write_aln($final_aln_obj);
 my $last_len = $final_aln_obj->length();
 
@@ -1569,7 +1615,7 @@ my $final_align_len = $final_aln_obj->num_sequences();
 $element_info{"copy_num"} = $final_align_len;
 my $final_aln_out =
   File::Spec->catpath( $volume, $out_path, $filename . ".final" );
-$out = Bio::AlignIO->new( -file => ">$final_aln_out", -format => 'fasta' );
+$out = Bio::AlignIO->new( -file => ">$final_aln_out", -format => 'fasta' ,-displayname_flat => 0);
 $out->write_aln($final_aln_obj);
 my $no_TSD_found_out_path =
   File::Spec->catpath( $volume, $out_path, $filename . ".TSD_issues.info" );
@@ -2318,4 +2364,112 @@ sub get_columns {
     }
   }
   return ( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end );
+}
+
+
+sub adjust_tir_starts {
+### adjust tir starts.
+
+  my $aln_obj         = shift;
+  my $right_tir_start = shift;
+  my $left_tir_start  = shift;
+
+  my $num_seqs = $aln_obj->num_sequences;
+  my %count;
+  my %modified;
+  my $orig_right_tir_start = $right_tir_start;
+  my $orig_left_tir_start  = $left_tir_start;
+  foreach my $seq_obj ( $aln_obj->each_seq ) {
+    my $seq    = $seq_obj->seq;
+    my $seq_id = $seq_obj->id;
+    my ( $gaps_left, $gaps_right ) = ( '', '' );
+    ## for right TIR
+    my $nt_col_pos = $right_tir_start;
+    my $left2right = $seq_obj->subseq( $left_tir_start, $nt_col_pos );
+    my $next2end   = $seq_obj->subseq( $nt_col_pos + 1, length $seq );
+    if ( $next2end =~ s/^(-+)// ) {
+      $gaps_right = $1;
+      my @next2end = split '', $next2end;
+      for ( my $i = 0 ; $i < @next2end ; $i++ ) {
+        my $nt = $next2end[$i];
+        $count{right}{$i}{$nt}++;
+      }
+    }
+
+    ## for left_TIR
+    $nt_col_pos = $left_tir_start;
+    my $start2left = $seq_obj->subseq( 1, $nt_col_pos - 1 );
+
+    # my $left2right             = $seq_obj->subseq( $nt_col + 1, length $seq );
+    print "$seq_id\n";
+    print "before: $start2left\n";
+    if ( $start2left =~ s/(-+)$// ) {
+      print "after:  $start2left\n";
+      my $gaps_left = $1;
+      my @start2left = split '', $start2left;
+      for ( my $i = ( ( length @start2left ) - 1 ) ; $i < 0 ; $i-- ) {
+        my $nt = $start2left[$i];
+        $count{left}{$i}{$nt}++;
+      }
+    }
+
+my $new_seq_p = "$gaps_left . $start2left . $left2right . $next2end . $gaps_right";
+    my $new_seq =
+      $gaps_left . $start2left . $left2right . $next2end . $gaps_right;
+
+    print "new: $new_seq_p\n";
+    $modified{$seq_id} = $new_seq;
+  }
+  my $done = 0;
+  ## for right tir
+  foreach my $pos ( sort { $a <=> $b } keys %{ $count{right} } ) {
+    my $nt = (
+      sort { $count{right}{$pos}{$b} <=> $count{right}{$pos}{$a} }
+        keys %{ $count{right}{$pos} }
+    )[0];
+    my $nt_count   = $count{right}{$pos}{$nt};
+    my $percent_nt = $nt_count / $num_seqs;
+    if ( $percent_nt > .8 ) {
+      $right_tir_start++;
+    }
+    else {
+      $done = 1;
+    }
+    last if $done;
+  }
+  $done = 0;
+  ## for left tir
+  foreach my $pos ( sort { $b <=> $a } keys %{ $count{left} } ) {
+    my $nt = (
+      sort { $count{left}{$pos}{$b} <=> $count{left}{$pos}{$a} }
+        keys %{ $count{left}{$pos} }
+    )[0];
+    my $nt_count   = $count{left}{$pos}{$nt};
+    my $percent_nt = $nt_count / $num_seqs;
+    if ( $percent_nt > .8 ) {
+      $left_tir_start--;
+    }
+    else {
+      $done = 1;
+    }
+    last if $done;
+  }
+
+  if ( $orig_right_tir_start != $right_tir_start
+    or $orig_left_tir_start != $left_tir_start )
+  {
+    print "origR: $orig_right_tir_start\n";
+    print "after adjR: $right_tir_start\n";
+    print "origL: $orig_left_tir_start\n";
+    print "after adjL: $left_tir_start\n";
+    foreach my $seq_obj ( $aln_obj->each_seq ) {
+      ## replace org seq with mod seq
+      my $seq_id = $seq_obj->id;
+      if ( exists $modified{$seq_id} ) {
+        my $new_seq = $modified{$seq_id};
+        $seq_obj->seq($new_seq);
+      }
+    }
+  }
+  return ( $right_tir_start, $left_tir_start );
 }
