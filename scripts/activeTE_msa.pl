@@ -248,9 +248,9 @@ my $out = Bio::AlignIO->new( -file => ">$test_aln_out", -format => 'fasta' , -di
 $out->write_aln($full_aln_obj);
 
 my ($ref2array,$l_t_s,$r_t_s, $ref2hash);
-($l_t_s,$r_t_s,$ref2array, $full_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $full_aln_obj, \%tir_positions);
-%tir_positions = %$ref2hash;
-@gap_seq_pos_remove = @$ref2array;
+($l_t_s,$r_t_s,$ref2array, $full_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $full_aln_obj, 0, 0, \%tir_positions);
+%tir_positions = %{$ref2hash};
+@gap_seq_pos_remove = @{$ref2array};
 
 ## printing out the new cleaned up alignments
 ## if more than 5 sequences, make a new alignment with muscle
@@ -2286,46 +2286,34 @@ sub get_columns {
 #This will get the column numbers of the start and stop position of both TIRs using their nucleotide positions from a hash.
 #Initially, the hash contains information for the sequences present after TIR matching. Sequences may be added subsequently.
 #This is needed after sequences and any resulting gap only columns have been removed from the alignment
-  my $self = shift;     # aln_obj
-  my $tir_positions = shift;    # \%tir_positions
-  my $round = shift;    # 1=starts no ends, 2=starts and ends
+    my $self = shift;     # aln_obj
+    my $tir_positions = shift;    # \%tir_positions
+    my $round = shift;    # 1=starts no ends, 2=starts and ends
 
-  $self->throw("Need Bio::Align::AlignI argument")
-    unless ref $self && $self->isa('Bio::Align::AlignI');
-  foreach my $seq_obj ( $self->each_seq() ) {
-    my $seq_name = $seq_obj->id();
-
-    #print $seq_name,"\n";
-    #skip sequences not in the hash
-    if ( defined ${$tir_positions}{$seq_name} ) {
-
-#if ( !defined $tir_positions{$seq_name} ) {
-#  next;
-#}
-#else {
-#print "TEST 2 dump $seq_name\n";
-#print Dumper $tir_positions;
-#print Dumper ${$tir_positions}{$seq_name};
-#print "TEST 2b inside else!!! $seq_name:", $tir_positions->{$seq_name}{'left_tir_start'},"\n";
-      my $left_tir_start =
-        $self->column_from_residue_number( $seq_name,
-        $tir_positions->{$seq_name}{'left_tir_start'} );
-      my $right_tir_start =
-        $self->column_from_residue_number( $seq_name,
-        $tir_positions->{$seq_name}{'right_tir_start'} );
-      my ( $left_tir_end , $right_tir_end  ) = (0,0);
-      if ($round == 2){
-        $left_tir_end =
-          $self->column_from_residue_number( $seq_name,
-          $tir_positions->{$seq_name}{'left_tir_end'} );
-        $right_tir_end =
-          $self->column_from_residue_number( $seq_name,
-          $tir_positions->{$seq_name}{'right_tir_end'} );
-       }
-      last;
+    $self->throw("Need Bio::Align::AlignI argument")
+        unless ref $self && $self->isa('Bio::Align::AlignI');
+    my ( $left_tir_start, $left_tir_end , $right_tir_start, $right_tir_end ) = (0,0,0,0);
+    
+    foreach my $seq_obj ( $self->each_seq() ) {
+        my $seq_name = $seq_obj->id();
+        print $seq_name,"\n";
+        #skip sequences not in the hash
+        if ( exists $tir_positions->{$seq_name} ) {
+            print "For get_columns: Entry exist in hash -", $seq_name, "\n";
+            print Dumper($tir_positions->{$seq_name});
+            print "Left start: $tir_positions->{$seq_name}{'left_tir_start'}\n";
+            $left_tir_start = $self->column_from_residue_number( $seq_name,  $tir_positions->{$seq_name}{'left_tir_start'} );
+            $right_tir_start = $self->column_from_residue_number( $seq_name, $tir_positions->{$seq_name}{'right_tir_start'} );
+            if ($round == 2){
+                print "Round = $round\n";
+                $left_tir_end = $self->column_from_residue_number( $seq_name, $tir_positions->{$seq_name}{'left_tir_end'} );
+                $right_tir_end = $self->column_from_residue_number( $seq_name, $tir_positions->{$seq_name}{'right_tir_end'} );
+            }
+            last;
+        }
     }
-  }
-  return ( $left_tir_start, $right_tir_start,  $left_tir_end, $right_tir_end );
+    print "left tir start: $left_tir_start, right_tir_start: $right_tir_start, left_tir_end: $left_tir_end, right_tir_end: $right_tir_end\n";
+    return ( $left_tir_start, $right_tir_start,  $left_tir_end, $right_tir_end );
 }
 
 
@@ -2447,9 +2435,9 @@ sub consensus_filter {
 
   my %trim_gap_seq_remove;
   my $consensus = $aln_obj->consensus_string(60);
-print "$consensus\n";
+  print "$consensus\n";
   ## first round of tir finding
-  if ( !defined $left_tir_start or !defined $right_tir_start ) {
+  if ( $left_tir_start == 0 and $right_tir_start == 0 ) {
     my @consensus    = split '', $consensus;
     my $nt_count     = 0;
     my $last_nomatch = 0;
@@ -2528,8 +2516,10 @@ print "$consensus\n";
     $aln_obj->remove_seq($seq_obj);
   } 
   $aln_obj = $aln_obj->remove_gaps( '-', 1 );
-  $tir_positions = get_tir_nt_starts($aln_obj,$tir_positions,$left_tir_start,$right_tir_start);
-  ($left_tir_start ,$right_tir_start) = get_columns($aln_obj,$tir_positions,1);
+  my $tir_positions_ref = get_tir_nt_starts($aln_obj,$tir_positions,$left_tir_start,$right_tir_start);
+  print Dumper($tir_positions_ref);
+  %tir_positions = %{$tir_positions_ref};
+  ($left_tir_start ,$right_tir_start) = get_columns($aln_obj,\%tir_positions,1);
   print "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
   print "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
   return ( $left_tir_start ,$right_tir_start, $gap_seq_pos_remove, $aln_obj , $tir_positions);
@@ -2615,8 +2605,8 @@ sub get_tir_nt_starts {
     my $right_tir_start_obj =
       $seq_obj->location_from_column( $right_tir_start );
     my $right_tir_start_pos = $right_tir_start_obj->start();
-    $$tir_positions{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
-    $$tir_positions{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
+    $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+    $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
   }
   return ($tir_positions);
 }
@@ -2641,11 +2631,12 @@ sub get_tir_nt_positions {
     my $right_tir_start_pos = $right_tir_start_obj->start();
     my $right_tir_end_pos =
       $right_tir_start_pos - ( $right_tir_len - 1 );
-    $tir_positions{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
-    $tir_positions{$seq_name}{'left_tir_end'}    = $left_tir_end_pos;
-    $tir_positions{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
-    $tir_positions{$seq_name}{'right_tir_end'}   = $right_tir_end_pos;
+    $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+    $tir_positions->{$seq_name}{'left_tir_end'}    = $left_tir_end_pos;
+    $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
+    $tir_positions->{$seq_name}{'right_tir_end'}   = $right_tir_end_pos;
   }
   return ($tir_positions);
 }
+
 
