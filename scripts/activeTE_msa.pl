@@ -101,6 +101,7 @@ if ( !-d $out_path ) {
 }
 
 my %element_info;    # this hash is for storing element information
+my %tir_positions;
 
 #generate trimal alignment gap summary file, using sed to remove the header infmal -in $infile -sgco
 
@@ -241,17 +242,29 @@ foreach my $key ( keys %gap_seq_remove ) {
 ## removes any columns that are now all gaps
 $full_aln_obj = $full_aln_obj->remove_gaps( '-', 1 );
 
+my $test_aln_out =
+  File::Spec->catpath( $volume, $out_path, $filename . ".trim_test" );
+my $out = Bio::AlignIO->new( -file => ">$test_aln_out", -format => 'fasta' , -displayname_flat => 0);
+$out->write_aln($full_aln_obj);
 
+my ($ref2array,$l_t_s,$r_t_s, $ref2hash);
+($l_t_s,$r_t_s,$ref2array, $full_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $full_aln_obj, \%tir_positions);
+%tir_positions = %$ref2hash;
+@gap_seq_pos_remove = @$ref2array;
 
 ## printing out the new cleaned up alignments
 ## if more than 5 sequences, make a new alignment with muscle
 my $trim_aln_out =
   File::Spec->catpath( $volume, $out_path, $filename . ".trim" );
-my $out = Bio::AlignIO->new( -file => ">$trim_aln_out", -format => 'fasta' , -displayname_flat => 0);
+$out = Bio::AlignIO->new( -file => ">$trim_aln_out", -format => 'fasta' , -displayname_flat => 0);
 $out->write_aln($full_aln_obj);
+
+## removes any columns that are now all gaps
+$full_aln_obj = $full_aln_obj->remove_gaps( '-', 1 );
+
 #open( IN,  $trim_aln_out ),          or die "Can't open $trim_aln_out\n";
 #open( OUT, ">$trim_aln_out.fixed" ), or die "Can't open $trim_aln_out.fixed\n";
-#while ( my $line = <IN> ) {
+#while ( my $line = <IN> ) 
 #  chomp $line;
 #  $line =~ s/\/\d+\-\d+$//;
 #  print OUT $line, "\n";
@@ -277,6 +290,10 @@ $out->write_aln($full_aln_obj);
 ##=cut
 
 my $trimmed_aln_obj = $full_aln_obj;
+
+
+
+############### remove code start
 
 ## below is processing of the .trim aln obj
 ## this the the orig aln minus any first round gap inducing
@@ -317,6 +334,9 @@ foreach my $row_ref (@trim_id_array) {
   print $trim_id_out "$pos[0]\t$pos[1]\t$pos[2]\n";
 }
 close($trim_id_out_path);
+
+############### remove code stop
+
 
 ## find TIRs
 my $left_tir_start1 = 0;
@@ -389,7 +409,7 @@ for ( my $i = 1 ; $i < $trim_aln_len ; $i++ ) {
   my $pos_present = $base_count / $total_count;
   if ( $right_tir_count == 0 ) {
     if ( $pos_id >= 80.0 and $pos_present >= .6 ) {
-      $right_tir_start1 = $trim_aln_len - $i + 1;
+      $right_tir_start1 = $trim_aln_len - $i;
       $right_tir_count++;
       next;
     }
@@ -421,7 +441,7 @@ for ( my $i = 1 ; $i < $trim_aln_len ; $i++ ) {
   }
 }
 print "First Left TIR start column: $left_tir_start1\n";
-print "First Right TIR start column: $right_tir_start1\n";
+print "First Right TIR start column: $right_tir_start1  (filename.trim)\n";
 
 if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 ) {
 
@@ -451,87 +471,16 @@ my $out_mod = Bio::AlignIO->new(
 $out_mod->write_aln($trimmed_aln_obj);
   
 #check whether any sequences have gaps within 50bp of start of putative TIRSs and remove them
+my ($left_tir_start, $right_tir_start);
+($left_tir_start, $right_tir_start , $ref2array, $trimmed_aln_obj, $ref2hash ) 
+   = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj,$left_tir_start1,$right_tir_start1, \%tir_positions);
+@gap_seq_pos_remove = @$ref2array;
+%tir_positions = %$ref2hash;
 
-
-my %trim_gap_seq_remove;
-my $consensus = $trimmed_aln_obj->consensus_string(60); 
-#print "consen: " ,$consensus , "\n";
-my %con_mm;
-for ( my $i = 0 ; $i < $trim_aln_len ; $i++ ) {
-  if ( ( $i >= $left_tir_start1 - 1 and $i <= $left_tir_start1 + 19 )
-    or ( $i >= $right_tir_start1 - 21 and $i <= $right_tir_start1 - 1 ) )
-  {
-
-    ## check each col for seqs that have a run of too many mismatches
-    my $col_aln_obj = $trimmed_aln_obj->slice($i+1,$i+1,1);
-    foreach my $seq_obj ($col_aln_obj->each_seq()){
-      my $seq_name = $seq_obj->id;
-      my $nt = $seq_obj->seq;
-      my $con_nt = substr ($consensus, $i, 1);
-      next if $con_nt =~ /N/i;
-      if ($nt ne $con_nt){
-        $con_mm{$seq_name}++;
-      }
-    }
-
-    foreach my $key (keys %con_mm){
-      next if $con_mm{$key} < 5 ;
-      my $seq_obj_to_remove = $trimmed_aln_obj->get_seq_by_id($key);
-      $trim_gap_seq_remove{$key} = $seq_obj_to_remove;
-      my @info    = ( $key, $i + 1, $seq_obj_to_remove );
-      push @gap_seq_pos_remove, [@info];
-    }
-    ## end check each col for too many mismatches
-
-
-    my @trim_gap_col_array   = @{$trim_gap_cols};
-    my $trim_gap_col_hashref = $trim_gap_col_array[$i];
-    my %trim_gap_col_hash    = %{$trim_gap_col_hashref};
-    my $base_count           = 0;
-    my $total_count          = 0;
-    foreach my $key ( keys %trim_gap_col_hash ) {
-      if ( $trim_gap_col_hash{$key} != 1 ) {
-        $base_count++;
-      }
-      $total_count++;
-    }
-    my $present_fraction = $base_count / $total_count;
-    ## if half or more of the seqs in this col are gaps, mark seqs with a gaps
-    ## to be be removed
-    if ( $present_fraction < 0.5 ) {
-      foreach my $key ( keys %trim_gap_col_hash ) {
-        if ( $trim_gap_col_hash{$key} != 1 ) {
-          my $seq_obj = $trimmed_aln_obj->get_seq_by_id($key);
-          $trim_gap_seq_remove{$key} = $seq_obj;
-          my @info    = ( $key, $i + 1, $seq_obj );
-          push @gap_seq_pos_remove, [@info];
-        }
-      }
-    }
-    ## if more than half of the seqs are not gaps, but one seq has a gap,
-    ## mark it for removal
-    else {
-      foreach my $key ( keys %trim_gap_col_hash ) {
-        if ( $trim_gap_col_hash{$key} == 1 ) {
-          my $seq_obj = $trimmed_aln_obj->get_seq_by_id($key);
-          my $seq     = $seq_obj->seq();
-          my $seq_pos = $seq_obj->location_from_column( $i + 1 );
-          $trim_gap_seq_remove{$key} = $seq_obj;
-          my @info    = ( $key, $i + 1, $seq_obj );
-          push @gap_seq_pos_remove, [@info];
-        }
-      }
-    }
-  }
-}
-
-#undef $trim_gap_cols;
-#undef $trim_aln_len;
-
-foreach my $key ( keys %trim_gap_seq_remove ) {
-  my $seq_obj = $trim_gap_seq_remove{$key};
-  $trimmed_aln_obj->remove_seq($seq_obj);
-}
+print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
+($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj , $left_tir_start, $right_tir_start);
+@gap_seq_pos_remove = @$ref2array;
+$trimmed_aln_obj = $trimmed_aln_obj->remove_gaps( '-', 1 );
 
 #undef %trim_gap_seq_remove;
 
@@ -557,7 +506,7 @@ my $trim_aln_out2 =
 my $out2 = Bio::AlignIO->new( -file => ">$trim_aln_out2", -format => 'fasta' ,-displayname_flat => 0);
 $out2->write_aln($trimmed_aln_obj);
 print "Trim2 Left TIR start column: $left_tir_start1\n";
-print "Trim2 Right TIR start column: $right_tir_start1\n";
+print "Trim2 Right TIR start column: $right_tir_start1 (filename.trim2)\n";
 
 #Store the column positions of the potential TIRs in the trimmed alignment and get the columns of them in the original alignminent to remove sequences that cause gaps in the tirs
 my %trim_left_pos_hash;
@@ -1035,7 +984,6 @@ foreach my $seq_obj (@bad_remove) {
 #undef @bad_remove;
 
 #get the end residue positions for the tirs from each sequence in the trimmed alignment that will be used to find the tir interval in the full alignment.
-my %tir_positions;
 foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
   my $seq_name = $seq_obj->id();
   my $trim_seq = $seq_obj->seq();
@@ -1076,8 +1024,9 @@ my $ori_aln_len = $ori_aln_obj->length();
 
 
 #get the column positions of tirs in the original alignment
-my ( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
-  get_columns( $ori_aln_obj, \%tir_positions );
+my ($left_tir_end, $right_tir_end );
+( $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end ) =
+  get_columns( $ori_aln_obj, \%tir_positions , 2);
 
 
 ## cleaning up aln using tir_starts found with get_columns 
@@ -1085,10 +1034,15 @@ my ( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
 ($right_tir_start , $left_tir_start) = adjust_tir_starts($ori_aln_obj,$right_tir_start,$left_tir_start);  
 
 
+my $adj_aln_out =
+File::Spec->catpath( $volume, $out_path, $filename . ".all_adj" );
+$out = Bio::AlignIO->new( -file => ">$adj_aln_out", -format => 'fasta' ,-displayname_flat => 0);
+$out->write_aln($ori_aln_obj);
+
 my $tir_length = $left_tir_end - $left_tir_start;
 print
 "First column grab just after reimporting the original alignment\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
-print "Starting MSA length = $ori_aln_len TIR length = $tir_length\n";
+print "Starting MSA length = $ori_aln_len TIR length = $tir_length (filename.all_adj)\n";
 
 #go back through the full alignment and remove only the sequences that create gaps in the TIRs or that failed the first two TIR searches
 my %gap_seq_remove2;
@@ -1170,10 +1124,10 @@ my $final_len = $final_aln_obj->length();
 print "MSA length is $final_len now\n";
 
 #get the column positions of tirs in the intermediate alignment
-( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
-  get_columns( $final_aln_obj, \%tir_positions );
+( $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end ) =
+  get_columns( $final_aln_obj, \%tir_positions , 2);
 print
-"2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
+"2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start (filename.intermediate)\n";
 
 my $new_gap_cols = $final_aln_obj->gap_col_matrix();
 my %new_gap_seq_remove;
@@ -1223,13 +1177,14 @@ my $check_len = $final_aln_obj->length();
 print "MSA length now: $check_len\n";
 
 #get the column positions of tirs in the intermediate alignment
-( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
-  get_columns( $final_aln_obj, \%tir_positions );
+( $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end ) =
+  get_columns( $final_aln_obj, \%tir_positions , 2);
 print
-"3rd column grab after removing more copies with TIR isssues\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start\n";
+"3rd column grab after removing more copies with TIR isssues\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start ($filename.intermediate)\n";
 my %to_remove_from_final;
 foreach my $seq_name ( keys %search_tirs ) {
   my $seq_obj     = $final_aln_obj->get_seq_by_id($seq_name);
+  next if !defined $seq_obj; 
   if ( exists $gap_seq_remove2{$seq_name} ) {
     $to_remove_from_final{$seq_name}=$seq_obj;
     next;
@@ -1246,7 +1201,7 @@ foreach my $seq_name ( keys %search_tirs ) {
   my $fname_start = $seqn_part[0];
   my $seq         = $seq_obj->seq();
   my $seq_len     = length($seq);
-
+print "Error $seq_name:seq_len is 0\n" if $seq_len == 0;
 #Length of $seq_name = $seq_len\n";
 #if ($seq =~ m/N{15}/g) {
 #    $final_aln_obj->remove_seq($seq_obj);
@@ -1288,7 +1243,6 @@ foreach my $seq_name ( keys %search_tirs ) {
   my $out_opt =
     File::Spec->catpath( $volume, $out_path, $fname_start . ".ggsearch3.out" );
   system("ggsearch36 -n -i -T 8 -d 1 $last_path $first_path > $out_opt");
-
   my @tir_match_result = match_tirs( $seq_obj, $out_opt, 3 );
   if ( $tir_match_result[0] == 0 or !@tir_match_result ) {
     my $seq_id = $seq_obj->id();
@@ -1318,10 +1272,10 @@ $out->write_aln($final_aln_obj);
 my $last_len = $final_aln_obj->length();
 
 #get the column positions of tirs in the final alignment
-( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end ) =
-  get_columns( $final_aln_obj, \%tir_positions );
+( $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end ) =
+  get_columns( $final_aln_obj, \%tir_positions , 2);
 print
-"Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start\n";
+"Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start ($filename.intermediate2)\n";
 
 #Extract the left and right TIRs as new alignment objects
 my $left_TIR_aln_obj =
@@ -1988,6 +1942,11 @@ sub match_tirs {
 
   #go through the FASTA input object . . down to the HSP
   while ( my $result = $fa_aln_obj->next_result ) {
+    #print "numHits: ",$result->num_hits,"\n";
+    if ($result->num_hits == 0){
+      push @result, ( 0, [0] );
+      last; 
+    }
     while ( my $hit = $result->next_hit ) {
       while ( my $hsp = $hit->next_hsp ) {
 
@@ -2172,8 +2131,6 @@ sub match_tirs {
                 push @result, ( 1, [@match] );
                 print
 "Another Mismatch at $count. Match is long, pushing match info for output\n";
-print "test ",substr($seq_name,0,5),"hit_pos_pre:",index( uc($seq), uc($match_hit), 40 ) ," hit_pos:$hit_pos, match_hit:$match_hit\n";
-print "\t",substr($seq,0,50),"\n";
                 last;
               }
             }
@@ -2329,10 +2286,12 @@ sub get_columns {
 #This will get the column numbers of the start and stop position of both TIRs using their nucleotide positions from a hash.
 #Initially, the hash contains information for the sequences present after TIR matching. Sequences may be added subsequently.
 #This is needed after sequences and any resulting gap only columns have been removed from the alignment
-  my $self = shift;    # aln_obj
+  my $self = shift;     # aln_obj
+  my $tir_positions = shift;    # \%tir_positions
+  my $round = shift;    # 1=starts no ends, 2=starts and ends
+
   $self->throw("Need Bio::Align::AlignI argument")
     unless ref $self && $self->isa('Bio::Align::AlignI');
-  my $tir_positions = shift;    # \%tir_positions
   foreach my $seq_obj ( $self->each_seq() ) {
     my $seq_name = $seq_obj->id();
 
@@ -2348,22 +2307,25 @@ sub get_columns {
 #print Dumper $tir_positions;
 #print Dumper ${$tir_positions}{$seq_name};
 #print "TEST 2b inside else!!! $seq_name:", $tir_positions->{$seq_name}{'left_tir_start'},"\n";
-      $left_tir_start =
+      my $left_tir_start =
         $self->column_from_residue_number( $seq_name,
         $tir_positions->{$seq_name}{'left_tir_start'} );
-      $left_tir_end =
-        $self->column_from_residue_number( $seq_name,
-        $tir_positions->{$seq_name}{'left_tir_end'} );
-      $right_tir_start =
+      my $right_tir_start =
         $self->column_from_residue_number( $seq_name,
         $tir_positions->{$seq_name}{'right_tir_start'} );
-      $right_tir_end =
-        $self->column_from_residue_number( $seq_name,
-        $tir_positions->{$seq_name}{'right_tir_end'} );
+      my ( $left_tir_end , $right_tir_end  ) = (0,0);
+      if ($round == 2){
+        $left_tir_end =
+          $self->column_from_residue_number( $seq_name,
+          $tir_positions->{$seq_name}{'left_tir_end'} );
+        $right_tir_end =
+          $self->column_from_residue_number( $seq_name,
+          $tir_positions->{$seq_name}{'right_tir_end'} );
+       }
       last;
     }
   }
-  return ( $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end );
+  return ( $left_tir_start, $right_tir_start,  $left_tir_end, $right_tir_end );
 }
 
 
@@ -2401,10 +2363,10 @@ sub adjust_tir_starts {
     my $start2left = $seq_obj->subseq( 1, $nt_col_pos - 1 );
 
     # my $left2right             = $seq_obj->subseq( $nt_col + 1, length $seq );
-    print "$seq_id\n";
-    print "before: $start2left\n";
+    #print "$seq_id\n";
+    #print "before: $start2left\n";
     if ( $start2left =~ s/(-+)$// ) {
-      print "after:  $start2left\n";
+      #print "after:  $start2left\n";
       my $gaps_left = $1;
       my @start2left = split '', $start2left;
       for ( my $i = ( ( length @start2left ) - 1 ) ; $i < 0 ; $i-- ) {
@@ -2413,11 +2375,11 @@ sub adjust_tir_starts {
       }
     }
 
-my $new_seq_p = "$gaps_left . $start2left . $left2right . $next2end . $gaps_right";
+#my $new_seq_p = "$gaps_left . $start2left . $left2right . $next2end . $gaps_right";
     my $new_seq =
       $gaps_left . $start2left . $left2right . $next2end . $gaps_right;
 
-    print "new: $new_seq_p\n";
+#print "new: $new_seq_p\n";
     $modified{$seq_id} = $new_seq;
   }
   my $done = 0;
@@ -2473,3 +2435,217 @@ my $new_seq_p = "$gaps_left . $start2left . $left2right . $next2end . $gaps_righ
   }
   return ( $right_tir_start, $left_tir_start );
 }
+
+sub consensus_filter {
+#### start
+  my $gap_seq_pos_remove = shift;              ## \@gap_seq_pos_remove
+  my $aln_obj            = shift;
+  my $left_tir_start     = shift;
+  my $right_tir_start    = shift;
+  my $tir_positions      = shift; # \%tir_positions
+  my $aln_len            = $aln_obj->length;
+
+  my %trim_gap_seq_remove;
+  my $consensus = $aln_obj->consensus_string(60);
+print "$consensus\n";
+  ## first round of tir finding
+  if ( !defined $left_tir_start or !defined $right_tir_start ) {
+    my @consensus    = split '', $consensus;
+    my $nt_count     = 0;
+    my $last_nomatch = 0;
+
+    ## left tir
+    for ( my $i = 0 ; $i < ( ( scalar @consensus ) * .5 ) ; $i++ ) {
+      my $nt = $consensus[$i];
+      if ( $nt eq '?' and $nt_count < 3 ) {
+        $last_nomatch = $i;
+        $nt_count     = 0;
+      }
+      elsif ( $nt ne '?' and $nt_count < 3 ) {
+        $nt_count++;
+      }
+      else {    #($nt ne '?' and $nt_count => 3){
+        $left_tir_start = $last_nomatch + 2;
+        last;
+      }
+    }
+    ## right tir
+    $last_nomatch = 0;
+    $nt_count     = 0;
+    for (
+      my $i = ( ( scalar @consensus ) - 1 ) ;
+      $i > ( ( scalar @consensus ) * .5 ) ;
+      $i--
+      )
+    {
+      my $nt = $consensus[$i];
+      if ( $nt eq '?' and $nt_count < 3 ) {
+        $last_nomatch = $i;
+        $nt_count     = 0;
+      }
+      elsif ( $nt ne '?' and $nt_count < 3 ) {
+        $nt_count++;
+      }
+      else {    #($nt ne '?' and $nt_count => 3){
+        $right_tir_start = $last_nomatch;
+        last;
+      }
+    }
+  }
+  print "in con_fil sub: leftTIR: $left_tir_start\n";
+  print "in con_fil sub: rightTIR: $right_tir_start\n";
+
+  #print "consen: " ,$consensus , "\n";
+  my %con_mm;
+  for ( my $i = 0 ; $i < $aln_len ; $i++ ) {
+    if ( ( $i >= $left_tir_start  and $i <= $left_tir_start + 20 )
+      or ( $i >= $right_tir_start - 20 and $i <= $right_tir_start  ) )
+    {
+
+      ## check each col for seqs that have a run of too many mismatches
+      my $col_aln_obj = $aln_obj->slice( $i + 1, $i + 1, 1 );
+      foreach my $seq_obj ( $col_aln_obj->each_seq() ) {
+        my $seq_name = $seq_obj->id;
+        my $nt       = $seq_obj->seq;
+        my $con_nt   = substr( $consensus, $i, 1 );
+        next if $con_nt =~ /N/i;
+        if ( $nt ne $con_nt ) {
+          $con_mm{$seq_name}++;
+        }
+      }
+      foreach my $key ( keys %con_mm ) {
+        next if $con_mm{$key} < 5;
+        my $seq_obj_to_remove = $aln_obj->get_seq_by_id($key);
+        $trim_gap_seq_remove{$key} = $seq_obj_to_remove;
+        my @info = ( $key, $i + 1, $seq_obj_to_remove );
+        push @$gap_seq_pos_remove, [@info];
+      }
+      ## end check each col for too many mismatches
+    }
+  }
+  foreach my $key ( keys %trim_gap_seq_remove ) {
+    my $seq_obj = $trim_gap_seq_remove{$key};
+    $aln_obj->remove_seq($seq_obj);
+  } 
+  $aln_obj = $aln_obj->remove_gaps( '-', 1 );
+  $tir_positions = get_tir_nt_starts($aln_obj,$tir_positions,$left_tir_start,$right_tir_start);
+  ($left_tir_start ,$right_tir_start) = get_columns($aln_obj,$tir_positions,1);
+  print "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
+  print "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
+  return ( $left_tir_start ,$right_tir_start, $gap_seq_pos_remove, $aln_obj , $tir_positions);
+}
+
+sub gap_filter {
+  my $gap_seq_pos_remove = shift;    ## \@gap_seq_pos_remove
+  my $aln_obj            = shift;
+  my $left_tir_start     = shift;
+  my $right_tir_start    = shift;
+  my $aln_len            = $aln_obj->length;
+
+  my %trim_gap_seq_remove;
+  for ( my $i = 0 ; $i < $aln_len ; $i++ ) {
+    if ( ( $i >= $left_tir_start - 1 and $i <= $left_tir_start + 19 )
+      or ( $i >= $right_tir_start - 21 and $i <= $right_tir_start - 1 ) )
+    {
+
+      my $gap_cols        = $aln_obj->gap_col_matrix();
+      my @gap_col_array   = @{$gap_cols};
+      my $gap_col_hashref = $gap_col_array[$i];
+      my %gap_col_hash    = %{$gap_col_hashref};
+      my $base_count      = 0;
+      my $total_count     = 0;
+      foreach my $key ( keys %gap_col_hash ) {
+        if ( $gap_col_hash{$key} != 1 ) {
+          $base_count++;
+        }
+        $total_count++;
+      }
+      my $present_fraction = $base_count / $total_count;
+      ## if half or more of the seqs in this col are gaps, mark seqs with a gaps
+      ## to be be removed
+      if ( $present_fraction < 0.5 ) {
+        foreach my $key ( keys %gap_col_hash ) {
+          if ( $gap_col_hash{$key} != 1 ) {
+            my $seq_obj = $aln_obj->get_seq_by_id($key);
+            $trim_gap_seq_remove{$key} = $seq_obj;
+            my @info = ( $key, $i + 1, $seq_obj );
+            push @$gap_seq_pos_remove, [@info];
+          }
+        }
+      }
+      ## if more than half of the seqs are not gaps, but one seq has a gap,
+      ## mark it for removal
+      else {
+        foreach my $key ( keys %gap_col_hash ) {
+          if ( $gap_col_hash{$key} == 1 ) {
+            my $seq_obj = $aln_obj->get_seq_by_id($key);
+            my $seq     = $seq_obj->seq();
+            my $seq_pos = $seq_obj->location_from_column( $i + 1 );
+            $trim_gap_seq_remove{$key} = $seq_obj;
+            my @info = ( $key, $i + 1, $seq_obj );
+            push @$gap_seq_pos_remove, [@info];
+          }
+        }
+      }
+    }
+  }
+
+  #undef $trim_gap_cols;
+  #undef $trim_aln_len;
+
+  foreach my $key ( keys %trim_gap_seq_remove ) {
+    my $seq_obj = $trim_gap_seq_remove{$key};
+    $aln_obj->remove_seq($seq_obj);
+  }
+  return ( $gap_seq_pos_remove, $aln_obj );
+}
+
+sub get_tir_nt_starts {
+  my $aln_obj = shift;
+  my $tir_positions = shift; # \%tir_positions
+  my $left_tir_start =shift;
+  my $right_tir_start =shift;
+
+  foreach my $seq_obj ( $aln_obj->each_seq() ) {
+    my $seq_name = $seq_obj->id();
+    my $seq = $seq_obj->seq();
+    my $left_tir_start_obj =
+      $seq_obj->location_from_column( $left_tir_start );
+    my $left_tir_start_pos = $left_tir_start_obj->start();
+    my $right_tir_start_obj =
+      $seq_obj->location_from_column( $right_tir_start );
+    my $right_tir_start_pos = $right_tir_start_obj->start();
+    $$tir_positions{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+    $$tir_positions{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
+  }
+  return ($tir_positions);
+}
+
+sub get_tir_nt_positions {
+  my $aln_obj = shift;
+  my $tir_positions = shift; # \%tir_positions
+  my $left_tir_start =shift; # $sorted_hitcolumn_keys[0] 
+  my $left_tir_len =shift;   # $sorted_hit_len_keys[0] 
+  my $right_tir_start =shift;# $sorted_querycolumn_keys[0] 
+  my $right_tir_len =shift;  # $sorted_query_len_keys[0] 
+
+  foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
+    my $seq_name = $seq_obj->id();
+    my $trim_seq = $seq_obj->seq();
+    my $left_tir_start_obj =
+      $seq_obj->location_from_column( $left_tir_start );
+    my $left_tir_start_pos = $left_tir_start_obj->start();
+    my $left_tir_end_pos   = $left_tir_start_pos + $left_tir_len  - 1;
+    my $right_tir_start_obj =
+      $seq_obj->location_from_column( $right_tir_start + ( $right_tir_len - 1 ) );
+    my $right_tir_start_pos = $right_tir_start_obj->start();
+    my $right_tir_end_pos =
+      $right_tir_start_pos - ( $right_tir_len - 1 );
+    $tir_positions{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+    $tir_positions{$seq_name}{'left_tir_end'}    = $left_tir_end_pos;
+    $tir_positions{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
+    $tir_positions{$seq_name}{'right_tir_end'}   = $right_tir_end_pos;
+  }
+  return ($tir_positions);
+}
+
