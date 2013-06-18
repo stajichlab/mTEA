@@ -28,6 +28,7 @@ use warnings;
 use Bio::AlignIO;
 use Bio::SearchIO;
 use Bio::Seq;
+use Bio::SeqIO;
 use Bio::PrimarySeq;
 use Bio::Tools::IUPAC;
 use FindBin;
