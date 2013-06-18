@@ -1266,12 +1266,14 @@ if ( $no_TSD_found_len >= 1 ) {
 #if necessary, change TIRS to remove the 2bp TSD that are included in them & calculate the overall percent identity of each TIR
 if ( $tsd1_count > $tsd2_count and $tsd1_count > $tsd3_count ) {
   print "Adjusting TIRs by 2bp\n\n";
+  $left_tir_start += 2;
+  $right_tir_start -= 2;
   $left_TIR_aln_obj =
-    $final_aln_obj->slice( $left_tir_start + 2, $left_tir_end, 1 );
+    $final_aln_obj->slice( $left_tir_start , $left_tir_end, 1 );
   $right_TIR_aln_obj =
-    $final_aln_obj->slice( $right_tir_end, $right_tir_start - 2, 1 );
+    $final_aln_obj->slice( $right_tir_end, $right_tir_start , 1 );
   $element_aln_obj =
-    $final_aln_obj->slice( $left_tir_start + 2, $right_tir_start - 2, 1 );
+    $final_aln_obj->slice( $left_tir_start , $right_tir_start , 1 );
   foreach my $seq_obj ( $final_aln_obj->each_seq() ) {
     my $seq_name = $seq_obj->id();
     if ( !defined $tir_positions{$seq_name}{'left_tir_start'} ) {
@@ -1290,12 +1292,14 @@ if ( $tsd1_count > $tsd2_count and $tsd1_count > $tsd3_count ) {
 }
 elsif ( $tsd2_count > $tsd1_count and $tsd2_count > $tsd3_count ) {
   print "Adjusting TIRs by 4bp\n\n";
+  $left_tir_start += 4;
+  $right_tir_start -= 4;
   $left_TIR_aln_obj =
-    $final_aln_obj->slice( $left_tir_start + 4, $left_tir_end, 1 );
+    $final_aln_obj->slice( $left_tir_start , $left_tir_end, 1 );
   $right_TIR_aln_obj =
-    $final_aln_obj->slice( $right_tir_end, $right_tir_start - 4, 1 );
+    $final_aln_obj->slice( $right_tir_end, $right_tir_start , 1 );
   $element_aln_obj =
-    $final_aln_obj->slice( $left_tir_start + 4, $right_tir_start - 4, 1 );
+    $final_aln_obj->slice( $left_tir_start , $right_tir_start , 1 );
   foreach my $seq_obj ( $final_aln_obj->each_seq() ) {
     my $seq_name = $seq_obj->id();
     if ( !defined $tir_positions{$seq_name}{'left_tir_start'} ) {
@@ -1567,8 +1571,14 @@ my $element_info_out_path =
 open( my $element_info_out, ">", $element_info_out_path )
   or die "Error creating $element_info_out_path. $!\n";
 print $element_info_out
-join ("/t",$fname_fin,$element_info{'copy_num'},$element_id,$element_info{'left_tir_seq'},$element_info{'left_tir_id'},$element_info{'right_tir_seq'},$element_info{'left_tir_id'},$element_info{'TSD_len'},$element_info{'TSD_seq'},$element_info{'TSD_fraction'},$classification),"\n";
+join ("\t",$fname_fin,$element_info{'copy_num'},$element_id,$element_info{'left_tir_seq'},$element_info{'left_tir_id'},$element_info{'right_tir_seq'},$element_info{'left_tir_id'},$element_info{'TSD_len'},$element_info{'TSD_seq'},$element_info{'TSD_fraction'},$classification),"\n";
 close($element_info_out);
+
+
+print "Printing fasta\n";
+my $element_fasta_out_path =
+  File::Spec->catpath( $volume, $out_path, $filename . ".fasta" );
+print_fasta($element_fasta_out_path,$element_aln_obj);
 
 my $out_fix           = $out_path . "/";
 my $Blogo_config_path = $FindBin::Bin . "/../lib/blogo/Blogo.conf";
@@ -2313,4 +2323,15 @@ sub error_out {
     clean_files($out_path);
   }
   exit 0;
+}
+sub print_fasta {
+  my $filename        = shift;
+  my $aln_obj         = shift;
+  my $seqIO_out_obj = Bio::SeqIO->new(-format=>'fasta',-file=>$filename);
+  foreach my $seq_obj ($aln_obj->each_seq){
+    my $seq = $seq_obj->seq;
+    $seq =~ s/-//g;
+    $seq_obj->seq($seq);
+    $seqIO_out_obj->write($seq_obj);
+  }
 }
