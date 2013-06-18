@@ -2328,7 +2328,7 @@ sub error_out {
 sub print_fasta {
   my $filename        = shift;
   my $aln_obj         = shift;
-  my $seqIO_out_obj = Bio::SeqIO->new(-format=>'fasta',-file=>$filename);
+  my $seqIO_out_obj = Bio::SeqIO->new(-format=>'fasta',-file=> ">$filename");
   foreach my $seq_obj ($aln_obj->each_seq){
     my $seq = $seq_obj->seq;
     $seq =~ s/-//g;
