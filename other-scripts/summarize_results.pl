@@ -5,6 +5,9 @@ use Getopt::Long;
 require File::Temp;
 use File::Temp qw/ :seekable /;
 
+# this script summarizes a BLAST run 
+# Author: Peter Arensburger
+
 my $RESULTSDIRECTORY; #directory with output data
 #my $SIZE_SIMILARITY = 0.9; # threshold below which the reference peptide and discovered peptide are too different in size to be the same
 #my $MATCH_THRESHOLD = 0.9; # how many matches the two reference and discovered peptide must be to considered the same
@@ -31,35 +34,34 @@ my %allpepseq; #holds the name of the peptide sequence as key and the sequence a
 opendir(DIR, $RESULTSDIRECTORY);
 my @filenames = readdir(DIR);
 foreach my $filename (@filenames) {
-	if ($filename =~ /(\S+)-domainBLAST$/) {
-		my $resultfilename = "$RESULTSDIRECTORY/" . $filename . "/" . $1 . ".RESTIRIR";
-		open (INPUT, $resultfilename) or die "Cannot open: $resultfilename";
-		while (my $line = <INPUT>) {
-			if ($line =~ />(\S+)-(\S+?:\d+\.\.\d+)_/) {
-				my $peptidename = $1;
-				my $pepfile = "$RESULTSDIRECTORY/" . $filename . "/" . $peptidename . ".pep"; #name of assciated peptide file				
-				my $location = $2;
+  if ($filename =~ /(\S+)-domainBLAST$/) {
+    my $resultfilename = "$RESULTSDIRECTORY/" . $filename . "/" . $1 . ".RESTIRIR";
+    open (INPUT, $resultfilename) or die "Cannot open: $resultfilename";
+    while (my $line = <INPUT>) {
+      if ($line =~ />(\S+)-(\S+?:\d+\.\.\d+)_/) {
+	my $peptidename = $1;
+	my $pepfile = "$RESULTSDIRECTORY/" . $filename . "/" . $peptidename . ".pep"; #name of assciated peptide file				
+	my $location = $2;
 
-				push @{ $pepof{$location} }, $pepfile; #record all the peptide file names at this location
+	push @{ $pepof{$location} }, $pepfile; #record all the peptide file names at this location
 
-				$line = <INPUT>;
-				chomp $line;
-				$hits{$location}[0] = $line;
-				open (INPUT2, $pepfile) or die "cannot open peptide file $pepfile\n";
-				<INPUT2>;
-				my $pepseq; #sequence of the peptide
-				while (my $line2 = <INPUT2>) {
-					chomp $line2;
-					$pepseq .= $line2;
-				}
-				$allpepseq{$pepfile} = $pepseq; 
-			}
-			else {
-				die ("error reading file $resultfilename at line\n$line");
-			}
-		}
-		close INPUT;
+	$line = <INPUT>;
+	chomp $line;
+	$hits{$location}[0] = $line;
+	open (INPUT2, $pepfile) or die "cannot open peptide file $pepfile\n";
+	<INPUT2>;
+	my $pepseq;		#sequence of the peptide
+	while (my $line2 = <INPUT2>) {
+	  chomp $line2;
+	  $pepseq .= $line2;
 	}
+	$allpepseq{$pepfile} = $pepseq; 
+      } else {
+	die ("error reading file $resultfilename at line\n$line");
+      }
+    }
+    close INPUT;
+  }
 }
 
 
