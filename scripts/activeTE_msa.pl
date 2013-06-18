@@ -2333,6 +2333,6 @@ sub print_fasta {
     my $seq = $seq_obj->seq;
     $seq =~ s/-//g;
     $seq_obj->seq($seq);
-    $seqIO_out_obj->write($seq_obj);
+    $seqIO_out_obj->write_seq($seq_obj);
   }
 }
