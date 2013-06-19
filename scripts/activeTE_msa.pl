@@ -296,6 +296,9 @@ print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\
 ($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj , $left_tir_start, $right_tir_start);
 @gap_seq_pos_remove = @$ref2array;
 $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps( '-', 1 );
+##Sofia added 06192013
+print "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+( $left_tir_start1, $right_tir_start1 )  = get_columns( $trimmed_aln_obj, \%tir_positions , 1);
 
 my $test_len = $trimmed_aln_obj->length();
 if ( $test_len == 0 ) {
@@ -309,7 +312,7 @@ my $trim_aln_out2 =
   File::Spec->catpath( $volume, $out_path, $filename . ".trim2" );
 my $out2 = Bio::AlignIO->new( -file => ">$trim_aln_out2", -format => 'fasta' ,-displayname_flat => 0);
 $out2->write_aln($trimmed_aln_obj);
-print "Trim2 Left TIR start column: $left_tir_start1\n";
+print "after get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
 print "Trim2 Right TIR start column: $right_tir_start1 (filename.trim2)\n";
 
 #Store the column positions of the potential TIRs in the trimmed alignment and get the columns of them in the original alignminent to remove sequences that cause gaps in the tirs
@@ -956,8 +959,22 @@ my $last_len = $final_aln_obj->length();
 #get the column positions of tirs in the final alignment
 ( $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end ) =
   get_columns( $final_aln_obj, \%tir_positions , 2);
-print
-"Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start ($filename.intermediate2)\n";
+
+#print
+#"Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start ($filename.intermediate2)\n";
+#my @gap_seq_pos_remove3;
+#($left_tir_start, $right_tir_start , $ref2array, $trimmed_aln_obj, $ref2hash )
+#   = consensus_filter(\@gap_seq_pos_remove3, $final_aln_obj,$left_tir_start,$right_tir_start, \%tir_positions, 'final');
+#@gap_seq_pos_remove3 = @$ref2array;
+#%tir_positions = %$ref2hash;
+#print "after last consenus filter on final_aln. LTStart: $left_tir_start  Right: $right_tir_start ($filename.final)\n";
+#
+#foreach my $info ( @gap_seq_pos_remove3 ) {
+#  my $seq_id = ${$info}[0];
+#  print $removed_out
+#    "$seq_id\tStep3:Sequence contained too many mismataches in at least one of the TIRs\n";
+#}
+
 
 #Extract the left and right TIRs as new alignment objects
 my $left_TIR_aln_obj =
@@ -1353,7 +1370,10 @@ my $TSD_array_length = @put_TSD_names;
 if ( $TSD_array_length == 0 ) {
   print "No TSDs found\n";
   my $bad_out_path = File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
-  error_out ($bad_out_path , "$filename\tNo TSDs found for any copy");
+  error_out ($bad_out_path , "$filename\tNo TSDs found for any copy",1);
+  my $gff_path = File::Spec->catpath( $volume, $out_path, $filename . ".gff" );
+  generate_gff ($final_aln_obj,$gff_path,"TSD",\%element_info);
+  exit 0;
 }
 
 #count the occurances of a TSD sequence and sort with the highest value first in an array
@@ -1835,18 +1855,19 @@ sub match_tirs {
 }
 
 sub generate_gff {
-  my $self  = shift;
-  my $path  = shift;
+  ## generate_gff ($aln_obj,$path,$round(final/TSD))
+  my $self  = shift; ## $aln_obj
+  my $path  = shift; 
   my $round = shift;
+  my $ele_info_ref = shift;
   print "Entered .gff printer\n";
   $self->throw("Need Bio::Align::AlignI argument")
     unless ref $self && $self->isa('Bio::Align::AlignI');
 
   #not implemented: round changes the output based on when the call is made
-  if ( $round eq 'final' ) {
+  if ( $round eq 'final' or $round eq 'TSD' ) {
     open( my $out, ">", $path ) or die "Error creating $path. $!\n";
     print "Round = final\n";
-    my $ele_info_ref = shift;
     foreach my $seq_obj ( $self->each_seq() ) {
       my $seq_name = $seq_obj->id();
       my $seq      = $seq_obj->seq();
@@ -1896,10 +1917,15 @@ sub generate_gff {
       my $rtir_start =
         $end - ( length( $ele_info_ref->{"right_tir_seq"} ) - 1 );
       my $ele_id    = $ele_info_ref->{"element_id"};
-      my $ele_class = $ele_info_ref->{"classification"};
       my $tir_id    = $ele_info_ref->{"left_tir_id"};
-      my $tsd_frac  = $ele_info_ref->{"TSD_fraction"};
-      my $tsd_con   = $ele_info_ref->{"TSD_seq"};
+      my $ele_class = 'N/A'; 
+      my $tsd_frac  = 'N/A';
+      my $tsd_con   = 'N/A';
+      if ($round eq 'final'){
+        $ele_class = $ele_info_ref->{"classification"};
+        $tsd_frac  = $ele_info_ref->{"TSD_fraction"};
+        $tsd_con   = $ele_info_ref->{"TSD_seq"};
+      }
       print $out join(
         "\t", $seqid,
         $PROGRAM_NAME,
@@ -1920,7 +1946,7 @@ sub generate_gff {
         $rtir_start, $end, ".", ".", ".", "Parent=$eleid-$copy_num" ),
         "\n";
 
-      if ( defined $ele_info_ref->{$seq_name}{"TSD"} ) {
+      if ( $round eq 'final' and defined $ele_info_ref->{$seq_name}{"TSD"} ) {
         my $ltsd_start = $start - length( $ele_info_ref->{$seq_name}{"TSD"} );
         my $ltsd_end   = $start - 1;
         my $rtsd_start = $end + 1;
@@ -2056,7 +2082,7 @@ sub adjust_tir_starts {
     )[0];
     my $nt_count   = $count{right}{$pos}{$nt};
     my $percent_nt = $nt_count / $num_seqs;
-print "numSeq=$num_seqs $nt:nt_count %=$percent_nt\n";
+#print "adjust_tirs RT $nt($pos):nt_count (nextposIN:$count{left}{$pos-1}) %=$percent_nt\n";
     if ( $percent_nt > .8 ) {
       $right_tir_start++;
     }
@@ -2074,6 +2100,7 @@ print "numSeq=$num_seqs $nt:nt_count %=$percent_nt\n";
     )[0];
     my $nt_count   = $count{left}{$pos}{$nt};
     my $percent_nt = $nt_count / $num_seqs;
+#print "adjust_tirs LT $nt($pos):nt_count (nextpos:$count{left}{$pos+1}) %=$percent_nt\n";
     if ( $percent_nt > .8 ) {
       $left_tir_start--;
     }
@@ -2109,8 +2136,10 @@ sub consensus_filter {
   my $left_tir_start     = shift;
   my $right_tir_start    = shift;
   my $tir_positions      = shift; # \%tir_positions
+  my $round              = shift;
   my $aln_len            = $aln_obj->length;
-
+  $round = defined $round ? $round : 'other';
+  print "in consensu_filt sub: round=$round\n";
   my %trim_gap_seq_remove;
   my $consensus = $aln_obj->consensus_string(80);
   print "$consensus\n";
@@ -2193,11 +2222,14 @@ sub consensus_filter {
     my $seq_obj = $trim_gap_seq_remove{$key};
     $aln_obj->remove_seq($seq_obj);
   } 
-  my $tir_positions_ref = get_tir_nt_starts($aln_obj,$tir_positions,$left_tir_start,$right_tir_start);
-  #print Dumper($tir_positions_ref);
-  %tir_positions = %{$tir_positions_ref};
+  my $tir_positions_ref;
+  if ($round ne 'final'){   
+    $tir_positions = get_tir_nt_starts($aln_obj,$tir_positions,$left_tir_start,$right_tir_start);
+    #print Dumper($tir_positions_ref);
+  }
+  #%tir_positions = %{$tir_positions_ref};
   $aln_obj = $aln_obj->remove_gaps( '-', 1 );
-  ($left_tir_start ,$right_tir_start) = get_columns($aln_obj,\%tir_positions,1);
+  ($left_tir_start ,$right_tir_start) = get_columns($aln_obj,$tir_positions,1);
   print "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
   print "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
   return ( $left_tir_start ,$right_tir_start, $gap_seq_pos_remove, $aln_obj , $tir_positions);
@@ -2318,6 +2350,7 @@ sub get_tir_nt_positions {
 sub error_out {
   my $bad_out_path = shift; ## error file path
   my $message      = shift;
+  my $exit = shift; ## 1=no exit; 0 or undef=exit
   open( my $bad_out, ">", $bad_out_path );
   print $bad_out "$message\n";
   close($bad_out);
@@ -2325,7 +2358,9 @@ sub error_out {
     print "Cleaning up files\n";
     clean_files($out_path);
   }
-  exit 0;
+  if (!$exit){
+    exit 0;
+  }
 }
 sub print_fasta {
   my $filename        = shift;
