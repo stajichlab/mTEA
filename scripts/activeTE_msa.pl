@@ -92,8 +92,10 @@ The test alignments all have f = 100.
 
 #breakdown directory and filename, create output directory
 my ( $volume, $in_dir, $filename ) = File::Spec->splitpath($infile);
-my ($fname_fin) =
-  split( '\\.', $filename );    # first bit after first '.' is the name
+#my ($fname_fin) = split( '\\.', $filename );    # first bit after first '.' is the name
+my @fname_fin = split( '\\.', $filename );    # first bit after first '.' is the name
+pop @fname_fin;
+my $fname_fin = join ('.',@fname_fin);
 my $out_dir_name = "activeTE_out_" . $fname_fin;
 my $out_path = File::Spec->catdir( $in_dir, $out_dir_name );
 if ( !-d $out_path ) {
@@ -612,17 +614,16 @@ else {
 
 #get column positions in of TIRs, using sequence name and index position of TIR in full sequence.
     $hit_aln_pos2 =
-      $trimmed_aln_obj->column_from_residue_number( $entry2[0],
-      ${ entry2 [1]{"hit"} }[0] );
+      $trimmed_aln_obj->column_from_residue_number( $entry2[0], ${ $entry2[1]{"hit"} }[0] );
     $hit_column_counts2{$hit_aln_pos2}++;
-    $hit_match_len2{ ${ entry2 [1]{"hit"} }[1] }++;
+    $hit_match_len2{ ${ $entry2 [1]{"hit"} }[1] }++;
 
     #do the same for the query (left) TIR
     $query_aln_pos2 =
       $trimmed_aln_obj->column_from_residue_number( $entry2[0],
-      ${ entry2 [1]{"query"} }[0] );
+      ${ $entry2 [1]{"query"} }[0] );
     $query_column_counts2{$query_aln_pos2}++;
-    $query_match_len2{ ${ entry2 [1]{"query"} }[1] }++;
+    $query_match_len2{ ${ $entry2 [1]{"query"} }[1] }++;
   }
 
 #sort the hit and query column and match length hashes by largest count to smallest
@@ -1528,9 +1529,9 @@ foreach my $ele_name ( keys %element_char_hash ) {
         $element_hits{$ele_name}++;
       }
 
-      #else {
-      #    delete $element_hits{$ele_name};
-      #}
+      else {
+          delete $element_hits{$ele_name};
+      }
     }
   }
 }
@@ -1792,9 +1793,10 @@ sub match_tirs {
                 my $match_hit_len   = length($match_hit);
 
     #find the position in the full sequence of the hit and query match sequences
-                $hit_pos = index( uc($seq), uc($match_hit), 40 ) + 1;
+                $hit_pos = index( uc($seq), uc($match_hit) ) + 1;
+                #$hit_pos = index( uc($seq), uc($match_hit), 40 ) + 1;
                 $query_pos = rindex( uc($seq), uc($match_query) ) + 1;
-
+#print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n";
                 #store sequence name and the hit and query info
                 my @match = (
                   $seq_name,
