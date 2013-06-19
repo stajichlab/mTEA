@@ -165,7 +165,7 @@ my @full_id_array;
 
 if ( !-e $full_id_out_path ) {
   open( my $id_out => ">$full_id_out_path" );
-  warn "Starting Full ID calculation\n";
+  print "Starting Full ID calculation\n";
   for ( my $i = 1 ; $i <= $full_aln_len ; $i++ ) {
     my $pos             = $full_aln_obj->slice( $i, $i, 1 );
     my $pos_id          = $pos->percentage_identity;
