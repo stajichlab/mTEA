@@ -42,7 +42,6 @@ my $flank = 100;
 my $trimal =
   'trimal';   # specify the full path to this if it can't be found automatically
 my $all;
-
 my $PROGRAM_NAME = "activeTE";
 
 GetOptions(
@@ -59,11 +58,12 @@ else {
 }
 
 # make sure only one valid input file is specified
-if ( @ARGV != 1 ) {
+if ( @ARGV != 2 ) {
   print "Please specify only one input file\n";
   help();
 }
 my $infile = shift @ARGV;
+my $new = shift;
 
 if ( !-f $infile ) {
   print "Supplied filepath is not valid: $!\n";
@@ -164,8 +164,14 @@ my $full_id_out_path =
 my @full_id_array;
 
 if ( !-e $full_id_out_path ) {
-  open( my $id_out => ">$full_id_out_path" );
+if($new){
   print "Starting Full ID calculation\n";
+  @full_id_array = get_percentID_perCol($infile,$full_id_out_path);
+}
+else{
+  print "Starting Full ID calculation\n";
+  @full_id_array = get_percentID_perCol($infile,$full_id_out_path);
+  open( my $id_out => ">$full_id_out_path" );
   for ( my $i = 1 ; $i <= $full_aln_len ; $i++ ) {
     my $pos             = $full_aln_obj->slice( $i, $i, 1 );
     my $pos_id          = $pos->percentage_identity;
@@ -193,6 +199,7 @@ if ( !-e $full_id_out_path ) {
       "\n";            # print out this info to a file
     push @full_id_array, [ $i, $pos_id, $pos_present ];
   }
+}
 }
 else {
   open( my $id_out, '<', "$full_id_out_path" );
@@ -2372,4 +2379,63 @@ sub print_fasta {
     $seq_obj->seq($seq);
     $seqIO_out_obj->write_seq($seq_obj);
   }
+}
+sub get_percentID_perCol {
+## @percent_id = get_percentID_perCol(file.aln,outfile);
+my $msa = shift;
+my $out = shift;
+open MSA, $msa or die "Can't open $msa\n";
+open MSAOUT, ">$msa.mod" or die "Can't open $msa.mod\n";
+<MSA>;#throw out first header
+my $seq;
+my $seq_count = 0;
+while (my $line = <MSA>){
+  chomp $line;
+  if ($line =~ /^>/){
+    $seq_count++;
+    print MSAOUT "$seq\n";
+    $seq = '';
+  }else {
+    $seq.=$line;
+  }
+}
+## for last seq
+$seq_count++;
+print MSAOUT "$seq\n";
+##
+
+close MSAOUT;
+close MSA;
+my @percent_id;
+my $first_seq = `head -1 $msa.mod`;
+chomp $first_seq;
+my $len = length $first_seq;
+open OUT , ">$out" or die "Can't opne $out $!\n";
+for (my $i=1 ; $i<$len+1 ; $i++){
+  my $total_nt;
+  my %nt_count;
+  chomp (my @col = `cut -c \$$i $msa.mod`);
+  foreach my $nt (@col){
+   next if $nt =~ /-/;
+   $nt_count{total}++;
+   ## only increment if the character is not a '-'
+   ## Ns will be included in the total
+   next if $nt =~ /N/i;
+   $nt_count{each}{$nt}++;
+  }
+  if ((scalar keys %{$nt_count{each}}) == 0){
+    push @percent_id , [$i , 0 , 0];
+    print OUT join( "\t", $i, 0 , 0 ),"\n";   
+  }else{
+    my $most_freq_nt = (sort {$nt_count{each}{$b} <=> $nt_count{each}{$a}} keys %{$nt_count{each}})[0];
+    my $count = $nt_count{each}{$most_freq_nt};
+    my $col_total = $nt_count{total};
+    my $pid = ($count/$col_total) *100;
+    #push @percent_id, ($count/$col_total);
+    push @percent_id , [$i , $pid , ($col_total/$seq_count) ];         
+    # print out this info to a file
+    print OUT join( "\t", $i, $pid, ($col_total/$seq_count) ),"\n";   
+  }
+}
+  return @percent_id;
 }
