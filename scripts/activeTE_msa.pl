@@ -214,7 +214,7 @@ else {
 my %gap_seq_remove;
 my @gap_seq_pos_remove;
 ## go thru each position in the alignment
-for ( my $i = 0 ; $i < $full_aln_len ; $i++ ) {
+for ( my $i = ($flank -1)  ; $i < ($full_aln_len - $flank) ; $i++ ) {
   my $id_row_ref      = $full_id_array[$i];
   my $gap_col_hashref = $gap_cols->[$i];
   my %gap_col_hash    = %{$gap_col_hashref};
