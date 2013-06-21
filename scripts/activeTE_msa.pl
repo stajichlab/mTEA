@@ -220,8 +220,22 @@ else {
 ## sequences that introduce only one col of gaps will be removed
 my %gap_seq_remove;
 my @gap_seq_pos_remove;
+
+my @flanks ;
+foreach my $seq_obj ( $full_aln_obj->each_seq ) {
+  my $seq_id = $seq_obj->id;
+  my $seq = $seq_obj->seq;
+  my $seq_len = $seq =~ tr/ATGCNatgcn/ATGCNatgcn/;
+  push @flanks , $full_aln_obj->column_from_residue_number( $seq_id, $flank);
+  push @flanks , $full_aln_obj->column_from_residue_number( $seq_id, ($seq_len - $flank)+1);
+}
+my @sorted_flanks = sort @flanks;
+my $smallest_flank = shift @sorted_flanks;
+my $largest_flank = pop @sorted_flanks;
+
+
 ## go thru each position in the alignment
-for ( my $i = ($flank -1)  ; $i < ($full_aln_len - $flank) ; $i++ ) {
+for ( my $i = $smallest_flank  ; $i < $largest_flank ; $i++ ) {
   my $id_row_ref      = $full_id_array[$i];
   my $gap_col_hashref = $gap_cols->[$i];
   my %gap_col_hash    = %{$gap_col_hashref};
@@ -2414,7 +2428,7 @@ open OUT , ">$out" or die "Can't opne $out $!\n";
 for (my $i=1 ; $i<$len+1 ; $i++){
   my $total_nt;
   my %nt_count;
-  chomp (my @col = `cut -c \$$i $msa.mod`);
+  chomp (my @col = `cut -c $i $msa.mod`);
   foreach my $nt (@col){
    next if $nt =~ /-/;
    $nt_count{total}++;
