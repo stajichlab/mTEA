@@ -58,7 +58,7 @@ else {
 }
 
 # make sure only one valid input file is specified
-if ( @ARGV != 2 ) {
+if ( @ARGV != 1 ) {
   print "Please specify only one input file\n";
   help();
 }
