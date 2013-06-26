@@ -2261,6 +2261,8 @@ sub consensus_filter {
   $round = defined $round ? $round : 'other';
   print "in consensu_filt sub: round=$round\n";
   my %trim_gap_seq_remove;
+  ## this will generate a sequence with '?' at every position in which there is less
+  ## than 80% consensus
   my $consensus = $aln_obj->consensus_string(80);
   print "$consensus\n";
   ## first round of tir finding
@@ -2356,15 +2358,27 @@ sub consensus_filter {
     }
 
   }## paren for remove least
-    if ( $round ne 'final' ) {
-      $tir_positions =
-        get_tir_nt_starts( $aln_obj, $tir_positions, $left_tir_start,
-        $right_tir_start );
+  ##how close are the first round of TIR starts to the ends of the aln
+  my $consensus_len = $right_tir_start - $left_tir_start + 1;
+  #print "consensus string (len=$consensus_len) is ",$consensus_len/$aln_len," of the len of the aln (len=$aln_len)\n"; 
+  my $message = '';
+  if ($consensus_len > ($aln_len*.9)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50 ))
+    $message = "$filename: too much of the alignment is conserved. Flanks are too similar\n";
+  }elsif (!$left_tir_start or !$right_tir_start){
+    $message = "$filename: no TIR start was found on one or both ends\n";
+  }
+  if ($message){
+    my $bad_out_path =
+      File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
+    error_out( $bad_out_path, $message );
+  }
+  if ( $round ne 'final' ) {
+    $tir_positions =
+      get_tir_nt_starts( $aln_obj, $tir_positions, $left_tir_start,
+      $right_tir_start );
+  }
 
-      #print Dumper($tir_positions);
-    }
 
-    #%tir_positions = %{$tir_positions_ref};
     $aln_obj = $aln_obj->remove_gaps( '-', 1 );
     ( $left_tir_start, $right_tir_start ) =
       get_columns( $aln_obj, $tir_positions, 1 );
@@ -2747,7 +2761,7 @@ sub remove_least {
 sub get_org_aln {
 my $infile = shift;
 #create input object and an alignment object from it
-my $in_obj = Bio::AlignIO->new( -file => $infile, -format => 'fasta' );
+my $in_obj = Bio::AlignIO->new( -file => $infile, -format => 'fasta' , -alphabet => 'dna');
 my $aln_obj;
 unless ( $aln_obj = $in_obj->next_aln() ) {
   die "Cannot find any alignment in file $infile\n";
