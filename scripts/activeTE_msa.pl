@@ -125,7 +125,7 @@ close($trimal_run);
 #initialize a global array to store results later
 
 my @good_aln = ();
-my ( $initial_left_TSD, $initial_right_TSD );
+#my ( $initial_left_TSD, $initial_right_TSD );
 ## replacing white space with underscores in MSA
 my @in_array;
 open( my $in => "<$infile" );
@@ -147,7 +147,13 @@ close($fix_out);
 my $full_aln_obj = get_org_aln ($infile);
 my $full_aln_len = $full_aln_obj->length();
 my $gap_cols = $full_aln_obj->gap_col_matrix();
-
+my $full_aln_num_seqs = $full_aln_obj->num_sequences;
+if ($full_aln_num_seqs < 2){
+  my $bad_out_path =
+    File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
+  error_out( $bad_out_path,
+    "$filename\thas only $full_aln_num_seqs sequence(s)\n" );
+}
 
 #calculate the % nucleotide identity and the fraction of copies with sequence at each position the full alignment and print to file
 
@@ -2439,12 +2445,19 @@ sub get_tir_nt_starts {
 
   foreach my $seq_obj ( $aln_obj->each_seq() ) {
     my $seq_name            = $seq_obj->id();
-    my $seq                 = $seq_obj->seq();
-    my $left_tir_start_obj  = $seq_obj->location_from_column($left_tir_start);
-    my $left_tir_start_pos  = $left_tir_start_obj->start();
-    my $right_tir_start_obj = $seq_obj->location_from_column($right_tir_start);
-    my $right_tir_start_pos = $right_tir_start_obj->start();
+    #my $seq                 = $seq_obj->seq();
+    my $left_tir_start_pos = 0;
+    if (defined $seq_obj->location_from_column($left_tir_start)){
+      my $left_tir_start_obj  = $seq_obj->location_from_column($left_tir_start);
+      $left_tir_start_pos  = $left_tir_start_obj->start();
+    }
     $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+    
+    my $right_tir_start_pos = 0;
+    if (defined $seq_obj->location_from_column($right_tir_start)){ 
+      my $right_tir_start_obj = $seq_obj->location_from_column($right_tir_start);
+      $right_tir_start_pos = $right_tir_start_obj->start();
+    }
     $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
   }
   return ($tir_positions);
