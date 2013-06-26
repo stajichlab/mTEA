@@ -1086,7 +1086,7 @@ foreach my $seq_obj ( $final_aln_obj->each_seq() ) {
   my $left_tsd_end_pos = $left_tsd_loc_obj->start();
   $starting_left_flank = substr( $seq, 0, $left_tsd_end_pos + 4 );
   $left_tsd = substr( $seq, $left_tsd_end_pos - 21, 24 );
-  if (length $left_tsd < 10){
+  if (length $left_tsd < 20){
     my $message = "Left flank too short to look at TSDs.\n";
     print $no_TSD_found_out $message;
     next;
@@ -2549,6 +2549,9 @@ sub get_percentID_perCol {
   close MSA;
   my @percent_id;
   my $first_seq = `head -1 $msa.mod`;
+  if (length $first_seq < 5){
+   die "Error retrieving first line of $msa.mod\n";
+  } 
   chomp $first_seq;
   my $len = length $first_seq;
   open OUT, ">$out" or die "Can't opne $out $!\n";
