@@ -2063,7 +2063,7 @@ sub clean_files {
   opendir( my $in_DIR, $out_path ) or die "Cannot open directory: $!";
   while ( my $file = readdir($in_DIR) ) {
     next if ( $file =~ m/^\./ );
-    if ( $file =~ m/\.(final|info|fa|element_info|bad|gff|tif|jpg)$/ ) {
+    if ( $file =~ m/\.(final|info|fa|element_info|bad|gff|tif|jpg|full_id)$/ ) {
       next;
     }
     else {
