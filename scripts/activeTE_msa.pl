@@ -89,6 +89,30 @@ The test alignments all have f = 100.
   exit 1;
 }
 
+## cleaning up MSA
+my @in_array;
+open( my $in => "<$infile" );
+while ( my $line = <$in> ) {
+  if ($line =~ /^>/){
+   ## replacing white space with underscores in MSA
+   $line =~ s/ /_/g;
+  }elsif  ($line =~ /^-+$/){
+    ## if we have a seq with all '-'
+    ## dont add seq line to array
+    ## and pop its name off of array
+    if ($in_array[-1] =~ /^>/){
+      pop @in_array; 
+    }
+    next;
+  }
+  push @in_array, $line;
+}
+close($in);
+open( my $fix_out => ">$infile" );
+print $fix_out @in_array;
+close($fix_out);
+@in_array = ();
+
 #breakdown directory and filename, create output directory
 my ( $volume, $in_dir, $filename ) = File::Spec->splitpath($infile);
 
@@ -123,26 +147,7 @@ while ( my $line = <$trimal_run> ) {
 close($trimal_run);
 
 #initialize a global array to store results later
-
 my @good_aln = ();
-#my ( $initial_left_TSD, $initial_right_TSD );
-## replacing white space with underscores in MSA
-my @in_array;
-open( my $in => "<$infile" );
-while ( my $line = <$in> ) {
-  $line =~ s/ /_/g;
-
-  # did you want to skip lines that don't have any whitespace?
-  push @in_array, $line;
-}
-close($in);
-open( my $fix_out => ">$infile" );
-print $fix_out @in_array;
-close($fix_out);
-@in_array = ();
-
-# the above could just be re-written
-# `perl -i -p -e 's/ /_/g;' $infile`;
 
 my $full_aln_obj = get_org_aln ($infile);
 my $full_aln_len = $full_aln_obj->length();
