@@ -92,24 +92,34 @@ The test alignments all have f = 100.
 ## cleaning up MSA
 my @in_array;
 open( my $in => "<$infile" );
+my $seq='';
 while ( my $line = <$in> ) {
   if ($line =~ /^>/){
    ## replacing white space with underscores in MSA
    $line =~ s/ /_/g;
-  }#elsif  ($line =~ /^-+$/){
-    ## if we have a seq with all '-'
-    ## dont add seq line to array
-    ## and pop its name off of array
-    #if ($in_array[-1] =~ /^>/){
-    #  pop @in_array; 
-    #}
-    #next;
-  #}
-  push @in_array, $line;
+   if ($seq){
+     ## if there is a seq already stored store it
+     my ($header,$justseq) = split /\n/ , $seq;
+     if ($justseq !~ /^-+$/){
+       push @in_array, $seq;
+     }
+     $seq = '';
+   }
+   $seq.=$line;
+  }else{
+    ##not header, just seq
+    chomp $line;
+    $seq.=$line;
+  }
+}
+## for last seq
+my ($header,$justseq) = split /\n/ , $seq;
+if ($justseq !~ /^-+$/){
+  push @in_array, $seq;
 }
 close($in);
 open( my $fix_out => ">$infile" );
-print $fix_out @in_array;
+print $fix_out join ("\n",@in_array),"\n";
 close($fix_out);
 @in_array = ();
 
@@ -2367,7 +2377,7 @@ sub consensus_filter {
   my $consensus_len = $right_tir_start - $left_tir_start + 1;
   #print "consensus string (len=$consensus_len) is ",$consensus_len/$aln_len," of the len of the aln (len=$aln_len)\n"; 
   my $message = '';
-  if ($consensus_len > ($aln_len*.9)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50 ))
+  if ($consensus_len > ($aln_len*.95)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50 ))
     $message = "$filename: too much of the alignment is conserved. Flanks are too similar\n";
   }elsif (!$left_tir_start or !$right_tir_start){
     $message = "$filename: no TIR start was found on one or both ends\n";
@@ -2471,24 +2481,41 @@ sub get_tir_nt_starts {
   print "get_tir_nt_starts(top): lts:$left_tir_start rts:$right_tir_start\n";
   foreach my $seq_obj ( $aln_obj->each_seq() ) {
     my $seq_name            = $seq_obj->id();
-    my $seq                 = $seq_obj->seq();
-    if ($seq =~ /^-+$/g){
-      #print "$seq_name: no seq found\n";
-      $$remove_these{$seq_name}=$seq_obj;
-    }
-    my $left_tir_start_pos = 0;
+    #my $seq                 = $seq_obj->seq();
+    #if ($seq =~ /^-+$/g){
+    #  #print "$seq_name: no seq found\n";
+    #}
     if (defined $seq_obj->location_from_column($left_tir_start) ){
       my $left_tir_start_obj  = $seq_obj->location_from_column($left_tir_start);
-      $left_tir_start_pos  = $left_tir_start_obj->start();
+      my $left_tir_start_pos  = $left_tir_start_obj->start();
+      if ($left_tir_start_pos > 0){
+        $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+      }else{
+        delete  $tir_positions->{$seq_name};
+        $$remove_these{$seq_name}=$seq_obj;
+        next;
+      }
+    }else{
+        delete  $tir_positions->{$seq_name};
+        $$remove_these{$seq_name}=$seq_obj;
+        next;
     }
-    $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
     
-    my $right_tir_start_pos = 0;
     if (defined $seq_obj->location_from_column($right_tir_start)){ 
       my $right_tir_start_obj = $seq_obj->location_from_column($right_tir_start);
-      $right_tir_start_pos = $right_tir_start_obj->start();
+      my $right_tir_start_pos = $right_tir_start_obj->start();
+      if ($right_tir_start_pos > 0){
+        $tir_positions->{$seq_name}{'right_tir_start'}  = $right_tir_start_pos;
+      }else{
+        delete  $tir_positions->{$seq_name};
+        $$remove_these{$seq_name}=$seq_obj;
+        next;
+      }
+    }else{
+        delete  $tir_positions->{$seq_name};
+        $$remove_these{$seq_name}=$seq_obj;
+        next;
     }
-    $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
   }
   return ($tir_positions,$remove_these);
 }
@@ -2527,6 +2554,7 @@ sub error_out {
   my $exit         = shift;    ## 1=no exit; 0 or undef=exit
   open( my $bad_out, ">", $bad_out_path );
   print $bad_out "$message\n";
+  print "ERROR:$message\n";
   close($bad_out);
   if ( !defined $all ) {
     print "Cleaning up files\n";
