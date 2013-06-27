@@ -2102,7 +2102,7 @@ sub get_columns {
     if ( exists $tir_positions->{$seq_name} ) {
 
       #print "For get_columns: Entry exist in hash -", $seq_name, "\n";
-      ##print Dumper($tir_positions->{$seq_name});
+      #print Dumper($tir_positions->{$seq_name});
       #print "Left start: $tir_positions->{$seq_name}{'left_tir_start'}\n";
       $left_tir_start =
         $self->column_from_residue_number( $seq_name,
@@ -2348,7 +2348,7 @@ sub consensus_filter {
   print "in con_fil sub before get_tir_nt_starts: rightTIR: $right_tir_start\n";
   ## skip seq removal if the number to remove is about the depth of the aln
   print "there are $aln_depth seqs in aln before cons_filter\n";
-  print "and there will be  $aln_depth - $to_remove_count=",
+  print "and there will be  $aln_depth - $to_remove_count = ",
     $aln_depth - $to_remove_count, " after filtering\n";
   if ( $aln_depth > ( $to_remove_count + 5 ) ) {
     print "removing seqs with cons_filter\n";
@@ -2372,12 +2372,18 @@ sub consensus_filter {
       File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
     error_out( $bad_out_path, $message );
   }
+  my $ref2remove_these;
   if ( $round ne 'final' ) {
-    $tir_positions =
+    ($tir_positions,$ref2remove_these) =
       get_tir_nt_starts( $aln_obj, $tir_positions, $left_tir_start,
       $right_tir_start );
   }
-
+  foreach my $key ( keys %$ref2remove_these ) {
+    my $seq_obj = $$ref2remove_these{$key};
+    $aln_obj->remove_seq($seq_obj);
+    my @info = ( $key, 0, $seq_obj );
+    push @$gap_seq_pos_remove, [@info];
+  } 
 
     $aln_obj = $aln_obj->remove_gaps( '-', 1 );
     ( $left_tir_start, $right_tir_start ) =
@@ -2456,12 +2462,17 @@ sub get_tir_nt_starts {
   my $tir_positions   = shift;    # \%tir_positions
   my $left_tir_start  = shift;
   my $right_tir_start = shift;
-
+  my $remove_these;
+  print "get_tir_nt_starts(top): lts:$left_tir_start rts:$right_tir_start\n";
   foreach my $seq_obj ( $aln_obj->each_seq() ) {
     my $seq_name            = $seq_obj->id();
-    #my $seq                 = $seq_obj->seq();
+    my $seq                 = $seq_obj->seq();
+    if ($seq =~ /^-+$/g){
+      #print "$seq_name: no seq found\n";
+      $$remove_these{$seq_name}=$seq_obj;
+    }
     my $left_tir_start_pos = 0;
-    if (defined $seq_obj->location_from_column($left_tir_start)){
+    if (defined $seq_obj->location_from_column($left_tir_start) ){
       my $left_tir_start_obj  = $seq_obj->location_from_column($left_tir_start);
       $left_tir_start_pos  = $left_tir_start_obj->start();
     }
@@ -2474,7 +2485,7 @@ sub get_tir_nt_starts {
     }
     $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
   }
-  return ($tir_positions);
+  return ($tir_positions,$remove_these);
 }
 
 sub get_tir_nt_positions {
