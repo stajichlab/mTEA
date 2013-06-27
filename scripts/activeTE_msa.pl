@@ -96,15 +96,15 @@ while ( my $line = <$in> ) {
   if ($line =~ /^>/){
    ## replacing white space with underscores in MSA
    $line =~ s/ /_/g;
-  }elsif  ($line =~ /^-+$/){
+  }#elsif  ($line =~ /^-+$/){
     ## if we have a seq with all '-'
     ## dont add seq line to array
     ## and pop its name off of array
-    if ($in_array[-1] =~ /^>/){
-      pop @in_array; 
-    }
-    next;
-  }
+    #if ($in_array[-1] =~ /^>/){
+    #  pop @in_array; 
+    #}
+    #next;
+  #}
   push @in_array, $line;
 }
 close($in);
