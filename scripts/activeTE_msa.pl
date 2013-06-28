@@ -179,7 +179,8 @@ my @full_id_array;
 
 my $first_col_80 = 1;
 my $last_col_80  = $full_aln_len;
-if ( !-e $full_id_out_path ) {
+## if file does not exisit or if it is file size 0, make the file
+if ( !-e $full_id_out_path or -z $full_id_out_path ) {
   print "Starting Full ID calculation\n";
   @full_id_array = get_percentID_perCol( $infile, $full_id_out_path );
 }
@@ -203,7 +204,7 @@ my %gap_seq_remove     = %$ref2gsr;
 my @gap_seq_pos_remove = @$ref2gspr;
 
 ## if this removes too many, remove a few as possible
-if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 ) {
+if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 or $full_aln_obj->num_sequences < 5) {
   my $aln_obj = get_org_aln ($infile);
   print "run less stringent intial filtering\n";
   (
@@ -778,7 +779,7 @@ if ($left_tir_adjusted or $right_tir_adjusted){
     if ($after_right_tir =~ s/^(-+)//){
       $right_gaps = $1;
     }
-    print substr($seq_id,0,4),":$left_gaps...$before_left_tir...$element...$after_right_tir...$right_gaps\n";
+    #print substr($seq_id,0,4),":$left_gaps...$before_left_tir...$element...$after_right_tir...$right_gaps\n";
     my $new_seq = $left_gaps.$before_left_tir.$element.$after_right_tir.$right_gaps;
     $seq_obj->seq($new_seq);
   }
@@ -2377,7 +2378,7 @@ sub consensus_filter {
   my $consensus_len = $right_tir_start - $left_tir_start + 1;
   #print "consensus string (len=$consensus_len) is ",$consensus_len/$aln_len," of the len of the aln (len=$aln_len)\n"; 
   my $message = '';
-  if ($consensus_len > ($aln_len*.95)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50 ))
+  if ($consensus_len > ($aln_len*.99)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50 ))
     $message = "$filename: too much of the alignment is conserved. Flanks are too similar\n";
   }elsif (!$left_tir_start or !$right_tir_start){
     $message = "$filename: no TIR start was found on one or both ends\n";
@@ -2578,20 +2579,23 @@ sub print_fasta {
   }
 }
 
+
 sub get_percentID_perCol {
 ## @percent_id = get_percentID_perCol(file.aln,outfile);
   my $msa = shift;
   my $out = shift;
   open MSA,    $msa        or die "Can't open $msa\n";
-  open MSAOUT, ">$msa.mod" or die "Can't open $msa.mod\n";
   <MSA>;    #throw out first header
   my $seq;
   my $seq_count = 0;
+  my @seq_order;
+  my %seqs;
   while ( my $line = <MSA> ) {
     chomp $line;
-    if ( $line =~ /^>/ ) {
+    if ( $line =~ /^>(\S+)/ ) {
+      push @seq_order , $1;
+      $seqs{$seq_count}= $seq;
       $seq_count++;
-      print MSAOUT "$seq\n";
       $seq = '';
     }
     else {
@@ -2599,24 +2603,26 @@ sub get_percentID_perCol {
     }
   }
 ## for last seq
+  $seqs{$seq_count}= $seq;
   $seq_count++;
-  print MSAOUT "$seq\n";
 ##
-
-  close MSAOUT;
   close MSA;
+  
+
   my @percent_id;
-  my $first_seq = `head -1 $msa.mod`;
-  if (length $first_seq < 5){
+  #my $first_seq = `head -1 $msa.mod`;
+  my $first_seq_len = length $seqs{0}; 
+  if ($first_seq_len < 5){
    die "Error retrieving first line of $msa.mod\n";
   } 
-  chomp $first_seq;
-  my $len = length $first_seq;
   open OUT, ">$out" or die "Can't opne $out $!\n";
-  for ( my $i = 1 ; $i < $len + 1 ; $i++ ) {
+  for ( my $i = 0 ; $i < $first_seq_len ; $i++ ) {
     my $total_nt;
     my %nt_count;
-    chomp( my @col = `cut -c $i $msa.mod` );
+    my @col;
+    foreach my $seq_num (sort {$a <=> $b} keys %seqs ){
+      push @col , substr $seqs{$seq_num} , $i , 1;
+    }
     foreach my $nt (@col) {
       $nt_count{total}++;
       if ( $nt =~ /-/ ) {
@@ -2630,16 +2636,16 @@ sub get_percentID_perCol {
       $nt_count{each}{$nt}++;
     }
     if ( ( scalar keys %{ $nt_count{each} } ) == 0 ) {
-      push @percent_id, [ $i, 0, 0 ];
-      print OUT join( "\t", $i, 0, 0 ), "\n";
+      push @percent_id, [ $i+1, 0, 0 ];
+      print OUT join( "\t", $i+1, 0, 0 ), "\n";
     }
     else {
       my $most_freq_nt =
         ( sort { $nt_count{each}{$b} <=> $nt_count{each}{$a} }
           keys %{ $nt_count{each} } )[0];
       if ( $most_freq_nt =~ /N/i ) {
-        push @percent_id, [ $i, 0, 0 ];
-        print OUT join( "\t", $i, 0, 0 ), "\n";
+        push @percent_id, [ $i+1, 0, 0 ];
+        print OUT join( "\t", $i+1, 0, 0 ), "\n";
       }
       my $count      = $nt_count{each}{$most_freq_nt};
       my $col_total  = $nt_count{total};
@@ -2649,11 +2655,11 @@ sub get_percentID_perCol {
 
       #push @percent_id, ($count/$col_total);
       push @percent_id,
-        [ $i, $pid, ( ( $col_total - $dash_total ) / $seq_count ) ];
+        [ $i+1, $pid, ( ( $col_total - $dash_total ) / $seq_count ) ];
 
       # print out this info to a file
       print OUT
-        join( "\t", $i, $pid, ( ( $col_total - $dash_total ) / $seq_count ) ),
+        join( "\t", $i+1, $pid, ( ( $col_total - $dash_total ) / $seq_count ) ),
         "\n";
     }
   }
