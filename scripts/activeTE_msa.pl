@@ -202,7 +202,7 @@ my ( $left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr,
 %tir_positions = %$ref2tp;
 my %gap_seq_remove     = %$ref2gsr;
 my @gap_seq_pos_remove = @$ref2gspr;
-
+my $remove_most = 1;
 ## if this removes too many, remove a few as possible
 if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 or $full_aln_obj->num_sequences < 5) {
   my $aln_obj = get_org_aln ($infile);
@@ -214,6 +214,7 @@ if ( $left_tir_start1 == 0 or $right_tir_start1 == 0 or $full_aln_obj->num_seque
   %tir_positions      = %$ref2tp;
   %gap_seq_remove     = %$ref2gsr;
   @gap_seq_pos_remove = @$ref2gspr;
+  $remove_most = 0;
 }
 ##overwrite full_aln with tmp_aln
 $full_aln_obj = $tmp_aln_obj;
@@ -340,9 +341,6 @@ my @sorted_right_tir_start_keys = sort {
   $right_tir_start_check_counts{$b} <=> $right_tir_start_check_counts{$a}
 } keys(%right_tir_start_check_counts);
 
-print
-"After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
-print "This is after the .trim to .trim2 transition\n";
 
 #check if TIRs start in flanks, indicating the flanks are highly similar
 my $left_flank_catch  = 0;
@@ -371,6 +369,9 @@ elsif ( !defined $sorted_right_tir_start_keys[0] ) {
     File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
   error_out( $bad_out_path, "$filename\tRight flank similar" );
 }
+  print
+    "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
+  print "This is after the .trim to .trim2 transition\n";
 
 if ( $sorted_left_tir_start_keys[0] <= $flank - 25 ) {
   $left_flank_catch++;
@@ -728,13 +729,19 @@ foreach my $seq_obj (@bad_remove) {
 
 print
 "before get_tir_nt_positions: ( $sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
-my ($ref2_tir_positions) = get_tir_nt_positions(
+my ($ref2_tir_positions, $ref2remove_these) = get_tir_nt_positions(
   $trimmed_aln_obj,            \%tir_positions,
   $sorted_hitcolumn_keys[0],   $sorted_hit_len_keys[0],
   $sorted_querycolumn_keys[0], $sorted_query_len_keys[0]
 );
 %tir_positions = %$ref2_tir_positions;
 
+  foreach my $key ( keys %$ref2remove_these ) {
+    my $seq_obj = $$ref2remove_these{$key};
+    $trimmed_aln_obj->remove_seq($seq_obj);
+    my @info = ( $key, 0, $seq_obj );
+    push @gap_seq_pos_remove, [@info];
+  } 
 #print "check errfile for tir_positions just before rereading org aln:\n";
 #warn "tir_positions just before rereading org aln:\n";
 #warn Dumper \%tir_positions;
@@ -807,7 +814,13 @@ my $tir_length = $left_tir_end - $left_tir_start;
 #go back through the full alignment and remove only the sequences that create gaps in the TIRs or that failed the first two TIR searches
 my %gap_seq_remove2;
 my %search_tirs;
-
+print "Num Seqs before first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
+## use differnet gap_cutoff values if remove_most or remove_least were used
+print "remove_most is $remove_most\n";
+my $gap_cutoff = 50;
+if (!$remove_most){
+  $gap_cutoff = 50;
+}
 for ( my $i = 0 ; $i < $ori_aln_len ; $i++ ) {
   if ( ( $i >= $left_tir_start - 1 and $i <= $left_tir_end - 1 )
     or ( $i >= $right_tir_end - 1 and $i <= $right_tir_start - 1 ) )
@@ -827,7 +840,7 @@ for ( my $i = 0 ; $i < $ori_aln_len ; $i++ ) {
       $total_count++;
     }
     my $pos_present = $base_count / $total_count;
-    if ( $gap_id_array[$i] >= 50.0 and $id_info[1] <= 50 or $pos_present < .5 )
+    if ( $gap_id_array[$i] >= $gap_cutoff and $id_info[1] <= $gap_cutoff or $pos_present < .5 )
     {
       foreach my $key ( keys %gap_col_hash ) {
         if ( $gap_col_hash{$key} != 1 ) {
@@ -835,7 +848,7 @@ for ( my $i = 0 ; $i < $ori_aln_len ; $i++ ) {
         }
       }
     }
-    elsif ( $gap_id_array[$i] < 50.0 ) {
+    elsif ( $gap_id_array[$i] < $gap_cutoff ) {
       foreach my $key ( keys %gap_col_hash ) {
         if ( $gap_col_hash{$key} == 1 ) {
           $gap_seq_remove2{$key}++;
@@ -844,7 +857,6 @@ for ( my $i = 0 ; $i < $ori_aln_len ; $i++ ) {
     }
   }
 }
-
 foreach my $row_ref (@gap_seq_pos_remove) {
   @entry = @{$row_ref};
   if ( exists $gap_seq_remove2{ $entry[0] } ) {
@@ -866,6 +878,8 @@ foreach my $key ( keys %gap_seq_remove ) {
 
 #keep track of removed sequences to print to file
 my %removed_seq_hash;
+## only remove if the number of seq remaining in the alignment after filtering is > 10
+#if ($ori_aln_obj->num_sequences() - (keys %gap_seq_remove2) > 10 ){
 foreach my $key ( keys %gap_seq_remove2 ) {
   my $remove = $ori_aln_obj->get_seq_by_id($key);
   my $seq_id = $remove->id();
@@ -874,6 +888,8 @@ foreach my $key ( keys %gap_seq_remove2 ) {
   $removed_seq_hash{$seq_id}++;
   $ori_aln_obj->remove_seq($remove);
 }
+#}
+print "Num Seqs after first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
 
 my $final_aln_obj = $ori_aln_obj->remove_gaps( '-', 1 );
 my $int_aln_out =
@@ -887,11 +903,28 @@ $out->write_aln($final_aln_obj);
 my $final_len = $final_aln_obj->length();
 print "MSA length is $final_len now\n";
 
+if ( $left_tir_start == 0 or $right_tir_start == 0 ){
+  #open a file to store info on why analysis of an element was aborted
+  my $bad_out_path =
+    File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
+  error_out( $bad_out_path,
+    "$filename\tTIRs not found in MSA after reimporting and first round filtering of original alignment" );
+}
+
 #get the column positions of tirs in the intermediate alignment
 ( $left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end ) =
   get_columns( $final_aln_obj, \%tir_positions, 2 );
 print
 "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start (filename.intermediate)\n";
+
+
+  if ( $left_tir_start == 0 or $right_tir_start == 0 ){
+    #open a file to store info on why analysis of an element was aborted
+    my $bad_out_path =
+      File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
+    error_out( $bad_out_path,
+      "$filename\tTIRs not found in MSA after reimporting and second round filtering of original alignment" );
+  }
 
 my $new_gap_cols = $final_aln_obj->gap_col_matrix();
 my %new_gap_seq_remove;
@@ -929,6 +962,7 @@ for ( my $i = 0 ; $i < $final_len ; $i++ ) {
   }
 }
 
+#if ($ori_aln_obj->num_sequences() - (keys %new_gap_seq_remove) > 10 ){
 foreach my $key ( keys %new_gap_seq_remove ) {
   my $seq_obj = $new_gap_seq_remove{$key};
   my $seq_id  = $seq_obj->id();
@@ -936,6 +970,7 @@ foreach my $key ( keys %new_gap_seq_remove ) {
     "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
   $final_aln_obj->remove_seq($seq_obj);
 }
+#}
 $final_aln_obj = $final_aln_obj->remove_gaps( '-', 1 );
 my $check_len = $final_aln_obj->length();
 print "MSA length now: $check_len\n";
@@ -978,6 +1013,13 @@ foreach my $seq_name ( keys %search_tirs ) {
     next;
   }
 
+  if ( $left_tir_start == 0 or $right_tir_start == 0 ){
+    #open a file to store info on why analysis of an element was aborted
+    my $bad_out_path =
+      File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
+    error_out( $bad_out_path,
+      "$filename\tTIRs not found in MSA after reimporting and third round filtering of original alignment" );
+  }
   my $left_tir_start_obj  = $seq_obj->location_from_column($left_tir_start);
   my $left_tir_start_pos  = $left_tir_start_obj->start();
   my $right_tir_start_obj = $seq_obj->location_from_column($right_tir_start);
@@ -1039,21 +1081,13 @@ my $last_len = $final_aln_obj->length();
 ( $left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end ) =
   get_columns( $final_aln_obj, \%tir_positions, 2 );
 
-#print
-#"Column grab after third ggsearch run\nLeft Tir Start: $left_tir_start  Right: $right_tir_start ($filename.intermediate2)\n";
-#my @gap_seq_pos_remove3;
-#($left_tir_start, $right_tir_start , $ref2array, $trimmed_aln_obj, $ref2hash )
-#   = consensus_filter(\@gap_seq_pos_remove3, $final_aln_obj,$left_tir_start,$right_tir_start, \%tir_positions, 'final');
-#@gap_seq_pos_remove3 = @$ref2array;
-#%tir_positions = %$ref2hash;
-#print "after last consenus filter on final_aln. LTStart: $left_tir_start  Right: $right_tir_start ($filename.final)\n";
-#
-#foreach my $info ( @gap_seq_pos_remove3 ) {
-#  my $seq_id = ${$info}[0];
-#  print $removed_out
-#    "$seq_id\tStep3:Sequence contained too many mismataches in at least one of the TIRs\n";
-#}
-
+if ( $left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+  #open a file to store info on why analysis of an element was aborted
+  my $bad_out_path =
+    File::Spec->catpath( $volume, $out_path, $filename . ".bad" );
+  error_out( $bad_out_path,
+    "$filename\tTIRs not found in Final MSA" );
+}
 #Extract the left and right TIRs as new alignment objects
 my $left_TIR_aln_obj =
   $final_aln_obj->slice( $left_tir_start, $left_tir_end, 1 );
@@ -2529,24 +2563,49 @@ sub get_tir_nt_positions {
   my $left_tir_len    = shift;    # $sorted_hit_len_keys[0]
   my $right_tir_start = shift;    # $sorted_querycolumn_keys[0]
   my $right_tir_len   = shift;    # $sorted_query_len_keys[0]
-
+  my $remove_these; 
+print "in get_tir_nt_positions: lts=$left_tir_start,rts=$right_tir_start\n";
   foreach my $seq_obj ( $trimmed_aln_obj->each_seq() ) {
     my $seq_name           = $seq_obj->id();
     my $trim_seq           = $seq_obj->seq();
-    my $left_tir_start_obj = $seq_obj->location_from_column($left_tir_start);
-    my $left_tir_start_pos = $left_tir_start_obj->start();
-    my $left_tir_end_pos   = $left_tir_start_pos + $left_tir_len - 1;
-    my $right_tir_start_obj =
+    if (defined $seq_obj->location_from_column($left_tir_start) ){
+     my $left_tir_start_obj = $seq_obj->location_from_column($left_tir_start);
+     my $left_tir_start_pos = $left_tir_start_obj->start();
+     my $left_tir_end_pos   = $left_tir_start_pos + $left_tir_len - 1;
+     if ($left_tir_start_pos > 0 and $left_tir_end_pos){
+       $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+       $tir_positions->{$seq_name}{'left_tir_end'}    = $left_tir_end_pos;
+     }else{
+        delete  $tir_positions->{$seq_name};
+        $$remove_these{$seq_name}=$seq_obj;
+        next;
+      }
+    }else{
+      delete  $tir_positions->{$seq_name};
+      $$remove_these{$seq_name}=$seq_obj;
+      next;
+    }
+    if (defined $seq_obj->location_from_column($right_tir_start)){
+      my $right_tir_start_obj =
       $seq_obj->location_from_column(
       $right_tir_start + ( $right_tir_len - 1 ) );
-    my $right_tir_start_pos = $right_tir_start_obj->start();
-    my $right_tir_end_pos = $right_tir_start_pos - ( $right_tir_len - 1 );
-    $tir_positions->{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
-    $tir_positions->{$seq_name}{'left_tir_end'}    = $left_tir_end_pos;
-    $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
-    $tir_positions->{$seq_name}{'right_tir_end'}   = $right_tir_end_pos;
+      my $right_tir_start_pos = $right_tir_start_obj->start();
+      my $right_tir_end_pos = $right_tir_start_pos - ( $right_tir_len - 1 );
+      if ($right_tir_start_pos > 0 and $right_tir_end_pos > 0){
+        $tir_positions->{$seq_name}{'right_tir_start'} = $right_tir_start_pos;
+        $tir_positions->{$seq_name}{'right_tir_end'}   = $right_tir_end_pos;
+      }else{
+        delete  $tir_positions->{$seq_name};
+        $$remove_these{$seq_name}=$seq_obj;
+        next;
+      }
+    }else{
+      delete  $tir_positions->{$seq_name};
+      $$remove_these{$seq_name}=$seq_obj;
+      next;
+    }
   }
-  return ($tir_positions);
+  return ($tir_positions, $remove_these);
 }
 
 sub error_out {
@@ -2556,6 +2615,7 @@ sub error_out {
   open( my $bad_out, ">", $bad_out_path );
   print $bad_out "$message\n";
   print "ERROR:$message\n";
+  warn "ERROR:$message\n";
   close($bad_out);
   if ( !defined $all ) {
     print "Cleaning up files\n";
