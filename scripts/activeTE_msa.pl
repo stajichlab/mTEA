@@ -1411,7 +1411,7 @@ if ( $no_TSD_found_len >= 1 ) {
   }
 }
 
-#if necessary, change TIRS to remove the 2bp TSD that are included in them & calculate the overall percent identity of each TIR
+#if necessary, change TIRS to remove the 2bp or 4bp TSD that are included in them & calculate the overall percent identity of each TIR
 if ( $tsd1_count > $tsd2_count and $tsd1_count > $tsd3_count ) {
   print "Adjusting TIRs by 2bp\n\n";
   $left_tir_start += 2;
@@ -1484,10 +1484,12 @@ else {
 my $left_tir_id   = $left_TIR_aln_obj->percentage_identity;
 my $right_tir_id  = $right_TIR_aln_obj->percentage_identity;
 my $element_id    = $element_aln_obj->percentage_identity;
+my $element_consensus = $element_aln_obj->consensus_string();
 my $left_tir_seq  = $left_TIR_aln_obj->consensus_string();
 my $right_tir_seq = $right_TIR_aln_obj->consensus_string();
 
 $element_info{"element_id"}    = $element_id;
+$element_info{"element_consensus"} = $element_consensus;
 $element_info{"left_tir_seq"}  = $left_tir_seq;
 $element_info{"left_tir_id"}   = $left_tir_id;
 $element_info{"right_tir_seq"} = $right_tir_seq;
@@ -1731,6 +1733,12 @@ print $element_info_out join( "\t",
   $classification ),
   "\n";
 close($element_info_out);
+
+#print element consensus to file
+my $element_consensus_out_path = File::Spec->catpath( $volume, $out_path, $filename . ".consensus" );
+open(my $element_consensus_out, ">", $element_consensus_out_path) or die "Error creating $element_consensus_out_path. $!\n";
+print $element_consensus_out join("\n", ">" . $fname_fin . "_consensus", $element_info{'element_consensus'}), "\n";
+close($element_consensus_out);
 
 print "Printing fasta\n";
 my $element_fasta_out_path =
@@ -2012,7 +2020,7 @@ sub generate_gff {
   $self->throw("Need Bio::Align::AlignI argument")
     unless ref $self && $self->isa('Bio::Align::AlignI');
 
-  #not implemented: round changes the output based on when the call is made
+  #not fully implemented: round changes the output based on when the call is made
   if ( $round eq 'final' or $round eq 'TSD' ) {
     open( my $out, ">", $path ) or die "Error creating $path. $!\n";
     print "Round = final\n";
@@ -2022,7 +2030,7 @@ sub generate_gff {
       $seq =~ s/-//g;
       my $seq_len    = length($seq);
       my $ori_end    = $seq_len - $flank;
-      my $left_comp  = $ele_info_ref->{$seq_name}{"left_tir_start"} - 101;
+      my $left_comp  = $ele_info_ref->{$seq_name}{"left_tir_start"} - ($flank+1);
       my $right_comp = $ele_info_ref->{$seq_name}{"right_tir_start"} - $ori_end;
       my $copy_num;
       my $eleid;
@@ -2043,6 +2051,12 @@ sub generate_gff {
         $start    = $4 + $left_comp;
         $end      = $5 + $right_comp;
         $strand   = $6;
+        if ($strand == 'plus') {
+            $strand = '+';
+        }
+        else {
+            $strand = '-'
+        }
       }
 
       #grab copy information from RSPB output
@@ -2119,7 +2133,7 @@ sub clean_files {
   opendir( my $in_DIR, $out_path ) or die "Cannot open directory: $!";
   while ( my $file = readdir($in_DIR) ) {
     next if ( $file =~ m/^\./ );
-    if ( $file =~ m/\.(final|info|fa|element_info|bad|gff|tif|jpg|full_id)$/ ) {
+    if ( $file =~ m/\.(final|info|fa|element_info|bad|gff|tif|jpg|full_id|consensus)$/ ) {
       next;
     }
     else {
