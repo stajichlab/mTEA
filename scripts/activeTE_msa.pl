@@ -2756,9 +2756,9 @@ sub tir_mismatch_filter {
         #print "Seq for $seq_name:\n$seq\n";
         for (my $i = 1; $i < length($aln_consensus); $i++ ) {
             my $pos_seq = substr($seq, $i-1, 1);
-            next if $pos_seq eq "-" and $round == 1;
+            next if ($round == 1 or $round == 0) and $pos_seq eq "-";
             my $consensus_pos = substr($aln_consensus, ($i-1), 1);
-            next if $consensus_pos eq "?" and $round == 1;
+            next if ($round == 1 or $round == 0) and $consensus_pos eq "?";
             #print "compare: $pos_seq to $consensus_pos\n";
             if ($i >= $left_tir_start and $i <= $left_tir_end) {
                 print "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
