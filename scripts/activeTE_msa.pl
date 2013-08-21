@@ -1663,7 +1663,7 @@ sub match_tirs {
   my $seq_name = $self->id();
   my $fa_aln_obj = Bio::SearchIO->new( -format => 'fasta', -file => $input_path );
   my @result;
-  print "ggsearch results path: $input_path\n";
+  #print "ggsearch results path: $input_path\n";
 
   #go through the FASTA input object . . down to the HSP
   while ( my $result = $fa_aln_obj->next_result ) {
@@ -1709,7 +1709,7 @@ sub match_tirs {
               $match_query = '';
               $match_hit   = '';
               $end_pos     = '';
-              print "No TIRs found near start of sequences, resetting counts and ending\n";
+              #print "No TIRs found near start of sequences, resetting counts and ending\n";
               last;
             }
           }
@@ -2695,13 +2695,11 @@ sub remove_least {
   $out->write_aln($aln_obj);
 
   my ( $left_tir_start, $right_tir_start );
-  ( $left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $ref2tp ) =
-    consensus_filter( $ref2gspr, $aln_obj, 0, 0, $tir_positions );
+  ( $left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $ref2tp ) = consensus_filter( $ref2gspr, $aln_obj, 0, 0, $tir_positions );
 
   #@gap_seq_pos_remove = @{$ref2gspr};
 
-  print
-    "after cons_filter (filename.trim: $left_tir_start, $right_tir_start\n";
+  print "after cons_filter (filename.trim: $left_tir_start, $right_tir_start\n";
 
 #my ($left_tir_start1,$right_tir_start1,$tmp_aln_obj,$ref2tp,$ref2gsr, $ref2gspr) = remove_most ($full_aln_obj,\%tir_positions, \@full_id_array);
   return ( $left_tir_start, $right_tir_start, $aln_obj, $tir_positions,
@@ -2761,26 +2759,26 @@ sub tir_mismatch_filter {
             next if ($round == 1 or $round == 0) and $consensus_pos eq "?";
             #print "compare: $pos_seq to $consensus_pos\n";
             if ($i >= $left_tir_start and $i <= $left_tir_end) {
-                print "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                #print "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
                 if ($pos_seq ne $consensus_pos) {
-                    print "Not equal\n";
+                    #print "Not equal\n";
                     $mismatches++;
                     $left_mis++;
                 }
                 else {
-                    print "Equal\n";
+                    #print "Equal\n";
                 }
             }
             
             elsif ($i >= $right_tir_end and $i <= $right_tir_start) {
-                print "In right TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                #print "In right TIR, compare at $i: $pos_seq to $consensus_pos\n";
                 if ($pos_seq ne $consensus_pos) {
-                    print "Not equal\n";
+                    #print "Not equal\n";
                     $mismatches++;
                     $right_mis++;
                 }
                 else {
-                    print "Equal\n";
+                    #print "Equal\n";
                 }
             }
             else {
