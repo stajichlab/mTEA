@@ -2472,8 +2472,7 @@ sub error_out {
 sub print_fasta {
   my $filename = shift;
   my $aln_obj  = shift;
-  my $seqIO_out_obj =
-    Bio::SeqIO->new( -format => 'fasta', -file => ">$filename" );
+  my $seqIO_out_obj = Bio::SeqIO->new( -format => 'fasta', -file => ">$filename" );
   foreach my $seq_obj ( $aln_obj->each_seq ) {
     my $seq = $seq_obj->seq;
     $seq =~ s/-//g;
@@ -2756,7 +2755,7 @@ sub tir_mismatch_filter {
             my $pos_seq = substr($seq, $i-1, 1);
             next if ($round == 1 or $round == 0) and $pos_seq eq "-";
             my $consensus_pos = substr($aln_consensus, ($i-1), 1);
-            next if ($round == 1 or $round == 0) and $consensus_pos eq "?";
+            next if $consensus_pos eq "?";
             #print "compare: $pos_seq to $consensus_pos\n";
             if ($i >= $left_tir_start and $i <= $left_tir_end) {
                 #print "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
