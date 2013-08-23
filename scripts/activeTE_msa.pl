@@ -131,7 +131,7 @@ my ( $volume, $in_dir, $filename ) = File::Spec->splitpath($infile);
 my @fname_fin =  split( '\\.', $filename );    # first bit after first '.' is the name
 pop @fname_fin;
 my $fname_fin    = join( '.', @fname_fin );
-my $out_dir_name = "activeTE_out_" . $fname_fin;
+my $out_dir_name = "aTE_" . $fname_fin;
 my $out_path     = File::Spec->catdir( $in_dir, $out_dir_name );
 if ( !-d $out_path ) {
   mkdir($out_path) or die "Can't create dir:$out_path $!\n"; 
@@ -2158,12 +2158,16 @@ sub consensus_filter {
   my $round              = shift;
   
   my $aln_len            = $aln_obj->length;
+  my $num_seqs = $aln_obj->num_sequences;
   $round = defined $round ? $round : 'other';
   print "in consensu_filt sub: round=$round\n";
   my %trim_gap_seq_remove;
   ## this will generate a sequence with '?' at every position in which there is less
   ## than 80% consensus
   my $consensus = $aln_obj->consensus_string(80);
+  if ($num_seqs <= 10) {
+      $consensus = $aln_obj->consensus_string(50);
+  }
   print "$consensus\n";
   ## first round of tir finding
   if ( $left_tir_start == 0 and $right_tir_start == 0 ) {
@@ -2605,8 +2609,7 @@ sub remove_most {
   ## removes any columns that are now all gaps
   $aln_obj = $aln_obj->remove_gaps( '-', 1 );
 
-  my $test_aln_out =
-    File::Spec->catpath( $volume, $out_path, $filename . ".removeMost_trim_0" );
+  my $test_aln_out = File::Spec->catpath( $volume, $out_path, $filename . ".removeMost_trim_0" );
   $out = Bio::AlignIO->new(
     -file             => ">$test_aln_out",
     -format           => 'fasta',
@@ -2615,13 +2618,11 @@ sub remove_most {
   $out->write_aln($aln_obj);
 
   my ( $left_tir_start, $right_tir_start );
-  ( $left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $tir_positions ) =
-    consensus_filter( $ref2gspr, $aln_obj, 0, 0, $tir_positions );
+  ( $left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $tir_positions ) = consensus_filter( $ref2gspr, $aln_obj, 0, 0, $tir_positions );
 
   #@gap_seq_pos_remove = @{$ref2gspr};
 
-  print
-    "after cons_filter (filename.trim: $left_tir_start, $right_tir_start\n";
+  print "after cons_filter (filename.trim: $left_tir_start, $right_tir_start\n";
 
 #my ($left_tir_start1,$right_tir_start1,$tmp_aln_obj,$ref2tp,$ref2gsr, $ref2gspr) = remove_most ($full_aln_obj,\%tir_positions, \@full_id_array);
   return ( $left_tir_start, $right_tir_start, $aln_obj, $tir_positions,
