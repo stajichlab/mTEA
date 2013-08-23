@@ -1990,7 +1990,7 @@ sub clean_files {
   opendir( my $in_DIR, $out_path ) or die "Cannot open directory: $!";
   while ( my $file = readdir($in_DIR) ) {
     next if ( $file =~ m/^\./ );
-    if ( $file =~ m/\.(final|info|fa|element_info|bad|gff|tif|jpg|full_id|consensus)$/ ) {
+    if ( $file =~ m/\.(final|info|fa|element_info|removed_sequences|fasta|bad|gff|tif|jpg|full_id|consensus)$/ ) {
       next;
     }
     else {
@@ -2159,14 +2159,20 @@ sub consensus_filter {
   
   my $aln_len            = $aln_obj->length;
   my $num_seqs = $aln_obj->num_sequences;
+  if ($num_seqs == 1) {
+      return ( $left_tir_start, $right_tir_start, $gap_seq_pos_remove, $aln_obj, $tir_positions );
+  }
   $round = defined $round ? $round : 'other';
   print "in consensu_filt sub: round=$round\n";
   my %trim_gap_seq_remove;
   ## this will generate a sequence with '?' at every position in which there is less
   ## than 80% consensus
   my $consensus = $aln_obj->consensus_string(80);
-  if ($num_seqs <= 10) {
-      $consensus = $aln_obj->consensus_string(50);
+  if ($num_seqs <= 10 and $num_seqs >= 6) {
+      $consensus = $aln_obj->consensus_string(60);
+  }
+  elsif ($num_seqs < 6) {
+      $consensus = $aln_obj->consensus_string(51);
   }
   print "$consensus\n";
   ## first round of tir finding
