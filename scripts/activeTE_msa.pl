@@ -194,7 +194,7 @@ my %gap_seq_remove     = %$ref2gsr;
 my @gap_seq_pos_remove = @$ref2gspr;
 my $remove_most = 1;
 ## if this removes too many, remove as few as possible
-if ($left_tir_start1 == 0 or $right_tir_start1 == 0 or $full_aln_obj->num_sequences < 5) {
+if ($left_tir_start1 == 0 or $right_tir_start1 == 0 or $tmp_aln_obj->num_sequences < 5) {
   my $aln_obj = get_org_aln ($infile);
   print "run less stringent intial filtering\n";
   ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2gspr) = remove_least($aln_obj, \%tir_positions, \@full_id_array);
@@ -403,8 +403,7 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
   close($last_out);
 
   #create fasta output filename then call ggsearch
-  my $out_opt =
-    File::Spec->catpath($volume, $out_path, $fname_start . ".ggsearch.out");
+  my $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".ggsearch.out");
   system("ggsearch36 -n -i -T 1 -d 1 $last_path $first_path > $out_opt");
 
   my @tir_match_result = match_tirs($seq_obj, $out_opt, 1);
@@ -994,8 +993,8 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   my $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
   my $last_path  = File::Spec->catpath($volume, $out_path, "last_half.txt");
 
-  $first = substr($seq, ($left_tir_start_pos - 1) -4, $ele_half_len+4);
-  $last = substr($seq, ($right_tir_start_pos - $ele_half_len), $ele_half_len+4);
+  $first = substr($seq, ($left_tir_start_pos - 1), $ele_half_len);
+  $last = substr($seq, ($right_tir_start_pos - $ele_half_len), $ele_half_len);
 
   #continue TIR search
   open(my $first_out, ">", $first_path) or die "Error creating $first_path. $!\n";
@@ -1469,9 +1468,6 @@ if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count
     
     $left_tir_start += 1;
     $right_tir_start -= 1;
-    $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
-    $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
-    $element_aln_obj = $final_aln_obj->slice($left_tir_start, $right_tir_start, 1);
     foreach my $seq_obj ($final_aln_obj->each_seq()) {
         my $seq_name = $seq_obj->id();
         if (!defined $tir_positions{$seq_name}{'left_tir_start'}) {
@@ -1484,28 +1480,44 @@ if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count
         }
         $element_info{$seq_name}{"left_tir_start"} = $tir_positions{$seq_name}{'left_tir_start'} + 1;
         $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 1;
-      }
-      @putative_TSD = @putative_TSD4;
-      @TSD_info = @TSD_info4;
-      @put_TSD_names = @put_TSD_names4;
+    }
+    #check for too many mismatches in putative TIRSs against the consensus sequence
+    my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
+
+    #print to file why copies were removed
+    foreach my $seq_name (@consensus_remove4) {
+        my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
+        print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
+        $final_aln_obj->remove_seq($seq_obj);
+    }
+    $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+    my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
+    $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
+    $out->write_aln($final_aln_obj);
+    $last_len = $final_aln_obj->length();
+    
+    $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
+    $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
+    $element_aln_obj = $final_aln_obj->slice($left_tir_start, $right_tir_start, 1);
+    @putative_TSD = @putative_TSD4;
+    @TSD_info = @TSD_info4;
+    @put_TSD_names = @put_TSD_names4;
       
-      undef @putative_TSD1;
-      undef @TSD_info1;
-      undef @put_TSD_names1;
-      undef @putative_TSD2;
-      undef @TSD_info2;
-      undef @put_TSD_names2;
-      undef @putative_TSD3;
-      undef @TSD_info3;
-      undef @put_TSD_names3;
+    undef @putative_TSD1;
+    undef @TSD_info1;
+    undef @put_TSD_names1;
+    undef @putative_TSD2;
+    undef @TSD_info2;
+    undef @put_TSD_names2;
+    undef @putative_TSD3;
+    undef @TSD_info3;
+    undef @put_TSD_names3;
 }
 elsif (($tsd1_count > $tsd2_count) and ($tsd1_count > $tsd3_count)) {
   print "Adjusting TIRs by 2bp\n\n";
   $left_tir_start += 2;
   $right_tir_start -= 2;
-  $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
-  $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
-  $element_aln_obj = $final_aln_obj->slice($left_tir_start, $right_tir_start, 1);
+
   foreach my $seq_obj ($final_aln_obj->each_seq()) {
     my $seq_name = $seq_obj->id();
     if (!defined $tir_positions{$seq_name}{'left_tir_start'}) {
@@ -1519,6 +1531,24 @@ elsif (($tsd1_count > $tsd2_count) and ($tsd1_count > $tsd3_count)) {
     $element_info{$seq_name}{"left_tir_start"} = $tir_positions{$seq_name}{'left_tir_start'} + 2;
     $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 2;
   }
+  #check for too many mismatches in putative TIRSs against the consensus sequence
+  my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
+
+  #print to file why copies were removed
+  foreach my $seq_name (@consensus_remove4) {
+    my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
+    print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
+    $final_aln_obj->remove_seq($seq_obj);
+  }
+  $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
+  $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
+  $out->write_aln($final_aln_obj);
+  $last_len = $final_aln_obj->length();
+  
+  $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
+  $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
+  $element_aln_obj = $final_aln_obj->slice($left_tir_start, $right_tir_start, 1);
   @putative_TSD = @putative_TSD1;
   @TSD_info = @TSD_info1;
   @put_TSD_names = @put_TSD_names1;
@@ -1536,9 +1566,7 @@ elsif (($tsd2_count > $tsd1_count) and ($tsd2_count > $tsd3_count)) {
   print "Adjusting TIRs by 4bp\n\n";
   $left_tir_start += 4;
   $right_tir_start -= 4;
-  $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
-  $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
-  $element_aln_obj = $final_aln_obj->slice($left_tir_start, $right_tir_start, 1);
+  
   foreach my $seq_obj ($final_aln_obj->each_seq()) {
     my $seq_name = $seq_obj->id();
     if (!defined $tir_positions{$seq_name}{'left_tir_start'}) {
@@ -1551,19 +1579,37 @@ elsif (($tsd2_count > $tsd1_count) and ($tsd2_count > $tsd3_count)) {
     }
     $element_info{$seq_name}{"left_tir_start"} = $tir_positions{$seq_name}{'left_tir_start'} + 4;
     $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 4;
-    }
-    @putative_TSD = @putative_TSD2;
-    @TSD_info = @TSD_info2;
-    @put_TSD_names = @put_TSD_names2;
-    undef @putative_TSD1;
-    undef @TSD_info1;
-    undef @put_TSD_names1;
-    undef @putative_TSD4;
-    undef @TSD_info4;
-    undef @put_TSD_names4;
-    undef @putative_TSD3;
-    undef @TSD_info3;
-    undef @put_TSD_names3;
+  }
+  #check for too many mismatches in putative TIRSs against the consensus sequence
+  my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
+
+  #print to file why copies were removed
+  foreach my $seq_name (@consensus_remove4) {
+    my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
+    print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
+    $final_aln_obj->remove_seq($seq_obj);
+  }
+  $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
+  $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
+  $out->write_aln($final_aln_obj);
+  $last_len = $final_aln_obj->length();
+  
+  $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
+  $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
+  $element_aln_obj = $final_aln_obj->slice($left_tir_start, $right_tir_start, 1);
+  @putative_TSD = @putative_TSD2;
+  @TSD_info = @TSD_info2;
+  @put_TSD_names = @put_TSD_names2;
+  undef @putative_TSD1;
+  undef @TSD_info1;
+  undef @put_TSD_names1;
+  undef @putative_TSD4;
+  undef @TSD_info4;
+  undef @put_TSD_names4;
+  undef @putative_TSD3;
+  undef @TSD_info3;
+  undef @put_TSD_names3;
 }
 else {
   foreach my $seq_obj ($final_aln_obj->each_seq()) {
@@ -1598,6 +1644,30 @@ my $element_id    = $element_aln_obj->percentage_identity;
 my $element_consensus = $element_aln_obj->consensus_string();
 my $left_tir_seq  = $left_TIR_aln_obj->consensus_string();
 my $right_tir_seq = $right_TIR_aln_obj->consensus_string();
+
+my $left_tir_iupac = $left_TIR_aln_obj->consensus_iupac();
+my $left_tir_iupac_seq_obj = Bio::Seq->new(-seq => $left_tir_iupac, -alphabet => 'dna');
+my $left_tir_iupac_obj   = Bio::Tools::IUPAC->new(-seq => $left_tir_iupac_seq_obj);
+my $left_tir_iupac_regexp  = $left_tir_iupac_obj->regexp();
+my $left_tir_regex_out_path = File::Spec->catpath($volume, $out_path, $filename . "_left_tir_regex.info");
+open(my $left_tir_regex_out, ">", $left_tir_regex_out_path);
+print $left_tir_regex_out "$fname_fin\t$left_tir_iupac_regexp\n";
+close($left_tir_regex_out);
+
+my $right_tir_iupac = $right_TIR_aln_obj->consensus_iupac();
+my $right_tir_iupac_seq_obj = Bio::Seq->new(-seq => $right_tir_iupac, -alphabet => 'dna');
+my $right_tir_iupac_obj   = Bio::Tools::IUPAC->new(-seq => $right_tir_iupac_seq_obj);
+my $right_tir_iupac_regexp  = $right_tir_iupac_obj->regexp();
+my $right_tir_regex_out_path = File::Spec->catpath($volume, $out_path, $filename . "_right_tir_regex.info");
+open(my $right_tir_regex_out, ">", $right_tir_regex_out_path);
+print $right_tir_regex_out "$fname_fin\t$right_tir_iupac_regexp\n";
+close($right_tir_regex_out);
+
+my $both_tirs_regex = $left_tir_iupac_regexp . ".+" . $right_tir_iupac_regexp;
+my $both_tirs_regex_out_path = File::Spec->catpath($volume, $out_path, $filename . "_both_tirs_regex.info");
+open(my $both_tirs_regex_out, ">", $both_tirs_regex_out_path);
+print $both_tirs_regex_out "$fname_fin\t$both_tirs_regex\n";
+close($both_tirs_regex_out);
 
 $element_info{"element_id"}    = $element_id;
 $element_info{"element_consensus"} = $element_consensus;
@@ -1771,16 +1841,19 @@ foreach my $ele_name (keys %element_char_hash) {
     $element_info{'TSD_len'} =~ m/$element_char_hash{$ele_name}{"tsd_length"}/)
   {
     $element_hits{$ele_name}++;
-    if ( $element_char_hash{$ele_name}{"tsd_con"} ne '' and $element_info{'TSD_seq'} =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
-      $element_hits{$ele_name}++;
-    }
-    else {
-      delete $element_hits{$ele_name};
+    if ( $element_char_hash{$ele_name}{"tsd_con"} ne '') {
+        if ($element_info{'TSD_seq'} =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
+            $element_hits{$ele_name}++;
+        }
+        else {
+            delete $element_hits{$ele_name};
+        }
     }
     if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
-      if ($element_info{'left_tir_seq'} =~
-        m/^$element_char_hash{$ele_name}{"tir_con"}/i)
-      {
+      my $right_match = $element_info{'right_tir_seq'};
+      $right_match =~ tr/ATGC/TACG/;
+      $right_match = reverse($right_match);
+      if (($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) or ($right_match =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i)) {
         $element_hits{$ele_name}++;
       }
 
