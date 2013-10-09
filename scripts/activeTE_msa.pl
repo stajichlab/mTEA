@@ -1642,6 +1642,9 @@ my $left_tir_id   = $left_TIR_aln_obj->percentage_identity;
 my $right_tir_id  = $right_TIR_aln_obj->percentage_identity;
 my $element_id    = $element_aln_obj->percentage_identity;
 my $element_consensus = $element_aln_obj->consensus_string();
+my $element_aln_out = File::Spec->catpath($volume, $out_path, $filename . "_element-only-msa.fa");
+$out = Bio::AlignIO->new(-file => ">$element_aln_out", -format => 'fasta', -displayname_flat => 0);
+$out->write_aln($element_aln_obj);
 my $left_tir_seq  = $left_TIR_aln_obj->consensus_string();
 my $right_tir_seq = $right_TIR_aln_obj->consensus_string();
 
