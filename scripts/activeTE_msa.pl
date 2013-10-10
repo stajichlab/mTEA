@@ -1484,7 +1484,7 @@ if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count
         $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 1;
     }
     #check for too many mismatches in putative TIRSs against the consensus sequence
-    if ($last_count > 9) {
+    if ($last_count >= 15) {
         my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
 
         #print to file why copies were removed
@@ -1545,7 +1545,7 @@ elsif (($tsd1_count > $tsd2_count) and ($tsd1_count > $tsd3_count)) {
     $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 2;
   }
   
-  if ($last_count > 9) {
+  if ($last_count >= 15) {
     my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
 
     #print to file why copies were removed
@@ -1605,7 +1605,7 @@ elsif (($tsd2_count > $tsd1_count) and ($tsd2_count > $tsd3_count)) {
     $element_info{$seq_name}{"left_tir_start"} = $tir_positions{$seq_name}{'left_tir_start'} + 4;
     $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 4;
   }
-  if ($last_count > 9) {
+  if ($last_count >= 15) {
     my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
 
     #print to file why copies were removed
