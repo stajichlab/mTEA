@@ -1468,7 +1468,9 @@ if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count
     
     $left_tir_start += 1;
     $right_tir_start -= 1;
+    my $last_count;
     foreach my $seq_obj ($final_aln_obj->each_seq()) {
+        $last_count++;
         my $seq_name = $seq_obj->id();
         if (!defined $tir_positions{$seq_name}{'left_tir_start'}) {
             my $left_pos_obj  = $seq_obj->location_from_column($left_tir_start);
@@ -1482,26 +1484,28 @@ if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count
         $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 1;
     }
     #check for too many mismatches in putative TIRSs against the consensus sequence
-    my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
+    if ($last_count > 9) {
+        my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
 
-    #print to file why copies were removed
-    foreach my $seq_name (@consensus_remove4) {
-        my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
-        print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
-        $final_aln_obj->remove_seq($seq_obj);
-    }
-    $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-    my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
-    $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
-    $out->write_aln($final_aln_obj);
-    $last_len = $final_aln_obj->length();
+        #print to file why copies were removed
+        foreach my $seq_name (@consensus_remove4) {
+            my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
+            print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
+            $final_aln_obj->remove_seq($seq_obj);
+        }
+        $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+        my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
+        $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
+        $out->write_aln($final_aln_obj);
+        $last_len = $final_aln_obj->length();
     
-    ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+        ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
 
-    if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
-        #open a file to store info on why analysis of an element was aborted
-        my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-        error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+        if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+            #open a file to store info on why analysis of an element was aborted
+            my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+            error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+        }
     }
     
     $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
@@ -1525,8 +1529,9 @@ elsif (($tsd1_count > $tsd2_count) and ($tsd1_count > $tsd3_count)) {
   print "Adjusting TIRs by 2bp\n\n";
   $left_tir_start += 2;
   $right_tir_start -= 2;
-
+  my $last_count;
   foreach my $seq_obj ($final_aln_obj->each_seq()) {
+    $last_count++;
     my $seq_name = $seq_obj->id();
     if (!defined $tir_positions{$seq_name}{'left_tir_start'}) {
       my $left_pos_obj  = $seq_obj->location_from_column($left_tir_start);
@@ -1539,27 +1544,29 @@ elsif (($tsd1_count > $tsd2_count) and ($tsd1_count > $tsd3_count)) {
     $element_info{$seq_name}{"left_tir_start"} = $tir_positions{$seq_name}{'left_tir_start'} + 2;
     $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 2;
   }
-  #check for too many mismatches in putative TIRSs against the consensus sequence
-  my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
-
-  #print to file why copies were removed
-  foreach my $seq_name (@consensus_remove4) {
-    my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
-    print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
-    $final_aln_obj->remove_seq($seq_obj);
-  }
-  $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
-  $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
-  $out->write_aln($final_aln_obj);
-  $last_len = $final_aln_obj->length();
   
-  ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+  if ($last_count > 9) {
+    my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
 
-  if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
-    #open a file to store info on why analysis of an element was aborted
-    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-    error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+    #print to file why copies were removed
+    foreach my $seq_name (@consensus_remove4) {
+        my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
+        print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
+        $final_aln_obj->remove_seq($seq_obj);
+    }
+    $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+    my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
+    $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
+    $out->write_aln($final_aln_obj);
+    $last_len = $final_aln_obj->length();
+    
+    ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+
+    if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+        #open a file to store info on why analysis of an element was aborted
+        my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+        error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+    }
   }
   
   $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
@@ -1582,8 +1589,10 @@ elsif (($tsd2_count > $tsd1_count) and ($tsd2_count > $tsd3_count)) {
   print "Adjusting TIRs by 4bp\n\n";
   $left_tir_start += 4;
   $right_tir_start -= 4;
+  my $last_count;
   
   foreach my $seq_obj ($final_aln_obj->each_seq()) {
+    $last_count++;
     my $seq_name = $seq_obj->id();
     if (!defined $tir_positions{$seq_name}{'left_tir_start'}) {
       my $left_pos_obj  = $seq_obj->location_from_column($left_tir_start);
@@ -1596,27 +1605,28 @@ elsif (($tsd2_count > $tsd1_count) and ($tsd2_count > $tsd3_count)) {
     $element_info{$seq_name}{"left_tir_start"} = $tir_positions{$seq_name}{'left_tir_start'} + 4;
     $element_info{$seq_name}{"right_tir_start"} = $tir_positions{$seq_name}{'right_tir_start'} - 4;
   }
-  #check for too many mismatches in putative TIRSs against the consensus sequence
-  my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
+  if ($last_count > 9) {
+    my @consensus_remove4 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 2);
 
-  #print to file why copies were removed
-  foreach my $seq_name (@consensus_remove4) {
-    my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
-    print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
-    $final_aln_obj->remove_seq($seq_obj);
-  }
-  $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
-  $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
-  $out->write_aln($final_aln_obj);
-  $last_len = $final_aln_obj->length();
-  
-  ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+    #print to file why copies were removed
+    foreach my $seq_name (@consensus_remove4) {
+        my $seq_obj = $final_aln_obj->get_seq_by_id($seq_name);
+        print $removed_out "$seq_name\tToo many mismatches in TIRs\n";
+        $final_aln_obj->remove_seq($seq_obj);
+    }
+    $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+    my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
+    $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
+    $out->write_aln($final_aln_obj);
+    $last_len = $final_aln_obj->length();
+    
+    ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
 
-  if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
-    #open a file to store info on why analysis of an element was aborted
-    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-    error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+    if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+        #open a file to store info on why analysis of an element was aborted
+        my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+        error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+    }
   }
   
   $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
