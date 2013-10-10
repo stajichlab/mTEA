@@ -1491,10 +1491,18 @@ if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count
         $final_aln_obj->remove_seq($seq_obj);
     }
     $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-    my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
+    my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
     $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
     $out->write_aln($final_aln_obj);
     $last_len = $final_aln_obj->length();
+    
+    ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+
+    if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+        #open a file to store info on why analysis of an element was aborted
+        my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+        error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+    }
     
     $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
     $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
@@ -1541,10 +1549,18 @@ elsif (($tsd1_count > $tsd2_count) and ($tsd1_count > $tsd3_count)) {
     $final_aln_obj->remove_seq($seq_obj);
   }
   $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
+  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
   $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
   $out->write_aln($final_aln_obj);
   $last_len = $final_aln_obj->length();
+  
+  ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+
+  if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+    #open a file to store info on why analysis of an element was aborted
+    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+    error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+  }
   
   $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
   $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
@@ -1590,10 +1606,18 @@ elsif (($tsd2_count > $tsd1_count) and ($tsd2_count > $tsd3_count)) {
     $final_aln_obj->remove_seq($seq_obj);
   }
   $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
+  my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".final");
   $out = Bio::AlignIO->new(-file => ">$int_aln_out3", -format => 'fasta', -displayname_flat => 0);
   $out->write_aln($final_aln_obj);
   $last_len = $final_aln_obj->length();
+  
+  ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
+
+  if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
+    #open a file to store info on why analysis of an element was aborted
+    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+    error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+  }
   
   $left_TIR_aln_obj = $final_aln_obj->slice($left_tir_start, $left_tir_end, 1);
   $right_TIR_aln_obj = $final_aln_obj->slice($right_tir_end, $right_tir_start, 1);
