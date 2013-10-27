@@ -284,7 +284,7 @@ my $trim_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".trim3"
 $out = Bio::AlignIO->new(-file => ">$trim_aln_out3", -format => 'fasta' , -displayname_flat => 0);
 $out->write_aln($trimmed_aln_obj);
 
-#Store the column positions of the potential TIRs in the trimmed alignment and get the columns of them in the original alignminent to remove sequences that cause gaps in the tirs
+#Store the column positions of the potential TIRs in the trimmed alignment and get the columns of them in the original alignment to remove sequences that cause gaps in the tirs
 my %trim_left_pos_hash;
 my %trim_right_pos_hash;
 my %left_tir_start_check_counts;
