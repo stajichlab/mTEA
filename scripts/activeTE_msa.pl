@@ -1725,6 +1725,7 @@ else {
                 $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
                 push @good_TSD_length, $tsd_len;
             }
+        }
         else {
             $final_TSD_length = 'NA';
             $final_TSD_fraction = 'NA';
