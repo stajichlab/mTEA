@@ -93,7 +93,7 @@ The test alignments all have f = 100.
 
 ## cleaning up MSA
 my @in_array;
-open(my $in => "<$infile");
+open(my $in, "<", $infile);
 my $seq='';
 while (my $line = <$in>) {
   if ($line =~ /^>/){
@@ -120,7 +120,7 @@ if ($justseq !~ /^-+$/){
   push @in_array, $seq;
 }
 close($in);
-open(my $fix_out => ">$infile");
+open(my $fix_out, ">", $infile);
 print $fix_out join ("\n",@in_array),"\n";
 close($fix_out);
 @in_array = ();
@@ -136,6 +136,9 @@ my $out_path     = File::Spec->catdir($in_dir, $out_dir_name);
 if (!-d $out_path) {
   mkdir($out_path) or die "Can't create dir:$out_path $!\n"; 
 }
+
+my $log_path = File::Spec->catpath($volume, $out_path, $filename . ".log");
+open(STDOUT, '>', $log_path) or die "Can't redirect STDOUT: $!";
 
 my %element_info;    # this hash is for storing element information
 my %tir_positions;
@@ -1097,6 +1100,8 @@ $last_len = $final_aln_obj->length();
 #get the column positions of tirs in the final alignment
 ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
 
+print "4th column grab after removing copies with mismatches in TIRs\nLeft Tir Start: $left_tir_start  Left Tir End: $left_tir_end\nRight Tir End: $right_tir_end  Right TIR Start: $right_tir_start ($filename.intermediate3)\n";
+
 if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
@@ -1154,15 +1159,18 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   my $alt_right_tsd_substr;
   my $starting_right_flank;
   my $last = 0;
-
+  
+  #print "Seq name: $seq_name\n";
+  
   #get seq_pos of the start of TIRs from column # in alignment. Adjust to include the 4-bp at outside ends of TIRs and then split into the 2-, 4-, and 10-bp sequences to search for TSDs
   my $left_tsd_loc_obj = $seq_obj->location_from_column($left_tir_start);
   my $left_tsd_end_pos = $left_tsd_loc_obj->start();
   $starting_left_flank = substr($seq, 0, $left_tsd_end_pos + 4);
   $left_tsd = substr($seq, $left_tsd_end_pos - 31, 34);
-  if (length $left_tsd < 40){
+  if (length $left_tsd < 34){
     my $message = "Left flank too short to look at TSDs.\n";
     print $no_TSD_found_out $message;
+    print "$message\n";
     next;
   }
   $left_tsd_substr = substr($left_tsd, 10, 20);
@@ -1172,16 +1180,16 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   my $right_tsd_start_pos = $right_tsd_loc_obj->start();
   $starting_right_flank = substr($seq,       $right_tsd_start_pos - 4);
   $right_tsd            = substr($seq,       $right_tsd_start_pos - 4, 34);
-  if (length $right_tsd < 24){
+  if (length $right_tsd < 34) {
     my $message = "Right flank too short to look at TSDs.";
     print $no_TSD_found_out $message;
+    print "$message\n";
     next;
   }
   $right_tsd_substr = substr($right_tsd, 4, 20);
   $alt_right_tsd_substr = substr($right_tsd, 3, 20);
-  if ($counter < 4) {
-      print "left tsd: $left_tsd_substr  alt left tsd: $alt_left_tsd_substr\nright tsd: $right_tsd_substr  alt right tsd: $alt_right_tsd_substr\n"
-  }
+  
+  print "$seq_name\nleft tsd: $left_tsd_substr  alt left tsd: $alt_left_tsd_substr\nright tsd: $right_tsd_substr  alt right tsd: $alt_right_tsd_substr\n";
   
   my $left_2bp  = substr($left_tsd,  -4, 2);
   my $right_2bp = substr($right_tsd, 2,  2);
@@ -1644,7 +1652,7 @@ $element_info{"right_tir_id"}  = $right_tir_id;
 
 #Determine the most common TSD by sequence first if possible or by length. If >80% of the TSDs are the same, then that sequence is stored as the TSD for output. Otherwise, look at the lengths of the TSDs and store if >80% of the TSDs have the same length.
 my %TSD_counts;
-my $TSD_array_length = @put_TSD_names;
+my $TSD_array_length = @putative_TSD;
 if ($TSD_array_length == 0) {
   print "No TSDs found\n";
   my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".no_tsd");
@@ -1663,72 +1671,112 @@ foreach my $row_ref (@put_TSD_names) {
 
 #undef @put_TSD_names;
 my @sorted_TSD_keys = sort { $TSD_counts{$b} <=> $TSD_counts{$a} } keys(%TSD_counts);
-
-#check whether the same TSD sequence was found in >80% of the copies. If not, count the occurances of TSD length, sort by highest occurances, and check if the length of the TSD is the same in >80% of the copies
 my $final_TSD_length;
 my $final_TSD_seq;
-my $TSD_fraction   = $TSD_counts{ $sorted_TSD_keys[0] } / $final_align_len;
+my $final_TSD_fraction;
 my $need_consensus = 0;
+my @good_TSD_length; 
+my @final_tsd_info;
 
-if (($TSD_fraction) > 0.8) {
-  $element_info{"TSD_fraction"} = $TSD_fraction;
-  $final_TSD_length             = length($sorted_TSD_keys[0]);
-  $final_TSD_seq                = $sorted_TSD_keys[0];
-  $element_info{"TSD_seq"}      = $final_TSD_seq;
-  $element_info{"TSD_len"}      = $final_TSD_length;
-  $element_info{"TSD_fraction"} = $TSD_fraction;
+foreach my $row (@sorted_TSD_keys) {
+    my $TSD_fraction = $TSD_counts{$row} / $final_align_len;
+    if ($TSD_fraction > 0.8 ) {
+        $final_TSD_seq = $row;
+        $final_TSD_length = length($row);
+        $final_TSD_fraction = $TSD_fraction;
+        push @good_TSD_length, length($row);
+        push @final_tsd_info, [length($row), $row];
+    }
+    elsif ($TSD_fraction >= 0.1 and defined $final_TSD_seq) {
+        $final_TSD_seq = $final_TSD_seq . ", " . $row;
+        $final_TSD_length = $final_TSD_length . ", " . length($row);
+        $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
+        push @good_TSD_length, length($row);
+        push @final_tsd_info, [length($row), $row];
+    }
+    else {
+        if (!defined $final_TSD_seq) {
+            $need_consensus = 1;
+        }
+        last;
+    }
+}
+if ($need_consensus == 0) {
+    $element_info{"TSD_fraction"} = $final_TSD_fraction;
+    $element_info{"TSD_seq"}      = $final_TSD_seq;
+    $element_info{"TSD_len"}      = $final_TSD_length;
 }
 else {
-  $need_consensus = 1;
-  my %TSD_length_counts;
-  foreach my $row (@putative_TSD) {
-    $TSD_length_counts{ length($row) }++;
-  }
-  my @sorted_TSD_length_keys = sort { $TSD_length_counts{$b} <=> $TSD_length_counts{$a} } keys(%TSD_length_counts);
-  $final_TSD_length = $sorted_TSD_length_keys[0];
-  $TSD_fraction     = $TSD_array_length / $final_align_len;
-
-  $element_info{"TSD_len"}      = $final_TSD_length;
-  $element_info{"TSD_fraction"} = $TSD_fraction;
+    my %TSD_length_counts;
+    foreach my $row (@putative_TSD) {
+        $TSD_length_counts{length($row)}++;
+    }
+    my @sorted_TSD_length_keys = sort { $TSD_length_counts{$b} <=> $TSD_length_counts{$a} } keys(%TSD_length_counts);
+    foreach my $tsd_len (@sorted_TSD_length_keys) {
+        my $TSD_fraction = $TSD_length_counts{$tsd_len} / $final_align_len;
+        if ($TSD_fraction > 0.8 ) {
+            $final_TSD_length = $tsd_len;
+            $final_TSD_fraction = $TSD_fraction;
+            push @good_TSD_length, $tsd_len;
+        }
+        elsif ($TSD_fraction >= 0.1 and defined $final_TSD_seq) {
+            $final_TSD_length = $final_TSD_length . ", " . $tsd_len;
+            $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
+            push @good_TSD_length, $tsd_len;
+        }
+        else {
+            last;
+        }
+    }    
+    $element_info{"TSD_len"}      = $final_TSD_length;
+    $element_info{"TSD_fraction"} = $final_TSD_fraction;
 }
 #undef @putative_TSD;
 
-my $insertion_site_file = $filename . ".insertion-site.fa";
-my $insertion_site_out_path = File::Spec->catpath($volume, $out_path, $insertion_site_file);
-my $tsd_out_path = File::Spec->catpath($volume, $out_path, $filename . ".tsd.fa");
+foreach my $row (@good_TSD_length) {
+    my $insertion_site_file = $filename . ".insertion-site" . $row . ".fa";
+    my $insertion_site_out_path = File::Spec->catpath($volume, $out_path, $insertion_site_file);
+    my $tsd_out_path = File::Spec->catpath($volume, $out_path, $filename . ".tsd" . $row . ".fa");
 
+    open(my $tsd_info_out, ">", $tsd_out_path) or die "Error creating $tsd_out_path. $!\n";
+    open(my $insertion_site_out, ">", $insertion_site_out_path) or die "Error creating $insertion_site_out_path. $!\n";
+    foreach my $row_ref (@TSD_info) {
+        #print "Printing insertion site info\n";
+        my @pos = @{$row_ref};
+        if (length($pos[2]) == $row) {
+            print $tsd_info_out ">$pos[0]\n$pos[2]\n";
+            if ($pos[1] !~ m/n/i) {
+                print $insertion_site_out ">$pos[0]\n$pos[1]\n";
+            }
+        }
+    }
+    close($insertion_site_out);
+    close($tsd_info_out);
+    close($no_TSD_found_out);
+    my $out_fix           = $out_path . "/";
+    my $Blogo_config_path = $FindBin::Bin . "/../lib/blogo/Blogo.conf";
+    my $Blogo_path        = $FindBin::Bin . "/../lib/blogo";
+    system("$Blogo_path/Blogo_batch.pl file_path=$out_fix file_names=$insertion_site_file img_abs_dir=$out_fix conf_file=$Blogo_config_path");
+
+    if ($need_consensus == 1) {
+        #read in tsd file as MSA to generate IUPAC consensus
+        my $tsd_in_obj =  Bio::AlignIO->new(-file => $tsd_out_path, -format => 'fasta');
+        my $tsd_aln_obj   = $tsd_in_obj->next_aln();
+        my $tsd_consensus = $tsd_aln_obj->consensus_iupac();
+        if (!exists $element_info{"TSD_seq"} ) {
+            $element_info{"TSD_seq"} = $tsd_consensus;
+            push @final_tsd_info, [$row, $tsd_consensus];
+        }
+        else {
+            $element_info{"TSD_seq"} = $element_info{"TSD_seq"} . ", " . $tsd_consensus;
+            push @final_tsd_info, [$row, $tsd_consensus];
+        }
+    }
+}
 my $left_tir_out_path = File::Spec->catpath($volume, $out_path, $filename . ".left-tir.fa");
 my $right_tir_out_path = File::Spec->catpath($volume, $out_path, $filename . ".right-tir.fa");
 print_fasta($left_tir_out_path, $left_TIR_aln_obj);
 print_fasta($right_tir_out_path, $right_TIR_aln_obj);
-
-open(my $tsd_info_out, ">", $tsd_out_path) or die "Error creating $tsd_out_path. $!\n";
-open(my $insertion_site_out, ">", $insertion_site_out_path) or die "Error creating $insertion_site_out_path. $!\n";
-my $insertion_num = @TSD_info;
-foreach my $row_ref (@TSD_info) {
-  #print "Printing insertion site info\n";
-  my @pos = @{$row_ref};
-  if (length($pos[2]) == $element_info{"TSD_len"}) {
-    print $tsd_info_out ">$pos[0]\n$pos[2]\n";
-    if ($pos[1] !~ m/n/i) {
-      print $insertion_site_out ">$pos[0]\n$pos[1]\n";
-    }
-  }
-  else {
-    print $no_TSD_found_out "$pos[0]\tTSD length different than >=80% of other copies\n";
-  }
-}
-close($insertion_site_out);
-close($tsd_info_out);
-close($no_TSD_found_out);
-
-if ($need_consensus == 1) {
-  #read in tsd file as MSA to generate IUPAC consensus
-  my $tsd_in_obj =  Bio::AlignIO->new(-file => $tsd_out_path, -format => 'fasta');
-  my $tsd_aln_obj   = $tsd_in_obj->next_aln();
-  my $tsd_consensus = $tsd_aln_obj->consensus_iupac();
-  $element_info{"TSD_seq"} = $tsd_consensus;
-}
 
 #import TE characteristics from table and generate regular expressions to classify element by TIR and TSD if possible
 print "\nProcessing TE charateristics table\n";
@@ -1801,69 +1849,79 @@ while (my $line = <$TE_in>) {
   }
 }
 print "Checking element for DNA TE charateristics\n";
+print "final_tsd_info array dump\n";
+print Dumper(\@final_tsd_info);
 my %element_hits;
-foreach my $ele_name (keys %element_char_hash) {
-  if (
-    $element_info{'TSD_len'} =~ m/$element_char_hash{$ele_name}{"tsd_length"}/)
-  {
-    $element_hits{$ele_name}++;
-    if ( $element_char_hash{$ele_name}{"tsd_con"} ne '') {
-        if ($element_info{'TSD_seq'} =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
+foreach my $tsd_info_ref (@final_tsd_info) {
+    my @tsd_info = @{$tsd_info_ref};
+    foreach my $ele_name (keys %element_char_hash) {
+        if ($tsd_info[0] =~ m/$element_char_hash{$ele_name}{"tsd_length"}/) {
             $element_hits{$ele_name}++;
+            if ( $element_char_hash{$ele_name}{"tsd_con"} ne '') {
+                if ($tsd_info[1] =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
+                    $element_hits{$ele_name}++;
+                }
+                else {
+                    delete $element_hits{$ele_name};
+                }
+            }
+            if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
+                my $right_match = $element_info{'right_tir_seq'};
+                $right_match =~ tr/ATGC/TACG/;
+                $right_match = reverse($right_match);
+                if (($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) or ($right_match =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i)) {
+                    $element_hits{$ele_name}++;
+                }
+                
+                else {
+                    delete $element_hits{$ele_name};
+                }
+            }
+        }
+    }
+    
+    my @sorted;
+    foreach my $key (sort { $element_hits{$b} <=> $element_hits{$a} } keys(%element_hits)) {
+        my $count = $element_hits{$key};
+        push @sorted, [ $key, $count ];
+    }
+
+    my $classification = '';
+
+    #store all classifications and the number of hits to each
+    foreach my $row_ref (@sorted) {
+        my @info = @{$row_ref};
+        if ($info[1] == ${ $sorted[0] }[1]) {
+            if ($classification eq '') {
+                $classification = $classification . $info[0] . "_" . $info[1];
+            }
+            else {
+                $classification = $classification . ", " . $info[0] . "_" . $info[1];
+            }
         }
         else {
-            delete $element_hits{$ele_name};
+            last;
         }
     }
-    if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
-      my $right_match = $element_info{'right_tir_seq'};
-      $right_match =~ tr/ATGC/TACG/;
-      $right_match = reverse($right_match);
-      if (($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) or ($right_match =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i)) {
-        $element_hits{$ele_name}++;
-      }
-
-      else {
-        delete $element_hits{$ele_name};
-      }
-    }
-  }
-}
-
-my @sorted;
-foreach my $key (sort { $element_hits{$b} <=> $element_hits{$a} } keys(%element_hits)) {
-  my $count = $element_hits{$key};
-  push @sorted, [ $key, $count ];
-}
-
-my $classification = '';
-
-#store all classifications and the number of hits to each
-foreach my $row_ref (@sorted) {
-  my @info = @{$row_ref};
-  if ($info[1] == ${ $sorted[0] }[1]) {
     if ($classification eq '') {
-      $classification = $classification . $info[0] . "_" . $info[1];
+        $classification = "Unknown";
+    }
+    if (!exists $element_info{"classification"}) {
+        $element_info{"classification"} = $classification;
     }
     else {
-      $classification = $classification . ", " . $info[0] . "_" . $info[1];
+        if ($element_info{"classification"} !~ m/$classification/) {
+            $element_info{"classification"} =  $element_info{"classification"} . "|" . $classification
+        }
     }
-  }
-  else {
-    last;
-  }
 }
-if ($classification eq '') {
-  $classification = "Unknown";
-}
-$element_info{"classification"} = $classification;
 print "Element classification finished\n";
 my $element_info_out_path = File::Spec->catpath($volume, $out_path, $filename . ".element_info");
 open(my $element_info_out, ">", $element_info_out_path)
   or die "Error creating $element_info_out_path. $!\n";
 print $element_info_out join("\t", $fname_fin, $element_info{'copy_num'}, $element_id, $element_info{'left_tir_seq'},
   $element_info{'left_tir_id'}, $element_info{'right_tir_seq'}, $element_info{'left_tir_id'}, $element_info{'TSD_len'},
-  $element_info{'TSD_seq'},     $element_info{'TSD_fraction'}, $classification), "\n";
+  $element_info{'TSD_seq'},     $element_info{'TSD_fraction'}, $element_info{"classification"}), "\n";
 close($element_info_out);
 
 #print element consensus to file
@@ -1875,11 +1933,6 @@ close($element_consensus_out);
 print "Printing fasta\n";
 my $element_fasta_out_path = File::Spec->catpath($volume, $out_path, $filename . ".fasta");
 print_fasta($element_fasta_out_path, $element_aln_obj);
-
-my $out_fix           = $out_path . "/";
-my $Blogo_config_path = $FindBin::Bin . "/../lib/blogo/Blogo.conf";
-my $Blogo_path        = $FindBin::Bin . "/../lib/blogo";
-system("$Blogo_path/Blogo_batch.pl file_path=$out_fix file_names=$insertion_site_file img_abs_dir=$out_fix conf_file=$Blogo_config_path");
 
 print "\nSetting up gff path\n";
 my $gff_path = File::Spec->catpath($volume, $out_path, $filename . ".gff");
