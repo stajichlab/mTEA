@@ -1721,15 +1721,22 @@ else {
                 push @good_TSD_length, $tsd_len;
             }
             else {
-                $final_TSD_length = $final_TSD_length . ", " . $tsd_len;
-                $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
-                push @good_TSD_length, $tsd_len;
+                if ($TSD_fraction > 0.05 ) {
+                    $final_TSD_length = $final_TSD_length . ", " . $tsd_len;
+                    $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
+                    push @good_TSD_length, $tsd_len;
+                }
+                else {
+                    last;
+                }
             }
         }
         else {
-            $final_TSD_length = 'NA';
-            $final_TSD_fraction = 'NA';
-            last;
+            if (!defined $final_TSD_seq) {
+                $final_TSD_length = 'NA';
+                $final_TSD_fraction = 'NA';
+                last;
+            }
         }
     }    
     $element_info{"TSD_len"}      = $final_TSD_length;
