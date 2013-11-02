@@ -1855,8 +1855,9 @@ while (my $line = <$TE_in>) {
 print "Checking element for DNA TE charateristics\n";
 print "final_tsd_info array dump\n";
 print Dumper(\@final_tsd_info);
-my %element_hits;
+
 foreach my $tsd_info_ref (@final_tsd_info) {
+    my %element_hits;
     my @tsd_info = @{$tsd_info_ref};
     foreach my $ele_name (keys %element_char_hash) {
         if ($tsd_info[0] =~ m/$element_char_hash{$ele_name}{"tsd_length"}/) {
