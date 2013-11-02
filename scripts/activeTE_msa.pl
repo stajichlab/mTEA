@@ -2017,7 +2017,7 @@ sub match_tirs {
             }
           }
           if ($round == 2) {
-            if ($count == 6 and $total_mis_aln >= 4) {
+            if ($count == 10 and $total_mis_aln >= 6) {
               $match_len   = 0;
               $start_pos   = '';
               $match_query = '';
@@ -2072,7 +2072,7 @@ sub match_tirs {
               next;
             }
           }
-          elsif ($match_len >= 1 and $match_len < ($match_cutoff - 1)) {
+          elsif ($match_len >= 1 and $match_len <= ($match_cutoff - 1)) {
 
             #if match length is 1-3 and position is not a match, increment mismatch counter and check if more than one mismatch has occurred
             if ($homo_char eq " ") {
@@ -2090,8 +2090,8 @@ sub match_tirs {
                 next;
               }
 
-              #more than one mismatch, reset counters and other info, continue
-              elsif ($match_mis_aln > 1 and $match_len < 5) {
+              #more than two mismatches, reset counters and other info, continue
+              elsif ($match_mis_aln > 2 and $match_len < 5) {
                 $match_len     = 0;
                 $start_pos     = '';
                 $match_query   = '';
@@ -2101,7 +2101,7 @@ sub match_tirs {
                 #print "Another Mismatch at $count, resetting counts\n";
                 next;
               }
-              elsif ($match_mis_aln < 3 and $match_len >= 5) {
+              elsif ($match_mis_aln <= 3 and $match_len >= 5) {
                 $match_len++;
                 $last_good = $count;
                 $match_query .= $query_char;
@@ -2133,7 +2133,7 @@ sub match_tirs {
               next;
             }
           }
-          elsif ($match_len >= $match_cutoff - 1) {
+          elsif ($match_len >= $match_cutoff) {
 
             #match length is $match_cutoff or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatches have occurred. If a match, continue.
             if ($homo_char eq " ") {
