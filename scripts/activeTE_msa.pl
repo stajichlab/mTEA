@@ -1714,17 +1714,20 @@ else {
     my @sorted_TSD_length_keys = sort { $TSD_length_counts{$b} <=> $TSD_length_counts{$a} } keys(%TSD_length_counts);
     foreach my $tsd_len (@sorted_TSD_length_keys) {
         my $TSD_fraction = $TSD_length_counts{$tsd_len} / $final_align_len;
-        if ($TSD_fraction > 0.8 ) {
-            $final_TSD_length = $tsd_len;
-            $final_TSD_fraction = $TSD_fraction;
-            push @good_TSD_length, $tsd_len;
-        }
-        elsif ($TSD_fraction >= 0.1 and defined $final_TSD_seq) {
-            $final_TSD_length = $final_TSD_length . ", " . $tsd_len;
-            $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
-            push @good_TSD_length, $tsd_len;
-        }
+        if ($TSD_fraction > 0.01 ) {
+            if (!defined $final_TSD_seq) {
+                $final_TSD_length = $tsd_len;
+                $final_TSD_fraction = $TSD_fraction;
+                push @good_TSD_length, $tsd_len;
+            }
+            else {
+                $final_TSD_length = $final_TSD_length . ", " . $tsd_len;
+                $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
+                push @good_TSD_length, $tsd_len;
+            }
         else {
+            $final_TSD_length = 'NA';
+            $final_TSD_fraction = 'NA';
             last;
         }
     }    
@@ -2584,8 +2587,12 @@ sub consensus_filter {
   my $message = '';
   if ($consensus_len > ($aln_len*.99)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50))
     $message = "$filename: too much of the alignment is conserved. Flanks are too similar\n";
-  }elsif (!$left_tir_start or !$right_tir_start){
-    $message = "$filename: no TIR start was found on one or both ends\n";
+  }
+  elsif (!$left_tir_start) {
+      $message = "$filename: no TIR start was found on left end\n";
+  }
+  elsif (!$right_tir_start){
+    $message = "$filename: no TIR start was found on right end\n";
   }
   if ($message){
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
