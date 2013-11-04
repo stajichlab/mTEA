@@ -51,13 +51,6 @@ GetOptions(
   'id'       => \$id,
 );
 
-if (defined $all) {
-  print "Intermediate files will be kept\n";
-}
-else {
-  print "Intermediate files will be removed\n";
-}
-
 # make sure only one valid input file is specified
 if (@ARGV != 1) {
   print "Please specify only one input file\n";
@@ -133,12 +126,27 @@ pop @fname_fin;
 my $fname_fin    = join('.', @fname_fin);
 my $out_dir_name = "aTE_" . $fname_fin;
 my $out_path     = File::Spec->catdir($in_dir, $out_dir_name);
+my $log_path = File::Spec->catpath($volume, $out_path, $filename . ".log");
+open(STDOUT, '>', $log_path) or die "Can't redirect STDOUT: $!";
+
 if (!-d $out_path) {
   mkdir($out_path) or die "Can't create dir:$out_path $!\n"; 
 }
+else {
+    my $glob_path = File::Spec->catpath($volume, $out_path, "*");
+    my @files = glob $glob_path;
+    foreach my $path (@files) {
+        unlink $path or print "Failed to unlink $path: $!";
+    }
+}
 
-my $log_path = File::Spec->catpath($volume, $out_path, $filename . ".log");
-open(STDOUT, '>', $log_path) or die "Can't redirect STDOUT: $!";
+
+if (defined $all) {
+  print "Intermediate files will be kept\n";
+}
+else {
+  print "Intermediate files will be removed\n";
+}
 
 my %element_info;    # this hash is for storing element information
 my %tir_positions;
@@ -565,8 +573,10 @@ else {
   #go through each entry of @good_aln2 array
   foreach my $row_ref (@good_aln2) {
     @entry2 = @{$row_ref};
+    print "Entry2 dumper: \n";
+    print Dumper(\@entry2);
 
-#get column positions in of TIRs, using sequence name and index position of TIR in full sequence.
+    #get column positions in of TIRs, using sequence name and index position of TIR in full sequence.
     $hit_aln_pos2 = $trimmed_aln_obj->column_from_residue_number($entry2[0], ${$entry2[1]{"hit"}}[0]);
     $hit_column_counts2{$hit_aln_pos2}++;
     $hit_match_len2{ ${ $entry2[1]{"hit"} }[1] }++;
@@ -1677,6 +1687,8 @@ my $final_TSD_fraction;
 my $need_consensus = 0;
 my @good_TSD_length; 
 my @final_tsd_info;
+$final_align_len = $final_aln_obj->num_sequences();
+$element_info{"copy_num"} = $final_align_len;
 
 foreach my $row (@sorted_TSD_keys) {
     my $TSD_fraction = $TSD_counts{$row} / $final_align_len;
@@ -1689,10 +1701,11 @@ foreach my $row (@sorted_TSD_keys) {
     }
     elsif ($TSD_fraction >= 0.1 and defined $final_TSD_seq) {
         $final_TSD_seq = $final_TSD_seq . ", " . $row;
-        $final_TSD_length = $final_TSD_length . ", " . length($row);
+        my $row_len = length($row);
+        $final_TSD_length = $final_TSD_length . ", " . $row_len;
         $final_TSD_fraction = $final_TSD_fraction . ", " . $TSD_fraction;
-        push @good_TSD_length, length($row);
-        push @final_tsd_info, [length($row), $row];
+        push @good_TSD_length, $row_len;
+        push @final_tsd_info, [$row_len, $row];
     }
     else {
         if (!defined $final_TSD_seq) {
@@ -1715,7 +1728,7 @@ else {
     foreach my $tsd_len (@sorted_TSD_length_keys) {
         my $TSD_fraction = $TSD_length_counts{$tsd_len} / $final_align_len;
         if ($TSD_fraction > 0.01 ) {
-            if (!defined $final_TSD_seq) {
+            if (!defined $final_TSD_fraction) {
                 $final_TSD_length = $tsd_len;
                 $final_TSD_fraction = $TSD_fraction;
                 push @good_TSD_length, $tsd_len;
@@ -1732,7 +1745,7 @@ else {
             }
         }
         else {
-            if (!defined $final_TSD_seq) {
+            if (!defined $final_TSD_fraction) {
                 $final_TSD_length = 'NA';
                 $final_TSD_fraction = 'NA';
                 last;
@@ -2047,6 +2060,18 @@ sub match_tirs {
               last;
             }
           }
+          elsif ($round ==2) {
+              if ($count == 3 and $total_mis_aln >= 2) {
+                  $match_len     = 0;
+                  $start_pos     = '';
+                  $match_query   = '';
+                  $match_hit     = '';
+                  $match_mis_aln = 0;
+                  
+                  #print "Another Mismatch at $count, resetting counts\n";
+                  next;
+              }
+          }
 
           if ($match_len == 0) {
             #if match length equals 0 and position is not a match, continue to next position
@@ -2177,7 +2202,7 @@ sub match_tirs {
                 #$hit_pos = index(uc($seq), uc($match_hit), 40) + 1;
                 $query_pos = rindex(uc($seq), uc($match_query)) + 1;
 
-                #print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n";
+                print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n";
                 #store sequence name and the hit and query info
                 my @match = (
                   $seq_name,
@@ -2597,6 +2622,9 @@ sub consensus_filter {
   if ($consensus_len > ($aln_len*.99)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50))
     $message = "$filename: too much of the alignment is conserved. Flanks are too similar\n";
   }
+  elsif (!$left_tir_start and !$right_tir_start) {
+      $message = "$filename: no TIR start was found on either end\n";
+  }
   elsif (!$left_tir_start) {
       $message = "$filename: no TIR start was found on left end\n";
   }
@@ -2798,7 +2826,7 @@ sub error_out {
   open(my $bad_out, ">", $bad_out_path);
   print $bad_out "$message\n";
   print "ERROR:$message\n";
-  warn "ERROR:$message\n";
+  #warn "ERROR:$message\n";
   close($bad_out);
   if (!defined $all) {
     print "Cleaning up files\n";
