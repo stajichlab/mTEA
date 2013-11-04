@@ -41,14 +41,12 @@ use Data::Dumper;
 my $flank = 100;
 my $trimal = 'trimal';   # specify the full path to this if it can't be found automatically
 my $all;
-my $id;
 my $PROGRAM_NAME = "activeTE";
 
 GetOptions(
   'flank:i'  => \$flank,
   'all'      => \$all,
   'trimal:s' => \$trimal,
-  'id'       => \$id,
 );
 
 # make sure only one valid input file is specified
@@ -76,7 +74,6 @@ activeTE_msa.pl -a -f <int> <multiple alignment file>
 
 -a keep all intermediate files  DEFAULT = remove
 -f length of sequence flanks  DEFAULT = 100
--id generate initial per position %id file
 
 The test alignments all have f = 100.
 
@@ -140,7 +137,6 @@ else {
     }
 }
 
-
 if (defined $all) {
   print "Intermediate files will be kept\n";
 }
@@ -179,25 +175,12 @@ if ($full_aln_num_seqs < 2){
 #calculate the % nucleotide identity and the fraction of copies with sequence at each position the full alignment and print to file
 my $full_id_out_path =  File::Spec->catpath($volume, $out_path, $filename . ".full_id");
 my @full_id_array;
-
 my $first_col_80 = 1;
 my $last_col_80  = $full_aln_len;
-## if file does not exisit or if it is file size 0, make the file
-if (!-e $full_id_out_path or -z $full_id_out_path or defined $id) {
-  print "Starting Full ID calculation\n";
-  @full_id_array = get_percentID_perCol($infile, $full_id_out_path);
-}
-else {
-  open(my $id_out, '<', "$full_id_out_path");
-  ##head 169.msa.full_id
-  ##1       0       0.000893655049151028
-  ##2       0       0.000893655049151028
-  while (my $line = <$id_out>) {
-    chomp $line;
-    my ($i, $pos_id, $pos_present) = split /\t/, $line;
-    push @full_id_array, [ $i, $pos_id, $pos_present ];
-  }
-}
+
+print "Starting Full ID calculation\n";
+@full_id_array = get_percentID_perCol($infile, $full_id_out_path);
+
 ## remove as many seqs as possible for the cleanest aln
 my ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2gspr) = remove_most($full_aln_obj, \%tir_positions, \@full_id_array);
 %tir_positions = %$ref2tp;
