@@ -129,6 +129,7 @@ if (!-d $out_path) {
 }
 else {
     my $glob_path = File::Spec->catpath($volume, $out_path, "*");
+    print "Glob path: $glob_path\n";
     my @files = glob $glob_path;
     foreach my $path (@files) {
         unlink $path or warn "Failed to unlink $path: $!";
