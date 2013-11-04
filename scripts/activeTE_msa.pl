@@ -123,8 +123,6 @@ pop @fname_fin;
 my $fname_fin    = join('.', @fname_fin);
 my $out_dir_name = "aTE_" . $fname_fin;
 my $out_path     = File::Spec->catdir($in_dir, $out_dir_name);
-my $log_path = File::Spec->catpath($volume, $out_path, $filename . ".log");
-open(STDOUT, '>', $log_path) or die "Can't redirect STDOUT: $!";
 
 if (!-d $out_path) {
   mkdir($out_path) or die "Can't create dir:$out_path $!\n"; 
@@ -133,9 +131,11 @@ else {
     my $glob_path = File::Spec->catpath($volume, $out_path, "*");
     my @files = glob $glob_path;
     foreach my $path (@files) {
-        unlink $path or print "Failed to unlink $path: $!";
+        unlink $path or warn "Failed to unlink $path: $!";
     }
 }
+my $log_path = File::Spec->catpath($volume, $out_path, $filename . ".log");
+open(STDOUT, '>', $log_path) or die "Can't redirect STDOUT: $!";
 
 if (defined $all) {
   print "Intermediate files will be kept\n";
