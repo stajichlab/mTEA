@@ -136,7 +136,7 @@ else {
     }
 }
 my $log_path = File::Spec->catpath($volume, $out_path, $filename . ".log");
-open($log_out, '>', $log_path) or die "Can't ropen log file: $!";
+open(my $log_out, '>', $log_path) or die "Can't ropen log file: $!";
 
 if (defined $all) {
   print "Intermediate files will be kept\n";
