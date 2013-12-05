@@ -177,11 +177,11 @@ close($trimal_run);
 #initialize a global array to store results later
 my @good_aln;
 
-my $full_aln_obj = get_org_aln ($infile);
+my $full_aln_obj = get_org_aln($infile);
 my $full_aln_len = $full_aln_obj->length();
 my $gap_cols = $full_aln_obj->gap_col_matrix();
 my $full_aln_num_seqs = $full_aln_obj->num_sequences;
-if ($full_aln_num_seqs < 2){
+if ($full_aln_num_seqs <= 2){
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
   error_out($abort_out_path, "$filename\thas only $full_aln_num_seqs sequence(s)\n");
 }
