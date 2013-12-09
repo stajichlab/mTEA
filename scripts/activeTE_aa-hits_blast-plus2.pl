@@ -104,8 +104,8 @@ while ( my $seq_obj = $in->next_seq() ) {
     $short_seq_id =~ s/-ClassII-TIR-/_/i;
     $short_seq_id =~ s/-/_/g;
     
-    if (length($short_seq_id > 30) {
-        $short_seq_id = substr($short_seq_id, 0, 30)
+    if (length($short_seq_id) > 30) {
+        $short_seq_id = substr($short_seq_id, 0, 30);
     }
     
     print "\nlong: $seq_id\nshort: $short_seq_id\n\n";
