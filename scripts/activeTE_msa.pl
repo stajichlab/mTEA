@@ -219,7 +219,7 @@ if ($left_tir_start1 == 0 or $right_tir_start1 == 0 or $tmp_aln_obj->num_sequenc
   print $log_out "run less stringent intial filtering\n";
   ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2gspr) = remove_least($aln_obj, \%tir_positions, \@full_id_array);
   %tir_positions      = %$ref2tp;
-  if (defined %$ref2gsr) {
+  if ($ref2gsr) {
     %gap_seq_remove = %$ref2gsr;
     @gap_seq_pos_remove = @$ref2gspr;
   }
@@ -378,18 +378,18 @@ if ($sorted_right_tir_start_keys[0] <= $flank - 25) {
 if ($left_flank_catch != 0) {
   if ($right_flank_catch != 0) {
     #open a file to store info on why analysis of an element was aborted
-    $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_flanks");
+    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_flanks");
     error_out($abort_out_path, "$filename\tBoth flanks similar");
   }
   else {
     #open a file to store info on why analysis of an element was aborted
-    $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_left_flank");
+    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_left_flank");
     error_out($abort_out_path, "$filename\tLeft flank similar");
   }
 }
 elsif ($right_flank_catch != 0) {
   #open a file to store info on why analysis of an element was aborted
-  $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_right_flank");
+  my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_right_flank");
   error_out($abort_out_path, "$filename\tRight flank similar");
 }
 
