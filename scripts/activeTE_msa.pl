@@ -715,17 +715,17 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
                     $found++;
                     my %matches = %{$entry[1]};
                     #print Dumper(\%matches);
-                    my $left_index = $matches{"query"}->[0];
-                    my $right_index = $matches{"hit"}->[0];
+                    my $right_index = $matches{"query"}->[0];
+                    my $left_index = $matches{"hit"}->[0];
                     my $right_nt_pos = $seq_len - $right_index;
                     print "left index: $left_index  right index: $right_index\n";
                     
                     my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
                     my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
                     $query_column_counts{$left_pos}++;
-                    $query_match_len{$matches{"query"}->[2]}++;
+                    $query_match_len{$matches{"hit"}->[2]}++;
                     $hit_column_counts{$right_pos}++;
-                    $hit_match_len{$matches{"hit"}->[2]}++;
+                    $hit_match_len{$matches{"query"}->[2]}++;
                 }
                 else {
                     push @bad_aln,    $seq_name;
