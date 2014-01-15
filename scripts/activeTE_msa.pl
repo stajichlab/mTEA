@@ -654,117 +654,111 @@ print $log_out "Bad aln len:  $bad_aln_len  Bad aln len2: $bad_aln_len2\n";
 my $protein_catch = 0;
 my $found = 0;
 if ($good_aln_len2 == 0 and $good_aln_len == 0) {
-    if (defined $protein) {
-        undef @good_aln;
-        undef @bad_aln;
-        undef @bad_remove;
-        undef %hit_column_counts;
-        undef %hit_match_len;
-        undef %query_column_counts;
-        undef %query_match_len;
-        undef @sorted_hitcolumn_keys;
-        undef @sorted_querycolumn_keys;
-        undef @sorted_hit_len_keys;
-        undef @sorted_query_len_keys;
-        undef @entry;
-        
-        #grab all sequences from trimmed alignment
-        foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
-        
-            #grab sequence name and shorten it for use in some output filenames
-            my $seq_name    = $seq_obj->id();
-            my @seqn_part   = split(":", $seq_name);
-            my $fname_start = $seqn_part[0];
-            print "Seq name = $seq_name\n";
-            print $log_out "Seq name = $seq_name\n";
-            
-            #grab sequence & strip hyphens
-            my $seq = $seq_obj->seq();
-            $seq =~ s/-//g;
-            my $strand;
-            my $seq_len = length($seq);
-            if ( $seq_name =~ m/hit[0-9]*_(.+)_([0-9]+)_([0-9]+)_(\w+)/ ) {
-                $strand = $4;
-            }
-            
-            #initialize variables
-            my $sub_seq;
-            my $first;
-            my $last;
-            my $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
-            my $last_path  = File::Spec->catpath($volume, $out_path, "last_half.txt");
-            my $last_offset = (($seq_len-1) - $trim_right_pos_hash{$seq_name}) - 12;
-            
-            $first = substr($seq, $trim_left_pos_hash{$seq_name} - 10, 30);
-            $last = substr($seq, $trim_right_pos_hash{$seq_name} - 20, 30);
-            
-            #save the two ends as files to use as inputs for a ggsearch search
-            open(my $first_out, ">", $first_path) or die "Error creating $first_path. $!\n";
-            open(my $last_out, ">", $last_path) or die "Error creating $last_path. $!\n";
-            print $first_out ">first\n$first\n";
-            print $last_out ">last\n$last\n";
-            close($first_out);
-            close($last_out);
-              
-            #change directory for ggsearch, adjust input filepaths, create output filepath, call ggsearch, change dir back to ori
-            chdir $out_path;
-            $first_path = "first_half.txt";
-            $last_path = "last_half.txt";
-            my $out_opt = $fname_start . ".blast.out";
-            
-            system("blastn -task blastn -query $first_path -strand minus -subject $last_path -word_size 4 -gapopen 5 -outfmt 5 -gapextend 2 -penalty -3 -reward 2 -num_alignments 1000 -dust no -out $out_opt");
-            chdir $orig_cwd;
-            $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".blast.out");
-            
-            my @tir_match_result = match_tirs2($seq_obj, $out_opt, 3, $strand, $last_offset);
-            print "Dumping tir match result\n";
-            print Dumper(\@tir_match_result);
-            
-            if ($tir_match_result[0] == 1) {
-                print "Has result\n";
-                push @good_aln, $tir_match_result[1];
-                $found++;
-            }
-            else {
-                push @bad_aln,    $seq_name;
-                push @bad_remove, $seq_obj;
-            }    
-        }
-        foreach my $row_ref (@good_aln) {
-            my %matches = %{$row_ref};
-            print Dumper(\%matches);
-            print $log_out Dumper(\%matches);
-            my $seq_len = $matches{"query"}->[3];
-            my $seq_name = $matches{"query"}->[4];
-            my $left_index = $matches{"query"}->[0];
-            my $right_index = $matches{"hit"}->[0];
-            my $right_nt_pos = $seq_len - $right_index;
-            print "left index: $left_index  right index: $right_index\n";
-            
-            my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
-            my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
-            $query_column_counts{$right_pos}++;
-            $query_match_len{$matches{"hit"}->[2]}++;
-            $hit_column_counts{$left_pos}++;
-            $hit_match_len{$matches{"query"}->[2]}++;
-        }
-        #sort the hit and query column and match length hashes by largest count to smallest
-        @sorted_hitcolumn_keys = sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys(%hit_column_counts);
-        @sorted_querycolumn_keys = sort { $query_column_counts{$b} <=> $query_column_counts{$a} } keys(%query_column_counts);
-        @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys(%hit_match_len);
-        @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys(%query_match_len);
+    undef @good_aln;
+    undef @bad_aln;
+    undef @bad_remove;
+    undef %hit_column_counts;
+    undef %hit_match_len;
+    undef %query_column_counts;
+    undef %query_match_len;
+    undef @sorted_hitcolumn_keys;
+    undef @sorted_querycolumn_keys;
+    undef @sorted_hit_len_keys;
+    undef @sorted_query_len_keys;
+    undef @entry;
     
-        print "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast orted_hit_len_keys: $sorted_hit_len_keys[0]\n";
-        print $log_out "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+    #grab all sequences from trimmed alignment
+    foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
+    
+        #grab sequence name and shorten it for use in some output filenames
+        my $seq_name    = $seq_obj->id();
+        my @seqn_part   = split(":", $seq_name);
+        my $fname_start = $seqn_part[0];
+        print "Seq name = $seq_name\n";
+        print $log_out "Seq name = $seq_name\n";
         
-        if ($found == 0) {
-            print "The protein flag is set, and the two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
-            print $log_out "The protein flag is set, and the two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
-            my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-            error_out($abort_out_path, "$filename\tThe two ggsearch runs failed to find TIRs");
+        #grab sequence & strip hyphens
+        my $seq = $seq_obj->seq();
+        $seq =~ s/-//g;
+        my $strand;
+        my $seq_len = length($seq);
+        if ( $seq_name =~ m/hit[0-9]*_(.+)_([0-9]+)_([0-9]+)_(\w+)/ ) {
+            $strand = $4;
         }
+        
+        #initialize variables
+        my $sub_seq;
+        my $first;
+        my $last;
+        my $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
+        my $last_path  = File::Spec->catpath($volume, $out_path, "last_half.txt");
+        my $last_offset = (($seq_len-1) - $trim_right_pos_hash{$seq_name}) - 12;
+        
+        $first = substr($seq, $trim_left_pos_hash{$seq_name} - 10, 30);
+        $last = substr($seq, $trim_right_pos_hash{$seq_name} - 20, 30);
+        
+        #save the two ends as files to use as inputs for a ggsearch search
+        open(my $first_out, ">", $first_path) or die "Error creating $first_path. $!\n";
+        open(my $last_out, ">", $last_path) or die "Error creating $last_path. $!\n";
+        print $first_out ">first\n$first\n";
+        print $last_out ">last\n$last\n";
+        close($first_out);
+        close($last_out);
+          
+        #change directory for ggsearch, adjust input filepaths, create output filepath, call ggsearch, change dir back to ori
+        chdir $out_path;
+        $first_path = "first_half.txt";
+        $last_path = "last_half.txt";
+        my $out_opt = $fname_start . ".blast.out";
+        
+        system("blastn -task blastn -query $first_path -strand minus -subject $last_path -word_size 4 -gapopen 5 -outfmt 5 -gapextend 2 -penalty -3 -reward 2 -num_alignments 1000 -dust no -out $out_opt");
+        chdir $orig_cwd;
+        $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".blast.out");
+        
+        my @tir_match_result = match_tirs2($seq_obj, $out_opt, 3, $strand, $last_offset);
+        print "Dumping tir match result\n";
+        print Dumper(\@tir_match_result);
+        
+        if ($tir_match_result[0] == 1) {
+            print "Has result\n";
+            push @good_aln, $tir_match_result[1];
+            $found++;
+        }
+        else {
+            push @bad_aln,    $seq_name;
+            push @bad_remove, $seq_obj;
+        }    
     }
-    else {
+    foreach my $row_ref (@good_aln) {
+        my %matches = %{$row_ref};
+        print Dumper(\%matches);
+        print $log_out Dumper(\%matches);
+        my $seq_len = $matches{"query"}->[3];
+        my $seq_name = $matches{"query"}->[4];
+        my $left_index = $matches{"query"}->[0];
+        my $right_index = $matches{"hit"}->[0];
+        my $right_nt_pos = $seq_len - $right_index;
+        print "left index: $left_index  right index: $right_index\n";
+        
+        my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
+        my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
+        $query_column_counts{$right_pos}++;
+        $query_match_len{$matches{"hit"}->[2]}++;
+        $hit_column_counts{$left_pos}++;
+        $hit_match_len{$matches{"query"}->[2]}++;
+    }
+    #sort the hit and query column and match length hashes by largest count to smallest
+    @sorted_hitcolumn_keys = sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys(%hit_column_counts);
+    @sorted_querycolumn_keys = sort { $query_column_counts{$b} <=> $query_column_counts{$a} } keys(%query_column_counts);
+    @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys(%hit_match_len);
+    @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys(%query_match_len);
+
+    print "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast orted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+    print $log_out "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+    
+    if ($found == 0) {
+        print "The two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
+        print $log_out "The two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
         my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
         error_out($abort_out_path, "$filename\tThe two ggsearch runs failed to find TIRs");
     }
