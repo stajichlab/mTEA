@@ -75,10 +75,12 @@ sub help {
 
 usage:
 
-activeTE_msa.pl -a -f <int> <multiple alignment file>
+activeTE_msa.pl -a -f -p <int> <multiple alignment file>
 
 -a keep all intermediate files  DEFAULT = remove
 -f length of sequence flanks  DEFAULT = 100
+-p MSA is from protein search
+
 
 The test alignments all have f = 100.
 
@@ -4875,8 +4877,8 @@ sub match_tirs2 {
   my $strand     = shift;
   my $flank      = shift;
   
-  $self->throw("Need Bio::Seq argument")
-    unless ref $self && $self->isa('Bio::Seq');
+  $self->throw("Need Bio::LocatableSeq argument")
+    unless ref $self && $self->isa('Bio::LocatableSeq');
   if (!-f $input_path) {
     die "Supplied filepath is not valid";
   }
