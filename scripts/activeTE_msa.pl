@@ -717,6 +717,8 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".blast.out");
             
             my @tir_match_result = match_tirs2($seq_obj, $out_opt, 3, $strand, $last_offset);
+            print "Dumping tir match result\n";
+            print Dumper(\@tir_match_result);
             
             if ($tir_match_result[0] == 1) {
                 print "Has result\n";
