@@ -5124,7 +5124,7 @@ sub match_tirs2 {
                     "query" => [ $query_pos, $match_query, $match_query_len, $seq_len, $seq_name ]
                   );
                 ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
-                push @result, [1, \%match];
+                push @result, (1, \%match);
 
                 #print "Another Mismatch at $count. Match is long, pushing match info for output\n";
                 last;
@@ -5159,7 +5159,7 @@ sub match_tirs2 {
                     "query" => [ $query_pos, $match_query, $match_query_len, $seq_len, $seq_name ]
                   );
                 ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
-                push @result, [1, \%match];
+                push @result, (1, \%match);
 
                 #print "Another Mismatch at $count. Match is long, pushing match info for output\n";
                 last;
