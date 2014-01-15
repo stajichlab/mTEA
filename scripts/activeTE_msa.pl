@@ -169,7 +169,6 @@ my %tir_positions;
 #generate trimal alignment gap summary file, using sed to remove the header info
 open(my $trimal_run => "$trimal -in $infile -sgc | sed -n '4,\$p' |") || die "Cannot run trimal!";
 print "Running Trimal\n";
-warn "Running Trimal - warn version\n";
 print $log_out "Running Trimal\n";
 
 # parse the trimal output file with the gap %  of each position in the full alignment
@@ -183,14 +182,13 @@ while (my $line = <$trimal_run>) {
 close($trimal_run);
 warn "Trimal run finished\n";
 
-warn "Calling get_org_aln\n";
 my $full_aln_obj = get_org_aln($infile);
-warn "Original aln imported\n";
 my $full_aln_len = $full_aln_obj->length();
-warn "Before gap_col_matrix\n";
 my $gap_cols = $full_aln_obj->gap_col_matrix();
-warn "After gap_col_matrix\n";
 my $full_aln_num_seqs = $full_aln_obj->num_sequences;
+print "Full alignment has $full_aln_num_seqs sequences\n";
+print $log_out "Full alignment has $full_aln_num_seqs sequences\n";
+
 if ($full_aln_num_seqs <= 1 and !defined $protein){
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
   error_out($abort_out_path, "$filename\thas only $full_aln_num_seqs sequence(s)\n");
@@ -213,8 +211,12 @@ my ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2g
 my %gap_seq_remove     = %$ref2gsr;
 my @gap_seq_pos_remove = @$ref2gspr;
 my $remove_most = 1;
+my $current_num_seq = $tmp_aln_obj->num_sequences;
+print "Current number of sequences in temp_aln_obj = $current_num_seq.\n";
+print $log_out "Current number of sequences in temp_aln_obj = $current_num_seq.\n";
+
 ## if this removes too many, remove as few as possible
-if ($left_tir_start1 == 0 or $right_tir_start1 == 0 or $tmp_aln_obj->num_sequences <= 5) {
+if ($left_tir_start1 == 0 or $right_tir_start1 == 0 or $current_num_seq <= 5) {
   my $aln_obj = get_org_aln($infile);
   print "run less stringent intial filtering\n";
   warn "run less stringent intial filtering - warn\n";
@@ -261,15 +263,20 @@ my ($left_tir_start, $right_tir_start, $ref2array, $ref2hash);
 @gap_seq_pos_remove = @$ref2array;
 %tir_positions      = %$ref2hash;
 print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
-warn "new tir starts after consensus filter: $left_tir_start, $right_tir_start - warn\n";
-print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
 
-($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start, $right_tir_start);
-@gap_seq_pos_remove = @$ref2array;
+print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
+$current_num_seq = $tmp_aln_obj->num_sequences;
+
+if ($current_num_seq > 4) {
+    ($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start, $right_tir_start);
+    @gap_seq_pos_remove = @$ref2array;
+}
 $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps('-', 1);
-##Sofia added 06192013
+
 print "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
 print $log_out "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+
+
 ($left_tir_start1, $right_tir_start1) =  get_columns($trimmed_aln_obj, \%tir_positions, 1);
 
 my $test_len = $trimmed_aln_obj->length();
@@ -4222,7 +4229,7 @@ sub consensus_filter {
   ## skip seq removal if the number to remove is about the depth of the aln
   print "there are $aln_depth seqs in aln before cons_filter\n";
   print $log_out "there are $aln_depth seqs in aln before cons_filter\n";
-  print "and there will be  $aln_depth - $to_remove_count = ",
+  print "and there will be  $aln_depth - $to_remove_count = ", $aln_depth - $to_remove_count, " after filtering\n";
   print $log_out "and there will be  $aln_depth - $to_remove_count = ",
     $aln_depth - $to_remove_count, " after filtering\n";
   if ($aln_depth > ($to_remove_count + 5)) {
@@ -4237,8 +4244,7 @@ sub consensus_filter {
   }
   ##how close are the first round of TIR starts to the ends of the aln
   my $consensus_len = $right_tir_start - $left_tir_start + 1;
-  #print "consensus string (len=$consensus_len) is ",$consensus_len/$aln_len," of the len of the aln (len=$aln_len)\n";
-  #print $log_out "consensus string (len=$consensus_len) is ",$consensus_len/$aln_len," of the len of the aln (len=$aln_len)\n";
+  
   my $message = '';
   my $catch = 0;
   if ($consensus_len >= ($aln_len - 50)){ ## ($consensus_len > ($aln_len - ($flank*2) + 50))
