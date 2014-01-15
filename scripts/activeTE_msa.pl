@@ -743,10 +743,10 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             
             my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
             my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
-            $query_column_counts{$left_pos}++;
-            $query_match_len{$matches{"query"}->[2]}++;
-            $hit_column_counts{$right_pos}++;
-            $hit_match_len{$matches{"hit"}->[2]}++;
+            $query_column_counts{$right_pos}++;
+            $query_match_len{$matches{"hit"}->[2]}++;
+            $hit_column_counts{$left_pos}++;
+            $hit_match_len{$matches{"query"}->[2]}++;
         }
         #sort the hit and query column and match length hashes by largest count to smallest
         @sorted_hitcolumn_keys = sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys(%hit_column_counts);
