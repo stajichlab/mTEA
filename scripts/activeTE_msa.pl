@@ -732,6 +732,7 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             print Dumper(\%matches);
             print $log_out Dumper(\%matches);
             my $seq_len = $matches{"query"}->[3];
+            my $seq_name = $matches{"query"}->[4];
             my $left_index = $matches{"query"}->[0];
             my $right_index = $matches{"hit"}->[0];
             my $right_nt_pos = $seq_len - $right_index;
@@ -5116,8 +5117,8 @@ sub match_tirs2 {
 
                 #print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n\n";
                 #store sequence name and the hit and query info
-                my %match = ("hit"   => [ $hit_pos, $match_hit, $match_hit_len, $seq_len ],
-                    "query" => [ $query_pos, $match_query, $match_query_len, $seq_len ]
+                my %match = ("hit"   => [ $hit_pos, $match_hit, $match_hit_len, $seq_len, $seq_name ],
+                    "query" => [ $query_pos, $match_query, $match_query_len, $seq_len, $seq_name ]
                   );
                 ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
                 push @result, [1, \%match];
@@ -5151,8 +5152,8 @@ sub match_tirs2 {
 
                 #print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n\n";
                 #store sequence name and the hit and query info
-                my %match = ("hit"   => [ $hit_pos, $match_hit, $match_hit_len, $seq_len ],
-                    "query" => [ $query_pos, $match_query, $match_query_len, $seq_len ]
+                my %match = ("hit"   => [ $hit_pos, $match_hit, $match_hit_len, $seq_len, $seq_name ],
+                    "query" => [ $query_pos, $match_query, $match_query_len, $seq_len, $seq_name ]
                   );
                 ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
                 push @result, [1, \%match];
