@@ -721,7 +721,8 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
                 if ($entry[0] == 1) {
                     $found++;
                     my %matches = %{$entry[1]};
-                    #print Dumper(\%matches);
+                    print Dumper(\%matches);
+                    print $log_out Dumper(\%matches);
                     my $right_index = $matches{"query"}->[0];
                     my $left_index = $matches{"hit"}->[0];
                     my $right_nt_pos = $seq_len - $right_index;
