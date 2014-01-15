@@ -723,23 +723,24 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
                     my %matches = %{$entry[1]};
                     print Dumper(\%matches);
                     print $log_out Dumper(\%matches);
-                    my $right_index = $matches{"query"}->[0];
-                    my $left_index = $matches{"hit"}->[0];
+                    my $left_index = $matches{"query"}->[0];
+                    my $right_index = $matches{"hit"}->[0];
                     my $right_nt_pos = $seq_len - $right_index;
                     print "left index: $left_index  right index: $right_index\n";
                     
                     my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
                     my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
                     $query_column_counts{$left_pos}++;
-                    $query_match_len{$matches{"hit"}->[2]}++;
+                    $query_match_len{$matches{"query"}->[2]}++;
                     $hit_column_counts{$right_pos}++;
-                    $hit_match_len{$matches{"query"}->[2]}++;
+                    $hit_match_len{$matches{"hit"}->[2]}++;
                 }
                 else {
                     push @bad_aln,    $seq_name;
                     push @bad_remove, $seq_obj;
                 }    
             }
+        }
         #sort the hit and query column and match length hashes by largest count to smallest
         @sorted_hitcolumn_keys = sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys(%hit_column_counts);
         @sorted_querycolumn_keys = sort { $query_column_counts{$b} <=> $query_column_counts{$a} } keys(%query_column_counts);
@@ -748,8 +749,6 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
     
         print "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast orted_hit_len_keys: $sorted_hit_len_keys[0]\n";
         print $log_out "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
-            
-        }
         
         if ($found == 0) {
             print "The protein flag is set, and the two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
