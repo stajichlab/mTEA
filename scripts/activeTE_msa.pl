@@ -265,7 +265,7 @@ my ($left_tir_start, $right_tir_start, $ref2array, $ref2hash);
 print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
 
 print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
-$current_num_seq = $tmp_aln_obj->num_sequences;
+$current_num_seq = $trimmed_aln_obj->num_sequences;
 
 if ($current_num_seq > 4) {
     ($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start, $right_tir_start);
@@ -675,6 +675,8 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             my $seq_name    = $seq_obj->id();
             my @seqn_part   = split(":", $seq_name);
             my $fname_start = $seqn_part[0];
+            print "Seq name = $seq_name\n";
+            print $log_out "Seq name = $seq_name\n";
             
             #grab sequence & strip hyphens
             my $seq = $seq_obj->seq();
@@ -716,30 +718,30 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             
             my @tir_match_result = match_tirs2($seq_obj, $out_opt, 3, $strand, $last_offset);
             
-            LINE: foreach my $row_ref (@tir_match_result) {
-                my @entry = @{$row_ref};
-                if ($entry[0] == 1) {
-                    $found++;
-                    my %matches = %{$entry[1]};
-                    print Dumper(\%matches);
-                    print $log_out Dumper(\%matches);
-                    my $left_index = $matches{"query"}->[0];
-                    my $right_index = $matches{"hit"}->[0];
-                    my $right_nt_pos = $seq_len - $right_index;
-                    print "left index: $left_index  right index: $right_index\n";
-                    
-                    my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
-                    my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
-                    $query_column_counts{$left_pos}++;
-                    $query_match_len{$matches{"query"}->[2]}++;
-                    $hit_column_counts{$right_pos}++;
-                    $hit_match_len{$matches{"hit"}->[2]}++;
-                }
-                else {
-                    push @bad_aln,    $seq_name;
-                    push @bad_remove, $seq_obj;
-                }    
+            if ($tir_match_result[0] == 1) {
+                push @good_aln, $tir_match_result[1];
+                $found++;
             }
+            else {
+                push @bad_aln,    $seq_name;
+                push @bad_remove, $seq_obj;
+            }    
+        }
+        foreach my $row_ref (@good_aln) {
+            my %matches = %{$row_ref};
+            print Dumper(\%matches);
+            print $log_out Dumper(\%matches);
+            my $left_index = $matches{"query"}->[0];
+            my $right_index = $matches{"hit"}->[0];
+            my $right_nt_pos = $seq_len - $right_index;
+            print "left index: $left_index  right index: $right_index\n";
+            
+            my $left_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $left_index+1);
+            my $right_pos = $trimmed_aln_obj->column_from_residue_number($seq_name, $right_nt_pos);
+            $query_column_counts{$left_pos}++;
+            $query_match_len{$matches{"query"}->[2]}++;
+            $hit_column_counts{$right_pos}++;
+            $hit_match_len{$matches{"hit"}->[2]}++;
         }
         #sort the hit and query column and match length hashes by largest count to smallest
         @sorted_hitcolumn_keys = sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys(%hit_column_counts);
