@@ -719,6 +719,7 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             my @tir_match_result = match_tirs2($seq_obj, $out_opt, 3, $strand, $last_offset);
             
             if ($tir_match_result[0] == 1) {
+                print "Has result\n";
                 push @good_aln, $tir_match_result[1];
                 $found++;
             }
