@@ -271,9 +271,11 @@ print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\
 print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
 $current_num_seq = $trimmed_aln_obj->num_sequences;
 
-if ($current_num_seq > 6) {
+if ($current_num_seq > 9) {
     ($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start, $right_tir_start);
-    @gap_seq_pos_remove = @$ref2array;
+    if ($ref2array) {
+        @gap_seq_pos_remove = @$ref2array;
+    }
 }
 $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps('-', 1);
 
