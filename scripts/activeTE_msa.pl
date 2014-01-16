@@ -257,7 +257,7 @@ if (!defined $left_tir_start1 or !defined $right_tir_start1 or $left_tir_start1 
 }
 
 my ($org_right_tir_start1, $org_left_tir_start1) = ($right_tir_start1, $left_tir_start1);
-($right_tir_start1, $left_tir_start1) = adjust_tir_starts($trimmed_aln_obj, $right_tir_start1, $left_tir_start1);
+($left_tir_start1, $right_tir_start1) = adjust_tir_starts($trimmed_aln_obj, $left_tir_start1, $right_tir_start1);
 my $left_tir_adjusted = $org_left_tir_start1 - $left_tir_start1;
 my $right_tir_adjusted = $right_tir_start1 - $org_right_tir_start1;
 
@@ -899,7 +899,7 @@ print $log_out "after get_col: $left_tir_start, $right_tir_start,$left_tir_end, 
 
 
 #cleaning up aln using tir_starts found with get_columns and overwriting the tir_starts with the adj values
-($right_tir_start, $left_tir_start) = adjust_tir_starts($ori_aln_obj, $right_tir_start, $left_tir_start);
+($left_tir_start, $right_tir_start) = adjust_tir_starts($ori_aln_obj, $left_tir_start, $right_tir_start);
 print "rt:$right_tir_start , lt:$left_tir_start\n";
 print $log_out "rt:$right_tir_start , lt:$left_tir_start\n";
 
@@ -1291,8 +1291,8 @@ undef $ref2remove_these;
 
 $left_tir_start = $sorted_hitcolumn_keys[0];
 $left_tir_end = $sorted_hitcolumn_keys[0] + $sorted_hit_len_keys[0] - 1;
-$right_tir_end = $sorted_querycolumn_keys[0];
-$right_tir_start = $sorted_querycolumn_keys[0] + $sorted_hit_len_keys[0] - 1;
+$right_tir_end = $sorted_querycolumn_keys[0] - $sorted_hit_len_keys[0];
+$right_tir_start = $sorted_querycolumn_keys[0] + 1;
 
 
 if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end <= 0 or $right_tir_end == 0){
@@ -3381,6 +3381,7 @@ sub match_tirs {
   my $check_seq = $seq;
   $check_seq =~ tr/ATGCatgc/TACGtacg/;
   $check_seq = reverse($check_seq);
+  my $half_seq = substr($seq, 0, $seq_len/2);
   my $seq_name = $self->id();
   my $fa_aln_obj = Bio::SearchIO->new(-format => 'fasta', -file => $input_path);
   my @result;
@@ -3452,7 +3453,7 @@ sub match_tirs {
           #if ($round == 3 or $round == 1) {
           if ($round == 1) {
             #$count == 4 and $total_mis_aln >= 2
-            if ($count == 3 and $total_mis_aln >= 2) {
+            if ($count == 4 and $total_mis_aln >= 2) {
               $match_len   = 0;
               $start_pos   = '';
               $match_query = '';
@@ -3597,7 +3598,7 @@ sub match_tirs {
                     }
                 }
                 elsif ($match_len > 7) {
-                    if (($match_len - $match_mis_aln) > 0) {
+                    if (($match_len - $match_mis_aln) > 1) {
                         $last_good = $count;
                         $match_len++;
                         $match_query .= $query_char;
@@ -3656,7 +3657,7 @@ sub match_tirs {
                     my $match_hit_len   = length($match_hit);
                     
                     #find the position in the full sequence of the hit and query match sequences
-                    $hit_pos = index(uc($seq), uc($match_hit)) + 1;
+                    $hit_pos = index(uc($half_seq), uc($match_hit)) + 1;
                     #$hit_pos = index(uc($seq), uc($match_hit), 40) + 1;
                     my $initial_query_pos = index(uc($check_seq), uc($match_query)) + 1;
                     $query_pos = $seq_len - $initial_query_pos;
@@ -3666,8 +3667,8 @@ sub match_tirs {
                     $match_query =~ tr/ATGCatgc/TACGtacg/;
                     $match_query = reverse($match_query);
                     
-                    print "$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
-                    print $log_out "$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    print "1st catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    print $log_out "1st catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
                     #store sequence name and the hit and query info
                     my @match = (
                     $seq_name,
@@ -3709,7 +3710,7 @@ sub match_tirs {
                 my $match_hit_len   = length($match_hit);
                 
                 #find the position in the full sequence of the hit and query match sequences
-                $hit_pos = index(uc($seq), uc($match_hit)) + 1;
+                $hit_pos = index(uc($half_seq), uc($match_hit)) + 1;
                 #$hit_pos = index(uc($seq), uc($match_hit), 40) + 1;
                 my $initial_query_pos = index(uc($check_seq), uc($match_query)) + 1;
                 $query_pos = $seq_len - $initial_query_pos;
@@ -3719,8 +3720,8 @@ sub match_tirs {
                 $match_query =~ tr/ATGCatgc/TACGtacg/;
                 $match_query = reverse($match_query);
                 
-                print "$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
-                print $log_out "$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                print "2nd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                print $log_out "2nd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
                 #store sequence name and the hit and query info
                 my @match = (
                   $seq_name,
@@ -3763,7 +3764,7 @@ sub match_tirs {
                     my $match_hit_len   = length($match_hit);
                     
                     #find the position in the full sequence of the hit and query match sequences
-                    $hit_pos = index(uc($seq), uc($match_hit)) + 1;
+                    $hit_pos = index(uc($half_seq), uc($match_hit)) + 1;
                     #$hit_pos = index(uc($seq), uc($match_hit), 40) + 1;
                     my $initial_query_pos = index(uc($check_seq), uc($match_query)) + 1;
                     $query_pos = $seq_len - $initial_query_pos;
@@ -3773,8 +3774,8 @@ sub match_tirs {
                     $match_query =~ tr/ATGCatgc/TACGtacg/;
                     $match_query = reverse($match_query);
                     
-                    print "$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
-                    print $log_out "$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    print "3rd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    print $log_out "3rd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
                     #store sequence name and the hit and query info
                     my @match = (
                     $seq_name,
@@ -4000,8 +4001,10 @@ sub adjust_tir_starts {
   print "Attempting to adjust tir starts\n";
   print $log_out "Attempting to adjust tir starts\n";
   my $aln_obj         = shift;
-  my $right_tir_start = shift;
   my $left_tir_start  = shift;
+  my $right_tir_start = shift;
+  print "In adjust_tir left_tir_start = $left_tir_start  right_tir_start = $right_tir_start\n";
+  print $log_out "In adjust_tir left_tir_start = $left_tir_start  right_tir_start = $right_tir_start\n";
 
   my $num_seqs = $aln_obj->num_sequences;
   my %count;
@@ -4013,9 +4016,8 @@ sub adjust_tir_starts {
     my $seq_id = $seq_obj->id;
     my ($gaps_left, $gaps_right) = ('', '');
     ## for right TIR
-    my $nt_col_pos = $right_tir_start;
-    my $left2right = $seq_obj->subseq($left_tir_start, $nt_col_pos);
-    my $next2end   = $seq_obj->subseq($nt_col_pos + 1, length $seq);
+    my $left2right = $seq_obj->subseq($left_tir_start, $right_tir_start);
+    my $next2end   = $seq_obj->subseq($right_tir_start + 1, length $seq);
     if ($next2end =~ /^(-+)/) {
       $gaps_right = $1;
       $next2end =~ s/^(-+)//;
@@ -4027,8 +4029,7 @@ sub adjust_tir_starts {
     }
 
     ## for left_TIR
-    $nt_col_pos = $left_tir_start;
-    my $start2left = $seq_obj->subseq(1, $nt_col_pos - 1);
+    my $start2left = $seq_obj->subseq(1, $left_tir_start - 1);
 
     #print "$seq_id\n";
     #print $log_out "$seq_id\n";
@@ -4113,7 +4114,7 @@ sub adjust_tir_starts {
       }
     }
   }
-  return ($right_tir_start, $left_tir_start);
+  return ($left_tir_start, $right_tir_start);
 }
 
 sub consensus_filter {
