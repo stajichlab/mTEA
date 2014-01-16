@@ -4303,7 +4303,7 @@ sub gap_filter {
   my $left_tir_start     = shift;
   my $right_tir_start    = shift;
   my $aln_len            = $aln_obj->length;
-  my $num_seq = $aln_obj->num_sequences;
+  my $num_seqs = $aln_obj->num_sequences;
 
   my %trim_gap_seq_remove;
   for (my $i = 0 ; $i < $aln_len ; $i++) {
