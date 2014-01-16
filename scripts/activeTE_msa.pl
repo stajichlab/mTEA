@@ -4017,7 +4017,7 @@ sub adjust_tir_starts {
     ## for right TIR
     my $left2right = $seq_obj->subseq($left_tir_start, $right_tir_start);
     my $next2end;
-    if ($next2end < length $seq) {
+    if ($right_tir_start < length $seq) {
         $next2end = $seq_obj->subseq($right_tir_start + 1, length $seq);
     }
     if ($next2end =~ /^(-+)/) {
@@ -4032,7 +4032,7 @@ sub adjust_tir_starts {
 
     ## for left_TIR
     my $start2left;
-    if ($start2left > 1) {
+    if ($left_tir_start > 1) {
         $start2left = $seq_obj->subseq(1, $left_tir_start - 1);
     }
     
@@ -4052,10 +4052,6 @@ sub adjust_tir_starts {
     }
     my $new_seq = $gaps_left . $start2left . $left2right . $next2end . $gaps_right;
     $modified{$seq_id} = $new_seq;
-
-    #my $new_seq_p = "$gaps_left . $start2left . $left2right . $next2end . $gaps_right";
-    #print "new: $new_seq_p\n";
-    #print $log_out "new: $new_seq_p\n";
   }
 
   #warn Dumper \%count;
