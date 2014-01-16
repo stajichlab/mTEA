@@ -208,8 +208,10 @@ print $log_out "Starting Full ID calculation\n";
 ## remove as many seqs as possible for the cleanest aln
 my ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2gspr) = remove_most($full_aln_obj, \%tir_positions, \@full_id_array);
 %tir_positions = %$ref2tp;
-my %gap_seq_remove     = %$ref2gsr;
-my @gap_seq_pos_remove = @$ref2gspr;
+if ($ref2gspr and $ref2gsr) {
+    my %gap_seq_remove     = %$ref2gsr;
+    my @gap_seq_pos_remove = @$ref2gspr;
+}
 my $remove_most = 1;
 my $current_num_seq = $tmp_aln_obj->num_sequences;
 print "Current number of sequences in temp_aln_obj = $current_num_seq.\n";
