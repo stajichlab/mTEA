@@ -4016,7 +4016,10 @@ sub adjust_tir_starts {
     my ($gaps_left, $gaps_right) = ('', '');
     ## for right TIR
     my $left2right = $seq_obj->subseq($left_tir_start, $right_tir_start);
-    my $next2end   = $seq_obj->subseq($right_tir_start + 1, length $seq);
+    my $next2end;
+    if ($next2end < length $seq) {
+        $next2end = $seq_obj->subseq($right_tir_start + 1, length $seq);
+    }
     if ($next2end =~ /^(-+)/) {
       $gaps_right = $1;
       $next2end =~ s/^(-+)//;
@@ -4028,12 +4031,11 @@ sub adjust_tir_starts {
     }
 
     ## for left_TIR
-    my $start2left = $seq_obj->subseq(1, $left_tir_start - 1);
-
-    #print "$seq_id\n";
-    #print $log_out "$seq_id\n";
-    #print "before: $start2left\n";
-    #print $log_out "before: $start2left\n";
+    my $start2left;
+    if ($start2left > 1) {
+        $start2left = $seq_obj->subseq(1, $left_tir_start - 1);
+    }
+    
     if ($start2left =~ /(-+)$/) {
       $gaps_left = $1;
       $start2left =~ s/(-+)$//;
