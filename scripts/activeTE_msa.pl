@@ -735,6 +735,12 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
             push @bad_remove, $seq_obj;
         }    
     }
+    if ($found == 0) {
+        print "The two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
+        print $log_out "The two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
+        my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+        error_out($abort_out_path, "$filename\tThe two ggsearch runs failed to find TIRs");
+    }
     foreach my $row_ref (@good_aln) {
         my %matches = %{$row_ref};
         print Dumper(\%matches);
@@ -761,13 +767,6 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
 
     print "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast orted_hit_len_keys: $sorted_hit_len_keys[0]\n";
     print $log_out "blast sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\nblast sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  blast sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
-    
-    if ($found == 0) {
-        print "The two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
-        print $log_out "The two ggsearch and blastn runs failed to find TIRs. Aborting run.\n";
-        my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-        error_out($abort_out_path, "$filename\tThe two ggsearch runs failed to find TIRs");
-    }
 }
 elsif ($good_aln_len2 == 0 and $good_aln_len != 0) {
   print "Alignment set 1 better\n\n";
