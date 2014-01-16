@@ -271,7 +271,7 @@ print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\
 print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
 $current_num_seq = $trimmed_aln_obj->num_sequences;
 
-if ($current_num_seq > 4) {
+if ($current_num_seq > 6) {
     ($ref2array, $trimmed_aln_obj) = gap_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start, $right_tir_start);
     @gap_seq_pos_remove = @$ref2array;
 }
@@ -392,7 +392,7 @@ if ($left_flank_catch != 0) {
   if ($right_flank_catch != 0) {
     #open a file to store info on why analysis of an element was aborted
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_flanks");
-    error_out($abort_out_path, "$filename\tBoth flanks similar");
+    error_out($abort_out_path, "$filename\tBoth flanks similar", 1);
   }
   else {
     #open a file to store info on why analysis of an element was aborted
@@ -4303,6 +4303,7 @@ sub gap_filter {
   my $left_tir_start     = shift;
   my $right_tir_start    = shift;
   my $aln_len            = $aln_obj->length;
+  my $num_seq = $aln_obj->num_sequences;
 
   my %trim_gap_seq_remove;
   for (my $i = 0 ; $i < $aln_len ; $i++) {
@@ -4349,12 +4350,22 @@ sub gap_filter {
       }
     }
   }
-
+  
+  my $remove_count;
   foreach my $key (keys %trim_gap_seq_remove) {
-    my $seq_obj = $trim_gap_seq_remove{$key};
-    if (defined $seq_obj) {
-        $aln_obj->remove_seq($seq_obj);
-    }
+      $remove_count++;
+  }
+  
+  if (($num_seqs - $remove_count) > 5) {
+      foreach my $key (keys %trim_gap_seq_remove) {
+        my $seq_obj = $trim_gap_seq_remove{$key};
+        if (defined $seq_obj) {
+            $aln_obj->remove_seq($seq_obj);
+        }
+      }
+  }
+  else {
+      undef $gap_seq_pos_remove;
   }
   return ($gap_seq_pos_remove, $aln_obj);
 }
@@ -4483,7 +4494,7 @@ sub error_out {
     print $log_out "Cleaning up files\n";
     clean_files($out_path);
   }
-  if (!$exit) {
+  if (!$exit or $exit == 0) {
     exit 0;
   }
 }
