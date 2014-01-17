@@ -699,6 +699,7 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
         my $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
         my $last_path  = File::Spec->catpath($volume, $out_path, "last_half.txt");
         my $last_offset = (($seq_len-1) - $trim_right_pos_hash{$seq_name}) - 12;
+        print "In blast search loop, left pos: $trim_left_pos_hash{$seq_name} right pos: $trim_right_pos_hash{$seq_name}\n";
         
         $first = substr($seq, $trim_left_pos_hash{$seq_name} - 10, 30);
         $last = substr($seq, $trim_right_pos_hash{$seq_name} - 20, 30);
@@ -3052,6 +3053,15 @@ if ($TSD_array_length == 0) {
   error_out($bad_out_path, "$filename\tNo TSDs found for any copy", 1);
   my $gff_path = File::Spec->catpath($volume, $out_path, $filename . ".gff");
   generate_gff($final_aln_obj, $gff_path, "TSD", \%element_info);
+  my $element_consensus_out_path = File::Spec->catpath($volume, $out_path, $filename . ".consensus");
+  open(my $element_consensus_out, ">", $element_consensus_out_path) or die "Error creating $element_consensus_out_path. $!\n";
+  print $element_consensus_out join("\n", ">" . $fname_fin . "_consensus", $element_info{'element_consensus'}), "\n";
+  close($element_consensus_out);
+
+  print "Printing fasta\n";
+  print $log_out "Printing fasta\n";
+  my $element_fasta_out_path = File::Spec->catpath($volume, $out_path, $filename . ".fasta");
+  print_fasta($element_fasta_out_path, $element_aln_obj);
   exit 0;
 }
 
@@ -3944,7 +3954,7 @@ sub clean_files {
   opendir(my $in_DIR, $out_path) or die "Cannot open directory: $!";
   while (my $file = readdir($in_DIR)) {
     next if ($file =~ m/^\./);
-    if ($file =~ m/\.(final|info|log|fa|element_info|removed_sequences|fasta|no_tsd|abort|gff|tif|jpg|full_id|consensus)$/) {
+    if ($file =~ m/\.(final|info|log|fa|element_info|removed_sequences|fasta|no_tsd|abort|gff|tif|jpg|full_id|consensus|conserved_left_flank|conserved_right_flank|conserved_flanks)$/) {
       next;
     }
     else {
