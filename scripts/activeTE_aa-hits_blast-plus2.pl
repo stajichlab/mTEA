@@ -72,9 +72,8 @@ if (!-d $out_path) {
 }
 my $tir_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_tirs.fa");
 open(my $tir_out, ">", $tir_path);
-
-my $name_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_ori-name_to_short-name.tab");
-open(my $name_out, ">", $name_path);
+my $no_tir_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_no-TIRs.txt");
+open(my $no_tir_out, ">", $no_tir_path);
 
 print "opening file\n";
 my $in = Bio::SeqIO->new(-file => $infile, -format => 'Fasta');
@@ -85,7 +84,15 @@ while ( my $seq_obj = $in->next_seq() ) {
     my $end; 
     my $contig;
     my $strand;
-    if ( $seq_id =~ m/Sbjct:(.+)[_|\s]Length:.+Location:\(([0-9]*)[_|\s]*-[_|\s]*([0-9]*)\)[_|\s]Direction:(\w+)/ ) {
+    my $seq_id_ori = $seq_id;
+    if ($seq_id =~ m/Chr_/) {
+        $seq_id =~ s/Chr_/Chr/;
+    }
+    elsif ($seq_id =~ m/chr_/) {
+        $seq_id =~ s/chr_/chr/;
+    }
+    print "Seq id ori: $seq_id_ori\nSeq id: $seq_id\n";
+    if ( $seq_id =~ m/hit[0-9]*[_| ](.+)[_| ]([0-9]+)[_| ]([0-9]+)[_| ](\w+)/ ) {
         $contig = $1;
         $start = $2;
         $end = $3;
@@ -95,21 +102,6 @@ while ( my $seq_obj = $in->next_seq() ) {
        die "Could not find genomic locus positions in sequence header: $seq_id\n"; 
     }
     
-    my $short_seq_id = (split /[_|\s]Length/, $seq_id)[0];
-    $short_seq_id =~ s/Sbjct[-|:]//i;
-    $short_seq_id =~ s/Query[-|:]//i;
-    $short_seq_id =~ s/.fa|.fasta//i;
-    $short_seq_id =~ s/_L1_clean//gi;
-    $short_seq_id =~ s/[0-9]-//gi;
-    $short_seq_id =~ s/-ClassII-TIR-/_/i;
-    $short_seq_id =~ s/-/_/g;
-    
-    if (length($short_seq_id) > 30) {
-        $short_seq_id = substr($short_seq_id, 0, 30);
-    }
-    
-    print "\nlong: $seq_id\nshort: $short_seq_id\n\n";
-    print $name_out "$short_seq_id\t$seq_id\n";
     
     my $seq = $seq_obj->seq();
     if ($strand eq 'minus') {
@@ -122,8 +114,8 @@ while ( my $seq_obj = $in->next_seq() ) {
     my $last_path;
     
     if (defined $all) {
-        $first_path = File::Spec->catpath($volume, $out_path, $short_seq_id . "first_half.txt");
-        $last_path  = File::Spec->catpath($volume, $out_path, $short_seq_id . "last_half.txt");
+        $first_path = File::Spec->catpath($volume, $out_path, $seq_id_ori . "first_half.txt");
+        $last_path  = File::Spec->catpath($volume, $out_path, $seq_id_ori . "last_half.txt");
     }
     else {
         $first_path = File::Spec->catpath($volume, $out_path, "first_half.txt");
@@ -149,7 +141,7 @@ while ( my $seq_obj = $in->next_seq() ) {
     #create fasta output filename then call fasta search program
     my $out_opt;
     if (defined $all) {
-        $out_opt = File::Spec->catpath($volume, $out_path, $short_seq_id . ".bl2seq.out");
+        $out_opt = File::Spec->catpath($volume, $out_path, $seq_id_ori . ".bl2seq.out");
     }
     else {
         $out_opt = File::Spec->catpath($volume, $out_path, $fname_fin . ".bl2seq.out");
@@ -162,10 +154,10 @@ while ( my $seq_obj = $in->next_seq() ) {
     #print Dumper(\@tir_match_results);
     #print "\n\n";
     my $c = 1;
-    my $element_path = File::Spec->catpath($volume, $out_path, $short_seq_id . "_elements.fa");
+    my $element_path = File::Spec->catpath($volume, $out_path, $seq_id_ori . "_elements.fa");
     $element_path =~ s/:/_/g;
     open(my $element_out, ">", $element_path ) or die "Error creating $element_path. $!\n";
-    
+        
     LINE: foreach my $row_ref (@tir_match_results) {
         #print "\n\n";
         #print Dumper($row_ref);
@@ -184,10 +176,12 @@ while ( my $seq_obj = $in->next_seq() ) {
             $right_tir =~ tr/ATGCatgc/TACGtacg/;
             $right_tir = reverse($right_tir);
             my $element = substr($seq, $left_index, -($right_index));
+            my $half = $seq_len/2.0;
+            my $diff = ($half - $left_index) + (($seq_len - $right_index) - $half);
             
-            my $title = $short_seq_id . "_tir" . $c;
-            my $ltitle = $short_seq_id . "_ltir" . $c;
-            my $rtitle = $short_seq_id . "_rtir" . $c;
+            my $title = $seq_id_ori . "_tir" . $c . "_" . $diff;
+            my $ltitle = $seq_id_ori . "_ltir" . $c . "_" . $diff;
+            my $rtitle = $seq_id_ori . "_rtir" . $c . "_" . $diff;
             if ($strand eq 'minus') {
                 $element =~ tr/ATGCatgc/TACGtacg/;
                 $element = reverse($element);
@@ -209,12 +203,12 @@ while ( my $seq_obj = $in->next_seq() ) {
             $c++;
         }
         else {
-            
+            print $no_tir_out "$seq_id_ori\n";
         }    
     }
 }
 close($tir_out);
-close($name_out);
+close($no_tir_out);
 print "Finished searches!\n";
 
 
