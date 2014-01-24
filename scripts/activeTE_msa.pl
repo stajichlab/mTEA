@@ -315,6 +315,9 @@ foreach my $seq_name (@consensus_remove) {
 }
 $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps('-', 1);
 ($left_tir_start1, $right_tir_start1) =  get_columns($trimmed_aln_obj, \%tir_positions, 1);
+print "Last TIRs before .trim3: Left tir start1: $left_tir_start1  Right tir start1: $right_tir_start1\n";
+
+print $log_out "Last TIRs before .trim3: Left tir start1: $left_tir_start1  Right tir start1: $right_tir_start1\n";
 
 $test_len = $trimmed_aln_obj->length();
 if ($test_len == 0) {
@@ -361,22 +364,27 @@ my @sorted_right_tir_start_keys = sort {$right_tir_start_check_counts{$b} <=> $r
 my $left_flank_catch  = 0;
 my $right_flank_catch = 0;
 
+print "sorted_left_tir_start_keys[0] = $sorted_left_tir_start_keys[0] ...\nsorted_right_tir_start_keys[0] = $sorted_right_tir_start_keys[0] ...\n";
+
+print $log_out "sorted_left_tir_start_keys[0] = $sorted_left_tir_start_keys[0] ...\nsorted_right_tir_start_keys[0] = $sorted_right_tir_start_keys[0] ...\n";
+
+
 if (!defined $sorted_left_tir_start_keys[0]) {
   if (!defined $sorted_right_tir_start_keys[0]) {
     #open a file to store info on why analysis of an element was aborted
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-    error_out($abort_out_path, "$filename\tTIRs not found for both flanks.", 1);
+    error_out($abort_out_path, "$filename\tTIRs not found for both flanks.", 0);
   }
   $left_flank_catch++;
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tLeft flank TIR not found.", 1);
+  error_out($abort_out_path, "$filename\tLeft flank TIR not found.", 0);
 }
 elsif (!defined $sorted_right_tir_start_keys[0]) {
 
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tRight flank TIR not found.", 1);
+  error_out($abort_out_path, "$filename\tRight flank TIR not found.", 0);
 }
   print "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
   print $log_out "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
@@ -394,18 +402,18 @@ if ($left_flank_catch != 0) {
   if ($right_flank_catch != 0) {
     #open a file to store info on why analysis of an element was aborted
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_flanks");
-    error_out($abort_out_path, "$filename\tBoth flanks similar", 1);
+    error_out($abort_out_path, "$filename\tBoth flanks similar", 0);
   }
   else {
     #open a file to store info on why analysis of an element was aborted
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_left_flank");
-    error_out($abort_out_path, "$filename\tLeft flank similar");
+    error_out($abort_out_path, "$filename\tLeft flank similar", 0);
   }
 }
 elsif ($right_flank_catch != 0) {
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_right_flank");
-  error_out($abort_out_path, "$filename\tRight flank similar");
+  error_out($abort_out_path, "$filename\tRight flank similar", 0);
 }
 
 
