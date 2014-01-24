@@ -701,8 +701,8 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
         my $last_offset = (($seq_len-1) - $trim_right_pos_hash{$seq_name}) - 12;
         print "In blast search loop, left pos: $trim_left_pos_hash{$seq_name} right pos: $trim_right_pos_hash{$seq_name}\n";
         
-        $first = substr($seq, $trim_left_pos_hash{$seq_name} - 10, 30);
-        $last = substr($seq, $trim_right_pos_hash{$seq_name} - 20, 30);
+        $first = substr($seq, $trim_left_pos_hash{$seq_name} - 10, 50);
+        $last = substr($seq, $trim_right_pos_hash{$seq_name} - 40, 50);
         
         #save the two ends as files to use as inputs for a ggsearch search
         open(my $first_out, ">", $first_path) or die "Error creating $first_path. $!\n";
@@ -1414,8 +1414,8 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
 
   my $right_tsd_loc_obj   = $seq_obj->location_from_column($right_tir_start);
   my $right_tsd_start_pos = $right_tsd_loc_obj->start();
-  $starting_right_flank = substr($seq,       $right_tsd_start_pos - 4);
-  $right_tsd            = substr($seq,       $right_tsd_start_pos - 4, 34);
+  $starting_right_flank = substr($seq, $right_tsd_start_pos - 4);
+  $right_tsd            = substr($seq, $right_tsd_start_pos - 4, 34);
   if (length $right_tsd < 34) {
     my $message = "Right flank too short to look at TSDs.";
     print $no_TSD_found_out $message;
@@ -3463,7 +3463,7 @@ sub match_tirs {
           #if ($round == 3 or $round == 1) {
           if ($round == 1) {
             #$count == 4 and $total_mis_aln >= 2
-            if ($count == 4 and $total_mis_aln >= 2) {
+            if (($count == 2 and $total_mis_aln >= 1) or ($count == 4 and $total_mis_aln >= 2)) {
               $match_len   = 0;
               $start_pos   = '';
               $match_query = '';
@@ -4154,7 +4154,7 @@ sub consensus_filter {
   
   my $limit;
   if (defined $protein or $num_seqs <= 8) {
-      $limit = 8;
+      $limit = 7;
   }
   else {
       $limit = 5;
