@@ -12,8 +12,9 @@ activeTE_msa family.aln
 
 =head1 Command line arguments
 
- -flank   [integer] Length of flanking sequence (default 100)
- -all     Process all
+ -flank     [integer] Length of flanking sequence (default 100)
+ -all       Process all
+ -protein   input MSA is from protein searches
 
 =head1 AUTHORS - Brad Cavinder
 
@@ -55,16 +56,24 @@ GetOptions(
 );
 
 # make sure only one valid input file is specified
-if (@ARGV != 1) {
-  print "Please specify only one input file\n";
+if (@ARGV != 1 and @ARGV != 2) {
+  print "Please specify one input file and, optionally, one protein match file\n";
   help();
 }
+
 my $infile = shift @ARGV;
+my $protein_match = shift @ARGV;
 
 if (!-f $infile) {
-  print "Supplied filepath is not valid: $!\n";
+  print "Supplied MSA filepath is not valid: $!\n";
   help();
 }
+
+if ($protein_match and !-f $protein_match) {
+  print "Supplied protein match filepath is not valid: $!\n";
+  help();
+}
+
 if ($flank <= 25) {
   print "Please use alignments with flanks >25 nucleotides long\n";
   help();
@@ -131,6 +140,7 @@ pop @fname_fin;
 my $fname_fin    = join('.', @fname_fin);
 my $out_dir_name = "aTE_" . $fname_fin;
 my $out_path     = File::Spec->catdir($in_dir, $out_dir_name);
+my $p_type;
 
 if (!-d $out_path) {
   mkdir($out_path) or die "Can't create dir:$out_path $!\n";
@@ -158,6 +168,8 @@ else {
 if (defined $protein) {
     print "Protein tirs flagged\n";
     print $log_out "Protein tirs flagged\n";
+    my @fname_type =  split('_', $fname_fin);
+    $p_type = pop @fname_type;
 }
 else {
     print "Protein tirs not flagged\n";
@@ -192,7 +204,7 @@ print $log_out "Full alignment has $full_aln_num_seqs sequences\n";
 
 if ($full_aln_num_seqs <= 1 and !defined $protein){
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\thas only $full_aln_num_seqs sequence(s)\n");
+  error_out($abort_out_path, "$filename\thas only $full_aln_num_seqs sequence(s)\n", 0);
 }
 
 #calculate the % nucleotide identity and the fraction of copies with sequence at each position the full alignment and print to file
@@ -206,6 +218,7 @@ warn "Starting Full ID calculation - warn\n";
 print $log_out "Starting Full ID calculation\n";
 @full_id_array = get_percentID_perCol($infile, $full_id_out_path);
 
+Cleaning_MSA:
 ## remove as many seqs as possible for the cleanest aln
 my ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2gspr) = remove_most($full_aln_obj, \%tir_positions, \@full_id_array);
 %tir_positions = %$ref2tp;
@@ -254,7 +267,7 @@ my $trimmed_aln_obj = $full_aln_obj;
 if (!defined $left_tir_start1 or !defined $right_tir_start1 or $left_tir_start1 == 0 or $right_tir_start1 == 0) {
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tTIRs not found in MSA by initial search", 1);
+  error_out($abort_out_path, "$filename\tTIRs not found in MSA by initial search", 0);
 }
 
 my ($org_right_tir_start1, $org_left_tir_start1) = ($right_tir_start1, $left_tir_start1);
@@ -290,7 +303,7 @@ my $test_len = $trimmed_aln_obj->length();
 if ($test_len == 0) {
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tTIRs not found in MSA. All sequences filtered out.");
+  error_out($abort_out_path, "$filename\tTIRs not found in MSA. All sequences filtered out.", 0);
 }
 
 my $trim_aln_out2 = File::Spec->catpath($volume, $out_path, $filename . ".trim2");
@@ -324,7 +337,7 @@ $test_len = $trimmed_aln_obj->length();
 if ($test_len == 0) {
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tTIRs not found in MSA. All sequences filtered out.");
+  error_out($abort_out_path, "$filename\tTIRs not found in MSA. All sequences filtered out.", 0);
 }
 
 #write new alignment to file
@@ -417,6 +430,7 @@ elsif ($right_flank_catch != 0) {
   error_out($abort_out_path, "$filename\tRight flank similar", 0);
 }
 
+TIR_Finding:
 
 my @good_aln;
 my @bad_remove;
@@ -432,8 +446,14 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
 
   #grab sequence name and shorten it for use in some output filenames
   my $seq_name    = $seq_obj->id();
+  print "Seq name first tir search: $seq_name\n";
+  print $log_out "Seq name first tir search: $seq_name\n";
   my @seqn_part   = split(":", $seq_name);
   my $fname_start = $seqn_part[0];
+  if ($fname_start =~ m/\|/) {
+      my @seqn_part2   = split(/\|/, $fname_start);
+      $fname_start = $seqn_part2[0];
+  }
 
   #grab sequence & strip hyphens
   my $seq = $seq_obj->seq();
@@ -533,8 +553,8 @@ else {
   
 }
 
-#repeat above but shifted out 12bp on each end to catch cases where found TIR is slightly off
-my $adjustment = 12;
+#repeat above but shifted out 15bp on each end to catch cases where found TIR is slightly off
+my $adjustment = 15;
 my %trim_left_pos_hash2;
 my %trim_right_pos_hash2;
 my @good_aln2;
@@ -566,6 +586,10 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
   my $seq_name    = $seq_obj->id();
   my @seqn_part   = split(":", $seq_name);
   my $fname_start = $seqn_part[0];
+  if ($fname_start =~ m/\|/) {
+      my @seqn_part2   = split("|", $fname_start);
+      $fname_start = $seqn_part2[0];
+  }
 
   #grab sequence, make a copy, strip leading and trailing hyphens
   my $seq = $seq_obj->seq();
@@ -669,10 +693,85 @@ print $log_out "Bad aln len:  $bad_aln_len  Bad aln len2: $bad_aln_len2\n";
 my $protein_catch = 0;
 my $found = 0;
 if ($good_aln_len2 == 0 and $good_aln_len == 0) {
-    print "No TIRs found by two ggsearches, aborting run\n\n";
-    print $log_out "No TIRs found by two ggsearches, aborting run\n\n";
-    my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-    error_out($abort_out_path, "$filename\tTIRs not found by two ggsearches", 0);
+    undef @good_aln;
+    #grab all sequences from trimmed alignment
+    foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
+    
+      #grab sequence name and shorten it for use in some output filenames
+      my $seq_name    = $seq_obj->id();
+      my @seqn_part   = split(":", $seq_name);
+      my $fname_start = $seqn_part[0];
+      if ($fname_start =~ m/\|/) {
+          my @seqn_part2   = split("|", $fname_start);
+          $fname_start = $seqn_part2[0];
+      }
+      
+      my $out_opt = File::Spec->catpath($volume, $out_path, $fname_start . ".ggsearch.out");
+    
+      my @tir_match_result = match_tirs2($seq_obj, $out_opt);
+    
+      if ($tir_match_result[0] == 1) {
+        push @good_aln, $tir_match_result[1];
+      }
+      else {
+        push @bad_aln,    $seq_name;
+        push @bad_remove, $seq_obj;
+      }
+    }
+    $good_aln_len = @good_aln;
+    
+    #find the TIRs in the trimmed alignment using the index positions of each TIR stored above
+    #initialize variables
+    undef %hit_column_counts;
+    undef %hit_match_len;
+    undef %query_column_counts;
+    undef %query_match_len;
+    undef @sorted_hitcolumn_keys;
+    undef @sorted_querycolumn_keys;
+    undef @sorted_hit_len_keys;
+    undef @sorted_query_len_keys;
+    undef @entry;
+    
+    if ($good_aln_len == 0) {
+      print "No TIRs found from MSA: Third round\n";
+      print $log_out "No TIRs found from MSA: Third round\n";
+      my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
+        error_out($abort_out_path, "$filename\tTIRs not found by three TIR searches", 0);
+      
+    }
+    else {
+      print "Found TIRs in MSA: 3rd round\n";
+      print $log_out "Found TIRs in MSA: 3rd round\n";
+    
+      #go through each entry of @good_aln array
+      foreach my $row_ref (@good_aln) {
+        my $query_aln_pos;
+        my $hit_aln_pos;
+        @entry = @{$row_ref};
+    
+        #get column position in alignment of left (hit) TIR, using sequence name and index position of TIR in full sequence. Increment the count of that column position in %hit_column_counts. Also, increment the count of TIR length in %hit_match_len
+        $hit_aln_pos = $trimmed_aln_obj->column_from_residue_number($entry[0], ${ $entry[1]{"hit"} }[0]);
+        $hit_column_counts{$hit_aln_pos}++;
+        $hit_match_len{${ $entry[1]{"hit"}}[1]}++;
+    
+        #do the same for the query TIR
+        $query_aln_pos = $trimmed_aln_obj->column_from_residue_number($entry[0], ${ entry [1]{"query"} }[0]);
+        $query_column_counts{$query_aln_pos}++;
+        $query_match_len{ ${ $entry[1]{"query"} }[1] }++;
+    
+        #Storing column info for $entry[0] in first ggsearch round\nLeft TIR start: \${entry[1]{'hit'}}[0]\tRight TIR start: \${entry[1]{'query'}}[0]\n";
+      }
+    
+      #sort the hit and query column and match length hashes by largest count to smallest
+      @sorted_hitcolumn_keys = sort { $hit_column_counts{$b} <=> $hit_column_counts{$a} } keys(%hit_column_counts);
+      @sorted_querycolumn_keys = sort { $query_column_counts{$b} <=> $query_column_counts{$a} } keys(%query_column_counts);
+      @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys(%hit_match_len);
+      @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys(%query_match_len);
+    
+      print "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+      print $log_out "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+      
+    }
 }
 elsif ($good_aln_len2 == 0 and $good_aln_len != 0) {
   print "Alignment set 1 better\n\n";
@@ -802,173 +901,179 @@ my ($left_tir_end, $right_tir_end);
 print "after get_col: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
 print $log_out "after get_col: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
 
-
-#cleaning up aln using tir_starts found with get_columns and overwriting the tir_starts with the adj values
-($left_tir_start, $right_tir_start) = adjust_tir_starts($ori_aln_obj, $left_tir_start, $right_tir_start);
-print "rt:$right_tir_start , lt:$left_tir_start\n";
-print $log_out "rt:$right_tir_start , lt:$left_tir_start\n";
-
-#Clear and rebuild the TIR posistions hash off the new values
-undef %tir_positions;
-
-foreach my $seq_obj ($ori_aln_obj->each_seq()) {
-    my $seq_name = $seq_obj->id();
-    if (defined $seq_obj->location_from_column($left_tir_start)){
-        my $left_tir_start_obj = $seq_obj->location_from_column($left_tir_start);
-        my $left_tir_start_pos = $left_tir_start_obj->start();
-        $tir_positions{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
-        if (defined $seq_obj->location_from_column($left_tir_end)){
-            my $left_tir_end_obj = $seq_obj->location_from_column($left_tir_end);
-            my $left_tir_end_pos = $left_tir_end_obj->start();
-            $tir_positions{$seq_name}{'left_tir_end'}  = $left_tir_end_pos;
+my $reimpport_num_seqs = $ori_aln_obj->num_sequences;
+if ($reimpport_num_seqs > 4) {
+    #cleaning up aln using tir_starts found with get_columns and overwriting the tir_starts with the adj values
+    ($left_tir_start, $right_tir_start) = adjust_tir_starts($ori_aln_obj, $left_tir_start, $right_tir_start);
+    print "rt:$right_tir_start , lt:$left_tir_start\n";
+    print $log_out "rt:$right_tir_start , lt:$left_tir_start\n";
+    
+    #Clear and rebuild the TIR posistions hash off the new values
+    undef %tir_positions;
+    
+    foreach my $seq_obj ($ori_aln_obj->each_seq()) {
+        my $seq_name = $seq_obj->id();
+        if (defined $seq_obj->location_from_column($left_tir_start)){
+            my $left_tir_start_obj = $seq_obj->location_from_column($left_tir_start);
+            my $left_tir_start_pos = $left_tir_start_obj->start();
+            $tir_positions{$seq_name}{'left_tir_start'}  = $left_tir_start_pos;
+            if (defined $seq_obj->location_from_column($left_tir_end)){
+                my $left_tir_end_obj = $seq_obj->location_from_column($left_tir_end);
+                my $left_tir_end_pos = $left_tir_end_obj->start();
+                $tir_positions{$seq_name}{'left_tir_end'}  = $left_tir_end_pos;
+            }
+            else {
+                delete  $tir_positions{$seq_name};
+                next;
+            }
+        }
+        else{
+            next;
+        }
+        if (defined $seq_obj->location_from_column($right_tir_start)){
+            my $right_tir_start_obj = $seq_obj->location_from_column($right_tir_start);
+            my $right_tir_start_pos = $right_tir_start_obj->start();
+            $tir_positions{$seq_name}{'right_tir_start'}  = $right_tir_start_pos;
+            if (defined $seq_obj->location_from_column($right_tir_end)){
+                my $right_tir_end_obj = $seq_obj->location_from_column($right_tir_end);
+                my $right_tir_end_pos = $right_tir_end_obj->start();
+                $tir_positions{$seq_name}{'right_tir_end'}  = $right_tir_end_pos;
+            }
+            else {
+                delete  $tir_positions{$seq_name};
+                next;
+            }
         }
         else {
             delete  $tir_positions{$seq_name};
             next;
         }
     }
-    else{
-        next;
-    }
-    if (defined $seq_obj->location_from_column($right_tir_start)){
-        my $right_tir_start_obj = $seq_obj->location_from_column($right_tir_start);
-        my $right_tir_start_pos = $right_tir_start_obj->start();
-        $tir_positions{$seq_name}{'right_tir_start'}  = $right_tir_start_pos;
-        if (defined $seq_obj->location_from_column($right_tir_end)){
-            my $right_tir_end_obj = $seq_obj->location_from_column($right_tir_end);
-            my $right_tir_end_pos = $right_tir_end_obj->start();
-            $tir_positions{$seq_name}{'right_tir_end'}  = $right_tir_end_pos;
-        }
-        else {
-            delete  $tir_positions{$seq_name};
-            next;
-        }
-    }
-    else {
-        delete  $tir_positions{$seq_name};
-        next;
-    }
+    
+    ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($ori_aln_obj, \%tir_positions, 2);
+    
+    print "after tir_positions rebuild: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
+    print $log_out "after tir_positions rebuild: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
 }
-
-($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($ori_aln_obj, \%tir_positions, 2);
-
-print "after tir_positions rebuild: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
-print $log_out "after tir_positions rebuild: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
 
 my $tir_length = $left_tir_end - $left_tir_start;
 
-#go back through the full alignment and remove sequences that create gaps in the TIRs
-my %gap_seq_remove2;
-my %search_tirs;
-print "Num Seqs before first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
-print $log_out "Num Seqs before first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
-
-#print "remove_most is $remove_most\n";
-#print $log_out "remove_most is $remove_most\n";
-my $gap_cutoff = 50;
-my %recheck;
-
-for (my $i = 0 ; $i < $ori_aln_len ; $i++) {
-  my $id_row_ref      = $full_id_array[$i];
-  my @id_info         = @{$id_row_ref};
-  my @gap_col_array   = @{$gap_cols};
-  my $gap_col_hashref = $gap_col_array[$i];
-  my %gap_col_hash    = %{$gap_col_hashref};
-  my $base_count      = 0;
-  my $total_count     = 0;
-  if (($i >= $left_tir_start-1 and $i <= $left_tir_end-1) or ($i >= $right_tir_end-1 and $i <= $right_tir_start-1)) {
-    foreach my $key (keys %gap_col_hash) {
-      #print "gap col key: $key\n";
-      #print $log_out "gap col key: $key\n";
-      if ($gap_col_hash{$key} != 1) {
-        $base_count++;
+if ($reimpport_num_seqs > 4) {
+    #go back through the full alignment and remove sequences that create gaps in the TIRs
+    my %gap_seq_remove2;
+    my %search_tirs;
+    print "Num Seqs before first filtering after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
+    print $log_out "Num Seqs before first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
+    
+    #print "remove_most is $remove_most\n";
+    #print $log_out "remove_most is $remove_most\n";
+    my $gap_cutoff = 50;
+    my %recheck;
+    
+    for (my $i = 0 ; $i < $ori_aln_len ; $i++) {
+      my $id_row_ref      = $full_id_array[$i];
+      my @id_info         = @{$id_row_ref};
+      my @gap_col_array   = @{$gap_cols};
+      my $gap_col_hashref = $gap_col_array[$i];
+      my %gap_col_hash    = %{$gap_col_hashref};
+      my $base_count      = 0;
+      my $total_count     = 0;
+      if (($i >= $left_tir_start and $i <= $left_tir_end) or ($i >= $right_tir_end and $i <= $right_tir_start)) {
+        foreach my $key (keys %gap_col_hash) {
+          #print "gap col key: $key\n";
+          #print $log_out "gap col key: $key\n";
+          if ($gap_col_hash{$key} != 1) {
+            $base_count++;
+          }
+          $total_count++;
+        }
+        my $pos_present = $base_count / $total_count;
+        if ($gap_id_array[$i] >= $gap_cutoff and $id_info[1] <= $gap_cutoff or $pos_present < .5) {
+          foreach my $key (keys %gap_col_hash) {
+            if ($gap_col_hash{$key} != 1) {
+              $gap_seq_remove2{$key}++;
+            }
+          }
+        }
       }
-      $total_count++;
-    }
-    my $pos_present = $base_count / $total_count;
-    if ($gap_id_array[$i] >= $gap_cutoff and $id_info[1] <= $gap_cutoff or $pos_present < .5) {
-      foreach my $key (keys %gap_col_hash) {
-        if ($gap_col_hash{$key} != 1) {
-          $gap_seq_remove2{$key}++;
+      elsif (($i >= $left_tir_start-30 and $i < $left_tir_start) or ($i > $right_tir_start and $i <= $right_tir_start + 30)) {
+        foreach my $key (keys %gap_col_hash) {
+          #print "gap col key: $key\n";
+          #print $log_out "gap col key: $key\n";
+          if ($gap_col_hash{$key} != 1) {
+            $base_count++;
+          }
+          $total_count++;
+        }
+        my $pos_present = $base_count / $total_count;
+        if ($gap_id_array[$i] < $gap_cutoff) {
+          foreach my $key (keys %gap_col_hash) {
+            if ($gap_col_hash{$key} == 1) {
+                $recheck{$key}++;
+                $gap_seq_remove2{$key}++;
+            }
+          }
         }
       }
     }
-  }
-  elsif (($i >= $left_tir_start-31 and $i < $left_tir_start-1) or ($i > $right_tir_start-1 and $i <= ($right_tir_start-1) + 30)) {
-    foreach my $key (keys %gap_col_hash) {
-      #print "gap col key: $key\n";
-      #print $log_out "gap col key: $key\n";
-      if ($gap_col_hash{$key} != 1) {
-        $base_count++;
-      }
-      $total_count++;
-    }
-    my $pos_present = $base_count / $total_count;
-    if ($gap_id_array[$i] < $gap_cutoff) {
-      foreach my $key (keys %gap_col_hash) {
-        if ($gap_col_hash{$key} == 1) {
-            $recheck{$key}++;
-            $gap_seq_remove2{$key}++;
-        }
-      }
-    }
-  }
-}
-
-#keep track of removed sequences to print to file
-my %removed_seq_hash;
-foreach my $key (keys %gap_seq_remove2) {
-  #print "key = $key\n";
-  #print $log_out "key = $key\n";
-  #print "Not working?\n";
-  #print $log_out "Not working?\n";
-  my $remove = $ori_aln_obj->get_seq_by_id($key);
-  if (exists $recheck{$key}) {
-      #print "says key exists!\n";
-      #print $log_out "says key exists!\n";
-      $recheck{$key} = $remove;
-  }
-  my $seq_id = $remove->id();
-  print $removed_out "$seq_id\tStep2:Sequence caused or contained gaps in at least one of the TIRs\n";
-  $removed_seq_hash{$seq_id}++;
-  if (defined $remove) {
-    $ori_aln_obj->remove_seq($remove);
-  }
-  if (exists $recheck{$key}) {
+    
+    #keep track of removed sequences to print to file
+    my %removed_seq_hash;
+    foreach my $key (keys %gap_seq_remove2) {
       #print "key = $key\n";
       #print $log_out "key = $key\n";
-      if (exists $gap_seq_remove2{$key}) {
-          #print "Deleting from gap_seq_remove2\n";
-          #print $log_out "Deleting from gap_seq_remove2\n";
-        delete $gap_seq_remove2{$key};
+      #print "Not working?\n";
+      #print $log_out "Not working?\n";
+      my $remove = $ori_aln_obj->get_seq_by_id($key);
+      if (exists $recheck{$key}) {
+          #print "says key exists!\n";
+          #print $log_out "says key exists!\n";
+          $recheck{$key} = $remove;
       }
-  }
-}
-#remove tir mismatch and no tir copies already found in trimmed alignment from the reimported original
-foreach my $seq_name (@consensus_remove) {
-    my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
-    if (defined $remove) {
+      my $seq_id = $remove->id();
+      print $removed_out "$seq_id\tStep2:Sequence caused or contained gaps in at least one of the TIRs\n";
+      $removed_seq_hash{$seq_id}++;
+      if (defined $remove) {
         $ori_aln_obj->remove_seq($remove);
+      }
+      if (exists $recheck{$key}) {
+          #print "key = $key\n";
+          #print $log_out "key = $key\n";
+          if (exists $gap_seq_remove2{$key}) {
+              #print "Deleting from gap_seq_remove2\n";
+              #print $log_out "Deleting from gap_seq_remove2\n";
+            delete $gap_seq_remove2{$key};
+          }
+      }
     }
-}
-foreach my $seq_obj (@bad_remove) {
-    my $seq_name = $seq_obj->id();
-    my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
-    if (defined $remove) {
-        $ori_aln_obj->remove_seq($remove);
+    #remove tir mismatch and no tir copies already found in trimmed alignment from the reimported original
+    foreach my $seq_name (@consensus_remove) {
+        my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
+        if (defined $remove) {
+            $ori_aln_obj->remove_seq($remove);
+        }
     }
-}
-#add the TIR mismatch sequences removed from the trimmed alignment to gap_seq_remove2 hash so subsequent steps are performed only once
-foreach my $seq_name (@consensus_remove) {
-    $gap_seq_remove2{$seq_name}++;
-}
-
-my @consensus_remove2 = tir_mismatch_filter($ori_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 1, \%recheck);
-foreach my $seq_name (@consensus_remove2) {
-    my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
-    if (defined $remove) {
-        $ori_aln_obj->remove_seq($remove);
+    foreach my $seq_obj (@bad_remove) {
+        my $seq_name = $seq_obj->id();
+        my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
+        if (defined $remove) {
+            $ori_aln_obj->remove_seq($remove);
+        }
     }
+    #add the TIR mismatch sequences removed from the trimmed alignment to gap_seq_remove2 hash so subsequent steps are performed only once
+    foreach my $seq_name (@consensus_remove) {
+        $gap_seq_remove2{$seq_name}++;
+    }
+    
+    my @consensus_remove2 = tir_mismatch_filter($ori_aln_obj, $left_tir_start, $left_tir_end, $right_tir_start, $right_tir_end, 1, \%recheck);
+    foreach my $seq_name (@consensus_remove2) {
+        my $remove = $ori_aln_obj->get_seq_by_id($seq_name);
+        if (defined $remove) {
+            $ori_aln_obj->remove_seq($remove);
+        }
+    }
+    print "Num Seqs after first filtering after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
+    print $log_out "Num Seqs after first filtering after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
 }
 
 undef @sorted_hitcolumn_keys;
@@ -984,8 +1089,7 @@ undef @bad_aln;
 undef @bad_aln2;
 undef @good_aln;
 
-print "Num Seqs after first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
-print $log_out "Num Seqs after first filterin after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
+
 
 my $final_aln_obj = $ori_aln_obj->remove_gaps('-', 1);
 my $int_aln_out =
@@ -997,13 +1101,14 @@ $out = Bio::AlignIO->new(
 );
 $out->write_aln($final_aln_obj);
 my $final_len = $final_aln_obj->length();
+my $final_num_seqs = $final_aln_obj->num_sequences();
 print "MSA length is $final_len now\n";
 print $log_out "MSA length is $final_len now\n";
 
 if ($left_tir_start == 0 or $right_tir_start == 0){
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tTIRs not found in MSA after reimporting and first round filtering of original alignment");
+  error_out($abort_out_path, "$filename\tTIRs not found in MSA after reimporting and first round filtering of original alignment", 0);
 }
 
 #get the column positions of tirs in the intermediate alignment
@@ -1014,57 +1119,59 @@ print $log_out "2nd column grab after removing some TIR disrupting copies and re
 if ($left_tir_start == 0 or $right_tir_start == 0){
     #open a file to store info on why analysis of an element was aborted
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-    error_out($abort_out_path, "$filename\tTIRs not found in MSA after reimporting and second round filtering of original alignment");
+    error_out($abort_out_path, "$filename\tTIRs not found in MSA after reimporting and second round filtering of original alignment", 0);
 }
 
-my $new_gap_cols = $final_aln_obj->gap_col_matrix();
-my %new_gap_seq_remove;
-
-for (my $i = 0 ; $i < $final_len ; $i++) {
-  if (($i >= $left_tir_start - 1 and $i <= $left_tir_end - 1) or ($i >= $right_tir_end - 1 and $i <= $right_tir_start - 1)) {
-    my $trim_gap_col_hashref = $new_gap_cols->[$i];
-    my $base_count           = 0;
-    my $total_count          = 0;
-    foreach my $key (keys %{$trim_gap_col_hashref}) {
-      if ($trim_gap_col_hashref->{$key} != 1) {
-        $base_count++;
-      }
-      $total_count++;
-    }
-    my $pos_present = $base_count / $total_count;
-    if ($pos_present < 0.5) {
-      foreach my $key (keys %{$trim_gap_col_hashref}) {
-        if ($trim_gap_col_hashref->{$key} != 1) {
-          my $seq_obj = $final_aln_obj->get_seq_by_id($key);
-          $new_gap_seq_remove{$key} = $seq_obj;
+if ($final_num_seqs > 4) {
+    my $new_gap_cols = $final_aln_obj->gap_col_matrix();
+    my %new_gap_seq_remove;
+    
+    for (my $i = 0 ; $i < $final_len ; $i++) {
+      if (($i >= $left_tir_start  and $i <= $left_tir_end ) or ($i >= $right_tir_end and $i <= $right_tir_start)) {
+        my $trim_gap_col_hashref = $new_gap_cols->[$i];
+        my $base_count           = 0;
+        my $total_count          = 0;
+        foreach my $key (keys %{$trim_gap_col_hashref}) {
+          if ($trim_gap_col_hashref->{$key} != 1) {
+            $base_count++;
+          }
+          $total_count++;
+        }
+        my $pos_present = $base_count / $total_count;
+        if ($pos_present < 0.5) {
+          foreach my $key (keys %{$trim_gap_col_hashref}) {
+            if ($trim_gap_col_hashref->{$key} != 1) {
+              my $seq_obj = $final_aln_obj->get_seq_by_id($key);
+              $new_gap_seq_remove{$key} = $seq_obj;
+            }
+          }
+        }
+        else {
+          foreach my $key (keys %{$trim_gap_col_hashref}) {
+            if ($trim_gap_col_hashref->{$key} == 1) {
+              my $seq_obj = $final_aln_obj->get_seq_by_id($key);
+              $new_gap_seq_remove{$key} = $seq_obj;
+            }
+          }
         }
       }
     }
-    else {
-      foreach my $key (keys %{$trim_gap_col_hashref}) {
-        if ($trim_gap_col_hashref->{$key} == 1) {
-          my $seq_obj = $final_aln_obj->get_seq_by_id($key);
-          $new_gap_seq_remove{$key} = $seq_obj;
-        }
+    
+    #if ($ori_aln_obj->num_sequences() - (keys %new_gap_seq_remove) > 10){
+    foreach my $key (keys %new_gap_seq_remove) {
+      my $seq_obj = $new_gap_seq_remove{$key};
+      my $seq_id  = $seq_obj->id();
+      if (defined $seq_obj) {
+        print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
+        $final_aln_obj->remove_seq($seq_obj);
       }
     }
-  }
+    #}
+    $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
+    my $check_len = $final_aln_obj->length();
+    print "MSA length now: $check_len\n";
+    print $log_out "MSA length now: $check_len\n";
 }
-
-#if ($ori_aln_obj->num_sequences() - (keys %new_gap_seq_remove) > 10){
-foreach my $key (keys %new_gap_seq_remove) {
-  my $seq_obj = $new_gap_seq_remove{$key};
-  my $seq_id  = $seq_obj->id();
-  if (defined $seq_obj) {
-    print $removed_out "$seq_id\tSequence caused or contained gaps in at least one of the TIRs\n";
-    $final_aln_obj->remove_seq($seq_obj);
-  }
-}
-#}
-$final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
-my $check_len = $final_aln_obj->length();
-print "MSA length now: $check_len\n";
-print $log_out "MSA length now: $check_len\n";
 
 #get the column positions of tirs in the intermediate alignment
 ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end) = get_columns($final_aln_obj, \%tir_positions, 2);
@@ -1074,7 +1181,7 @@ print $log_out "3rd column grab after removing more copies with TIR isssues\nLef
 if ($left_tir_start == 0 or $right_tir_start == 0){
     #open a file to store info on why analysis of an element was aborted
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-    error_out($abort_out_path, "$filename\tTIRs not found in MSA after reimporting and third round filtering of original alignment");
+    error_out($abort_out_path, "$filename\tTIRs not found in MSA after reimporting and third round filtering of original alignment", 0);
 }
 
 my %to_remove_from_final;
@@ -1083,6 +1190,11 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   next if !defined $seq_obj;
   my @seqn_part   = split(":", $seq_name);
   my $fname_start = $seqn_part[0];
+  if ($fname_start =~ m/\|/) {
+      my @seqn_part2   = split("|", $fname_start);
+      $fname_start = $seqn_part2[0];
+  }
+  
   my $seq         = $seq_obj->seq();
   my $seq_len     = length($seq);
   print "Error $seq_name:seq_len is 0\n" if $seq_len == 0;
@@ -1191,19 +1303,22 @@ foreach my $row_ref (@good_aln) {
 print
 "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_query_len_keys: $sorted_query_len_keys[0]\n";
 
+print $log_out
+"\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_query_len_keys: $sorted_query_len_keys[0]\n";
+
 undef $ref2_tir_positions;
 undef $ref2remove_these;
 
 $left_tir_start = $sorted_hitcolumn_keys[0];
 $left_tir_end = $sorted_hitcolumn_keys[0] + $sorted_hit_len_keys[0] - 1;
-$right_tir_end = $sorted_querycolumn_keys[0] - $sorted_hit_len_keys[0];
-$right_tir_start = $sorted_querycolumn_keys[0] + 1;
+$right_tir_end = $sorted_querycolumn_keys[0] - $sorted_hit_len_keys[0] -1;
+$right_tir_start = $sorted_querycolumn_keys[0];
 
 
 if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end <= 0 or $right_tir_end == 0){
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tTIRs not found in Final MSA");
+  error_out($abort_out_path, "$filename\tTIRs not found in Final MSA", 0);
 }
 
 #check for too many mismatches in putative TIRSs against the consensus sequence
@@ -1232,7 +1347,7 @@ print $log_out "4th column grab after removing copies with mismatches in TIRs\nL
 if ($left_tir_start == 0 or $right_tir_start == 0 or $left_tir_end ==0 or $right_tir_end==0){
   #open a file to store info on why analysis of an element was aborted
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-  error_out($abort_out_path, "$filename\tTIRs not found after removing sequences with mismatches in TIRs");
+  error_out($abort_out_path, "$filename\tTIRs not found after removing sequences with mismatches in TIRs", 0);
 }
 
 TSD_Finding:
@@ -1369,8 +1484,8 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   }
 }
 
-if ($aln_count_check - $left_short_count < 2) {
-    if ($aln_count_check - $right_short_count < 2) {
+if ($aln_count_check - $left_short_count < 1) {
+    if ($aln_count_check - $right_short_count < 1) {
         my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_flanks");
         error_out($abort_out_path, "$filename\tBoth flanks similar, TIRs too close to ends for TSD finding.", 0);
     }
@@ -1379,7 +1494,7 @@ if ($aln_count_check - $left_short_count < 2) {
         error_out($abort_out_path, "$filename\tLeft flank similar, TIR start too close to end for TSD finding.", 0);
     }
 }
-elsif ($aln_count_check - $right_short_count < 2) {
+elsif ($aln_count_check - $right_short_count < 1) {
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_right_flank");
     error_out($abort_out_path, "$filename\tRight flank similar, TIR start too close to end for TSD finding.", 0);
 }
@@ -1507,6 +1622,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
 
   #Save found TSD to an array or report that a TSD wasn't found
   if ($tsd4 or $tsd5 or $tsd6) {
+        $tsd4_catch = 1;
         if ($tsd4) {
             if ($tsd5 and !$tsd6) {
                 if ((length($tsd4) >= length($tsd5) or $tsd4_count > $tsd5_count) and ($tsd5_count <= $tsd4_count or $tsd5_precount < $tsd4_precount)) {
@@ -1523,6 +1639,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd2;
                         undef $tsd3;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                     elsif (!$tsd1 and !$tsd2 and $tsd3) {
                         if ((length($tsd4) >= length($tsd3) or $tsd4_count > $tsd3_count) and ($tsd3_count <= $tsd4_count or $tsd3_precount < $tsd4_precount)) {
@@ -1538,6 +1655,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd3;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                         else {
                             my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
@@ -1551,6 +1669,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd4;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                     }
                     elsif (!$tsd1_count and !$tsd3_count and $tsd2) {
@@ -1567,6 +1686,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd3;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                         else {
                             my $insertion_site = substr($left_tsd, (-14)) . substr($right_tsd, 4, 10);
@@ -1580,6 +1700,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd4;
                             undef $tsd3;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                     }
                     elsif (!$tsd2 and !$tsd3 and $tsd1) {
@@ -1596,6 +1717,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd3;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                         else {
                             my $insertion_site = substr($left_tsd, -14, 12) . substr($right_tsd, 4, 10);
@@ -1609,6 +1731,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd3;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                     }
                 }
@@ -1737,6 +1860,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd1;
                         undef $tsd2;
                         undef $tsd3;
+                        undef $tsd5;
                         undef $tsd6;
                     }
                     elsif (!$tsd1 and !$tsd2 and $tsd3) {
@@ -1753,6 +1877,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd3;
                             undef $tsd6;
+                            undef $tsd5;
                         }
                         else {
                             my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
@@ -1764,7 +1889,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
-                            undef $tsd3;
+                            undef $tsd5;
                             undef $tsd4;
                             undef $tsd6;
                         }
@@ -1782,6 +1907,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd1;
                             undef $tsd2;
                             undef $tsd3;
+                            undef $tsd5;
                             undef $tsd6;
                         }
                         else {
@@ -1795,6 +1921,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd1;
                             undef $tsd4;
                             undef $tsd3;
+                            undef $tsd5;
                             undef $tsd6;
                         }
                     }
@@ -1811,6 +1938,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd1;
                             undef $tsd2;
                             undef $tsd3;
+                            undef $tsd5;
                             undef $tsd6;
                         }
                         else {
@@ -1824,6 +1952,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd4;
                             undef $tsd2;
                             undef $tsd3;
+                            undef $tsd5;
                             undef $tsd6;
                         }
                     }
@@ -1955,6 +2084,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             undef $tsd2;
                             undef $tsd3;
                             undef $tsd5;
+                            undef $tsd6;
                         }
                         elsif (!$tsd1 and !$tsd2 and $tsd3) {
                             if ((length($tsd4) >= length($tsd3) or $tsd4_count > $tsd3_count) and ($tsd3_count <= $tsd4_count or $tsd3_precount < $tsd4_precount)) {
@@ -1970,6 +2100,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 undef $tsd2;
                                 undef $tsd3;
                                 undef $tsd5;
+                                undef $tsd6;
                             }
                             else {
                                 my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
@@ -1983,6 +2114,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 undef $tsd2;
                                 undef $tsd4;
                                 undef $tsd5;
+                                undef $tsd6;
                             }
                         }
                         elsif (!$tsd1_count and !$tsd3_count and $tsd2) {
@@ -1999,6 +2131,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 undef $tsd2;
                                 undef $tsd3;
                                 undef $tsd5;
+                                undef $tsd6;
                             }
                             else {
                                 my $insertion_site = substr($left_tsd, (-14)) . substr($right_tsd, 4, 10);
@@ -2012,6 +2145,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 undef $tsd4;
                                 undef $tsd3;
                                 undef $tsd5;
+                                undef $tsd6;
                             }
                         }
                         elsif (!$tsd2 and !$tsd3 and $tsd1) {
@@ -2028,6 +2162,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 undef $tsd2;
                                 undef $tsd3;
                                 undef $tsd5;
+                                undef $tsd6;
                             }
                             else {
                                 my $insertion_site = substr($left_tsd, -14, 12) . substr($right_tsd, 4, 10);
@@ -2041,6 +2176,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 undef $tsd2;
                                 undef $tsd3;
                                 undef $tsd5;
+                                undef $tsd6;
                             }
                         }
                     }
@@ -2307,7 +2443,6 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
-                            undef $tsd3;
                             undef $tsd4;
                             undef $tsd6;
                             undef $tsd5;
@@ -2391,6 +2526,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     undef $tsd2;
                     undef $tsd3;
                     undef $tsd5;
+                    undef $tsd6;
                 }
                 elsif (!$tsd1 and !$tsd2 and $tsd3) {
                     if ((length($tsd4) >= length($tsd3) or $tsd4_count > $tsd3_count) and ($tsd3_count <= $tsd4_count or $tsd3_precount < $tsd4_precount)) {
@@ -2406,6 +2542,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd2;
                         undef $tsd3;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                     else {
                         my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
@@ -2419,6 +2556,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd2;
                         undef $tsd4;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                 }
                 elsif (!$tsd1_count and !$tsd3_count and $tsd2) {
@@ -2435,6 +2573,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd2;
                         undef $tsd3;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                     else {
                         my $insertion_site = substr($left_tsd, (-14)) . substr($right_tsd, 4, 10);
@@ -2448,6 +2587,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd4;
                         undef $tsd3;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                 }
                 elsif (!$tsd2 and !$tsd3 and $tsd1) {
@@ -2464,6 +2604,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd2;
                         undef $tsd3;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                     else {
                         my $insertion_site = substr($left_tsd, -14, 12) . substr($right_tsd, 4, 10);
@@ -2477,6 +2618,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd2;
                         undef $tsd3;
                         undef $tsd5;
+                        undef $tsd6;
                     }
                 }
             }
@@ -2509,6 +2651,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         $tsd4_catch = 1;
                         undef $tsd1;
                         undef $tsd2;
+                        undef $tsd3;
                         undef $tsd4;
                     }
                     else {
@@ -2521,7 +2664,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         $tsd3_count++;
                         undef $tsd1;
                         undef $tsd2;
-                        undef $tsd3;
+                        undef $tsd4;
                         undef $tsd5;
                     }
                 }
@@ -2538,6 +2681,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd1;
                         undef $tsd2;
                         undef $tsd3;
+                        undef $tsd4;
                     }
                     else {
                         my $insertion_site = substr($left_tsd, (-14)) . substr($right_tsd, 4, 10);
@@ -2550,6 +2694,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd1;
                         undef $tsd5;
                         undef $tsd3;
+                        undef $tsd4;
                     }
                 }
                 elsif (!$tsd2 and !$tsd3 and $tsd1) {
@@ -2578,6 +2723,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         undef $tsd5;
                         undef $tsd2;
                         undef $tsd3;
+                        undef $tsd4;
                     }
                 }
             }
@@ -2624,7 +2770,6 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
-                            undef $tsd3;
                             undef $tsd4;
                             undef $tsd6;
                             undef $tsd5;
@@ -2735,7 +2880,6 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
-                            undef $tsd3;
                             undef $tsd4;
                             undef $tsd6;
                             undef $tsd5;
@@ -2848,7 +2992,6 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     $tsd3_count++;
                     undef $tsd1;
                     undef $tsd2;
-                    undef $tsd3;
                     undef $tsd4;
                     undef $tsd6;
                     undef $tsd5;
@@ -3074,6 +3217,7 @@ if ($no_TSD_found_len >= 1) {
   }
 }
 
+TIR_Adjustment:
 #if necessary, change TIRS to remove the 2bp or 4bp TSD, or 1bp partial TSD, that are included in them
 #calculate the overall percent identity of each TIR
 if (($tsd4_count > $tsd1_count) and ($tsd4_count > $tsd2_count) and ($tsd4_count > $tsd3_count) and ($tsd4_count > $tsd5_count) and ($tsd4_count > $tsd6_count)) {
@@ -3332,17 +3476,25 @@ else {
   undef @TSD_info6;
   undef @put_TSD_names6;
 }
+
+Summation:
 my $left_tir_id   = $left_TIR_aln_obj->percentage_identity;
 my $right_tir_id  = $right_TIR_aln_obj->percentage_identity;
 my $element_id    = $element_aln_obj->percentage_identity;
-my $element_consensus = $element_aln_obj->consensus_string();
+
 my $element_aln_out = File::Spec->catpath($volume, $out_path, $filename . "_element-only-msa.fa");
 $out = Bio::AlignIO->new(-file => ">$element_aln_out", -format => 'fasta', -displayname_flat => 0);
 $out->write_aln($element_aln_obj);
+my $trimal_element_aln_out = File::Spec->catpath($volume, $out_path, $filename . "_element-only-msa_trimal.fa");
+system("$trimal -in $element_aln_out -out $trimal_element_aln_out -gt 0.5");
+my $in_obj = Bio::AlignIO->new(-file => $trimal_element_aln_out, -format => 'fasta' , -alphabet => 'dna');
+my $trimmed_element_aln_obj = $in_obj->next_aln();
+my $element_consensus = $trimmed_element_aln_obj->consensus_string();
 my $left_tir_seq  = $left_TIR_aln_obj->consensus_string();
 my $right_tir_seq = $right_TIR_aln_obj->consensus_string();
 
 my $left_tir_iupac = $left_TIR_aln_obj->consensus_iupac();
+$left_tir_iupac = uc($left_tir_iupac);
 my $left_tir_iupac_seq_obj = Bio::Seq->new(-seq => $left_tir_iupac, -alphabet => 'dna');
 my $left_tir_iupac_obj   = Bio::Tools::IUPAC->new(-seq => $left_tir_iupac_seq_obj);
 my $left_tir_iupac_regexp  = $left_tir_iupac_obj->regexp();
@@ -3352,6 +3504,7 @@ print $left_tir_regex_out "$fname_fin\t$left_tir_iupac_regexp\n";
 close($left_tir_regex_out);
 
 my $right_tir_iupac = $right_TIR_aln_obj->consensus_iupac();
+$right_tir_iupac = uc($right_tir_iupac);
 my $right_tir_iupac_seq_obj = Bio::Seq->new(-seq => $right_tir_iupac, -alphabet => 'dna');
 my $right_tir_iupac_obj   = Bio::Tools::IUPAC->new(-seq => $right_tir_iupac_seq_obj);
 my $right_tir_iupac_regexp  = $right_tir_iupac_obj->regexp();
@@ -3373,6 +3526,26 @@ $element_info{"left_tir_id"}   = $left_tir_id;
 $element_info{"right_tir_seq"} = $right_tir_seq;
 $element_info{"right_tir_id"}  = $right_tir_id;
 
+my $left_tir_out_path = File::Spec->catpath($volume, $out_path, $filename . ".left-tir.fa");
+my $right_tir_out_path = File::Spec->catpath($volume, $out_path, $filename . ".right-tir.fa");
+open(my $left_tir_out, ">", $left_tir_out_path) or die "Error creating $left_tir_out_path. $!\n";
+print $left_tir_out join("\n", ">" . $fname_fin . "_left_tir_consensus", $left_tir_seq), "\n";
+close($left_tir_out);
+
+open(my $right_tir_out, ">", $right_tir_out_path) or die "Error creating $right_tir_out_path. $!\n";
+print $right_tir_out join("\n", ">" . $fname_fin . "_right_tir_consensus", $right_tir_seq), "\n";
+close($right_tir_out);
+
+my $element_consensus_out_path = File::Spec->catpath($volume, $out_path, $filename . ".consensus");
+open(my $element_consensus_out, ">", $element_consensus_out_path) or die "Error creating $element_consensus_out_path. $!\n";
+print $element_consensus_out join("\n", ">" . $fname_fin . "_consensus", $element_info{'element_consensus'}), "\n";
+close($element_consensus_out);
+print "Printing fasta\n";
+print $log_out "Printing fasta\n";
+my $element_fasta_out_path = File::Spec->catpath($volume, $out_path, $filename . ".fasta");
+print_fasta($element_fasta_out_path, $element_aln_obj);
+
+
 #Determine the most common TSD by sequence first if possible or by length. If >80% of the TSDs are the same, then that sequence is stored as the TSD for output. Otherwise, look at the lengths of the TSDs and store if >80% of the TSDs have the same length.
 my %TSD_counts;
 my $TSD_array_length = @putative_TSD;
@@ -3382,16 +3555,7 @@ if ($TSD_array_length == 0) {
   my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".no_tsd");
   error_out($bad_out_path, "$filename\tNo TSDs found for any copy", 1);
   my $gff_path = File::Spec->catpath($volume, $out_path, $filename . ".gff");
-  generate_gff($final_aln_obj, $gff_path, "TSD", \%element_info);
-  my $element_consensus_out_path = File::Spec->catpath($volume, $out_path, $filename . ".consensus");
-  open(my $element_consensus_out, ">", $element_consensus_out_path) or die "Error creating $element_consensus_out_path. $!\n";
-  print $element_consensus_out join("\n", ">" . $fname_fin . "_consensus", $element_info{'element_consensus'}), "\n";
-  close($element_consensus_out);
-
-  print "Printing fasta\n";
-  print $log_out "Printing fasta\n";
-  my $element_fasta_out_path = File::Spec->catpath($volume, $out_path, $filename . ".fasta");
-  print_fasta($element_fasta_out_path, $element_aln_obj);
+  generate_gff($final_aln_obj, $gff_path, "TSD", \%element_info, $p_type);
   exit 0;
 }
 
@@ -3521,10 +3685,23 @@ foreach my $row (@good_TSD_length) {
         }
     }
 }
-my $left_tir_out_path = File::Spec->catpath($volume, $out_path, $filename . ".left-tir.fa");
-my $right_tir_out_path = File::Spec->catpath($volume, $out_path, $filename . ".right-tir.fa");
-print_fasta($left_tir_out_path, $left_TIR_aln_obj);
-print_fasta($right_tir_out_path, $right_TIR_aln_obj);
+
+Classification:
+
+#import list of transposase superfamilies found in genome MSA is from if specified
+my %known_tpase;
+if ($protein_match) {
+    open(my $known_in, "<", $protein_match) or die "Error reading $protein_match . $!";
+    while (my $line = <$known_in>) {
+        chomp $line;
+        my @split = split("\t", $line);
+        my $super_name = $split[0];
+        if ($super_name ne "retro" and $super_name ne "Unknown" and $super_name ne "unpredicted" and $super_name ne "Maverick" and $super_name ne "Helitron") {
+            $known_tpase{$super_name} = 1;
+        }
+    }
+}
+
 
 #import TE characteristics from table and generate regular expressions to classify element by TIR and TSD if possible
 print "\nProcessing TE charateristics table\n";
@@ -3607,26 +3784,28 @@ foreach my $tsd_info_ref (@final_tsd_info) {
     my %element_hits;
     my @tsd_info = @{$tsd_info_ref};
     foreach my $ele_name (keys %element_char_hash) {
-        if ($tsd_info[0] =~ m/$element_char_hash{$ele_name}{"tsd_length"}/) {
-            $element_hits{$ele_name}++;
-            if ( $element_char_hash{$ele_name}{"tsd_con"} ne '') {
-                if ($tsd_info[1] =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
-                    $element_hits{$ele_name}++;
+        if (exists $known_tpase{$ele_name}) {
+            if ($tsd_info[0] =~ m/$element_char_hash{$ele_name}{"tsd_length"}/) {
+                $element_hits{$ele_name}++;
+                if ( $element_char_hash{$ele_name}{"tsd_con"} ne '') {
+                    if ($tsd_info[1] =~ m/$element_char_hash{$ele_name}{"tsd_con"}/i) {
+                        $element_hits{$ele_name}++;
+                    }
+                    else {
+                        delete $element_hits{$ele_name};
+                    }
                 }
-                else {
-                    delete $element_hits{$ele_name};
-                }
-            }
-            if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
-                my $right_match = $element_info{'right_tir_seq'};
-                $right_match =~ tr/ATGC/TACG/;
-                $right_match = reverse($right_match);
-                if (($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) or ($right_match =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i)) {
-                    $element_hits{$ele_name}++;
-                }
-
-                else {
-                    delete $element_hits{$ele_name};
+                if ($element_char_hash{$ele_name}{"tir_con"} ne '') {
+                    my $right_match = $element_info{'right_tir_seq'};
+                    $right_match =~ tr/ATGC/TACG/;
+                    $right_match = reverse($right_match);
+                    if (($element_info{'left_tir_seq'} =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i) or ($right_match =~ m/^$element_char_hash{$ele_name}{"tir_con"}/i)) {
+                        $element_hits{$ele_name}++;
+                    }
+    
+                    else {
+                        delete $element_hits{$ele_name};
+                    }
                 }
             }
         }
@@ -3667,6 +3846,9 @@ foreach my $tsd_info_ref (@final_tsd_info) {
         }
     }
 }
+if (defined $protein and defined $p_type) {
+    $element_info{"classification"} = $p_type . "||" . $element_info{"classification"};
+}
 print "Element classification finished\n";
 print $log_out "Element classification finished\n";
 my $element_info_out_path = File::Spec->catpath($volume, $out_path, $filename . ".element_info");
@@ -3676,17 +3858,6 @@ print $element_info_out join("\t", $fname_fin, $element_info{'copy_num'}, $eleme
   $element_info{'left_tir_id'}, $element_info{'right_tir_seq'}, $element_info{'left_tir_id'}, $element_info{'TSD_len'},
   $element_info{'TSD_seq'},     $element_info{'TSD_fraction'}, $element_info{"classification"}), "\n";
 close($element_info_out);
-
-#print element consensus to file
-my $element_consensus_out_path = File::Spec->catpath($volume, $out_path, $filename . ".consensus");
-open(my $element_consensus_out, ">", $element_consensus_out_path) or die "Error creating $element_consensus_out_path. $!\n";
-print $element_consensus_out join("\n", ">" . $fname_fin . "_consensus", $element_info{'element_consensus'}), "\n";
-close($element_consensus_out);
-
-print "Printing fasta\n";
-print $log_out "Printing fasta\n";
-my $element_fasta_out_path = File::Spec->catpath($volume, $out_path, $filename . ".fasta");
-print_fasta($element_fasta_out_path, $element_aln_obj);
 
 print "\nSetting up gff path\n";
 print $log_out "\nSetting up gff path\n";
@@ -3767,7 +3938,7 @@ sub match_tirs {
           my $homo_char  = substr($homo_string, $count, 1);
           my $query_char = substr($query_str,   $count, 1);
           my $hit_char   = substr($hit_str,     $count, 1);
-          if ($round == 1 and $count == 8 and $total_mis_aln >= 5) {
+          if ($round == 1 and $count == 8 and $total_mis_aln >= 4) {
             if ($match_len < 3) {
               $match_len = 0;
               $start_pos = '';
@@ -3779,7 +3950,7 @@ sub match_tirs {
             }
           }
           if ($round == 2) {
-            if (($count == 20 and $total_mis_aln >= 12) or ($count == 30 and $match_len < $match_cutoff) ) {
+            if (($count == 20 and $total_mis_aln >= 12) or ($count == 30 and $match_len <= $match_cutoff) ) {
               $match_len = 0;
               $start_pos = '';
               $match_query = '';
@@ -3791,7 +3962,7 @@ sub match_tirs {
           ## skip any seqs that have 1 or more mismatches in the first 3 bases of the TIR
           #if ($round == 3 or $round == 1) {
           if ($round == 1) {
-            if ($count == 3 and $total_mis_aln >= 1) {
+            if (($count == 3 and $total_mis_aln >= 1) or ($count == 6 and $total_mis_aln >= 2)) {
               $match_len = 0;
               $start_pos = '';
               $match_query = '';
@@ -3805,8 +3976,19 @@ sub match_tirs {
             #if match length equals 0 and position is not a match, continue to next position
             if ($homo_char eq " ") {
                 if ($round == 1 or $round == 2) {
-                    $total_mis_aln++;
-                    next;
+                    if ($hit_char ne '-' and $query_char ne '-') {
+                        $total_mis_aln++;
+                        next;
+                    }
+                    else {
+                        if ($first_match == 0) {
+                            next;
+                        }
+                        else {
+                            $total_mis_aln++;
+                            next;
+                        }
+                    }
                 }
                 else {
                     if ($first_match == 0) {
@@ -3872,7 +4054,7 @@ sub match_tirs {
                 # print "Another Mismatch at $count\n";
                 next;
               }
-              elsif ($total_mis_aln >= 3) {
+              else {
                 if ($round ==1) {
                     $match_len = 0;
                     $start_pos = '';
@@ -4095,6 +4277,8 @@ sub generate_gff {
   my $path         = shift;
   my $round        = shift;
   my $ele_info_ref = shift;
+  my $type = shift;
+  
   print "Entered .gff printer\n";
   print $log_out "Entered .gff printer\n";
   $self->throw("Need Bio::Align::AlignI argument")
@@ -4138,14 +4322,14 @@ sub generate_gff {
             $strand = '-'
         }
       }
-      elsif ($seq_name =~ /(.+hit[0-9]+)_(.+)_([0-9]+)_([0-9]+)_(\w+)/) {
+      elsif ($seq_name =~ /(.+hit[0-9]+)_(.+)_([0-9]+)_([0-9]+)_(\w+)_/) {
         $input = $1;
         $seqid = $2;
         $start = $3 + $left_comp;
         $end = $4 + $right_comp;
         $strand = $5;
         $copy_num = $count;
-        if ($filename =~ /(protein_cluster[0-9]+)_/) {
+        if ($filename =~ /(cluster[0-9]+)_/) {
             $eleid = $1;
         }
         if ($strand eq 'plus') {
@@ -4179,7 +4363,7 @@ sub generate_gff {
       my $rtir_start = $end - (length($ele_info_ref->{"right_tir_seq"}) - 1);
       my $ele_id    = $ele_info_ref->{"element_id"};
       my $tir_id    = $ele_info_ref->{"left_tir_id"};
-      my $ele_class = 'N/A';
+      my $ele_class = $type . '||N/A';
       my $tsd_frac  = 'N/A';
       my $tsd_con   = 'N/A';
 
@@ -4416,11 +4600,21 @@ sub consensus_filter {
   print $log_out "consensus:\n$consensus\n";
   
   my $limit;
-  if (defined $protein or $num_seqs <= 6) {
-      $limit = 9;
+  if (defined $protein) {
+      if ($num_seqs <= 6) {
+          $limit = 16;
+      }
+      else {
+        $limit = 13;
+    }
   }
   else {
-      $limit = 6;
+    if ($num_seqs <= 6) {
+        $limit = 13;
+    }
+    else {
+        $limit = 10;
+    }
   }
   print "Limit: $limit\n";
   print "left_tir_start: $left_tir_start  right_tir_start: $right_tir_start\n";
@@ -4428,14 +4622,28 @@ sub consensus_filter {
   if ($left_tir_start == 0 && $right_tir_start == 0 or defined $protein) {
     my @consensus    = split '', $consensus;
     my $nt_count     = 0;
+    my $bad_count = 0;
     my $last_nomatch = 0;
 
     ## left tir
-    for (my $i = 0 ; $i < ((scalar @consensus) * .6) ; $i++) {
+    for (my $i = 0 ; $i < ((scalar @consensus) * .8) ; $i++) {
       my $nt = $consensus[$i];
       if ($nt eq '?' and $nt_count < $limit) {
-        $last_nomatch = $i;
-        $nt_count     = 0;
+        if ($bad_count > 0) {
+            $last_nomatch = $i;
+            $nt_count     = 0;
+            $bad_count = 0;
+        }
+        else {
+            if ($nt_count > 3) {
+                $bad_count++;
+                $nt_count++;
+            }
+            else {
+                $last_nomatch = $i;
+                $nt_count     = 0;
+            }
+        }
       }
       elsif ($nt ne '?' and $nt_count < $limit) {
         $nt_count++;
@@ -4448,16 +4656,30 @@ sub consensus_filter {
     ## right tir
     $last_nomatch = 0;
     $nt_count     = 0;
+    $bad_count = 0;
     for (
       my $i = ((scalar @consensus) - 1) ;
-      $i > ((scalar @consensus) * .4) ;
+      $i > ((scalar @consensus) * .2) ;
       $i--
      )
     {
       my $nt = $consensus[$i];
       if ($nt eq '?' and $nt_count < $limit) {
-        $last_nomatch = $i;
-        $nt_count     = 0;
+        if ($bad_count > 0) {
+            $last_nomatch = $i;
+            $nt_count     = 0;
+            $bad_count = 0;
+        }
+        else {
+            if ($nt_count > 3) {
+                $bad_count++;
+                $nt_count++;
+            }
+            else {
+                $last_nomatch = $i;
+                $nt_count     = 0;
+            }
+        }
       }
       elsif ($nt ne '?' and $nt_count < $limit) {
         $nt_count++;
@@ -4542,11 +4764,11 @@ sub consensus_filter {
   if ($message){
     if ($catch == 0) {
         my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
-        error_out($abort_out_path, $message);
+        error_out($abort_out_path, $message, 0);
     }
     else {
         my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".conserved_flanks");
-        error_out($abort_out_path, $message);
+        error_out($abort_out_path, $message, 0);
     }
   }
   my $ref2remove_these;
@@ -4625,7 +4847,7 @@ sub gap_filter {
     }
   }
   
-  my $remove_count;
+  my $remove_count = 0;
   foreach my $key (keys %trim_gap_seq_remove) {
       $remove_count++;
   }
@@ -5167,301 +5389,109 @@ sub tir_mismatch_filter {
 }
 
 sub match_tirs2 {
-  my $self       = shift;    ## seq_obj
-  my $input_path = shift;
-  my $round      = shift;
-  my $strand     = shift;
-  my $flank      = shift;
-  
-  $self->throw("Need Bio::LocatableSeq argument")
-    unless ref $self && $self->isa('Bio::LocatableSeq');
-  if (!-f $input_path) {
-    die "Supplied filepath is not valid";
-  }
-  my $seq = $self->seq();
-  $seq =~ s/-//g;
-  
-  my $reverse_seq = reverse($seq);
-  $reverse_seq =~ tr/ATGCatgc/TACGtacg/;
-  
-  my $seq_len = length($seq);
-  my $seq_name = $self->id();
-  my $fa_aln_obj = Bio::SearchIO->new(-format => 'blastxml', -file => $input_path);
-  my @result;
-  #print "ggsearch results path: $input_path\n";
-  #my $last_match_seq;
-  #my $last_query_seq;
-
-  #go through the FASTA input object . . down to the HSP
-  while (my $result = $fa_aln_obj->next_result) {
-    #print Dumper($result);
-    #print "numHits: ",$result->num_hits,"\n";
-    if ($result->num_hits == 0) {
-      push @result, [0, [0]];
-      last;
+    my $self       = shift;    ## seq_obj
+    my $input_path = shift;
+    
+    $self->throw("Need Bio::LocatableSeq argument")
+        unless ref $self && $self->isa('Bio::LocatableSeq');
+    if (!-f $input_path) {
+        die "Supplied filepath is not valid";
     }
-    while (my $hit = $result->next_hit) {
-        my $hit_name = $hit->name();
-        #print "hit name: $hit_name\n";
-        my $hsp = $hit->next_hsp;
-
-        #grab the query, hit, and homology strings
-        my $homo_string = $hsp->homology_string;
-        my $query_str   = $hsp->query_string;
-        my $hit_str     = $hsp->hit_string;
-        my $len_homo    = length($homo_string);
-        my $len_query   = length($query_str);
-        my $len_hit     = length($hit_str);
-        my $hit_start = $hsp->start('hit');
-        my $hit_end = $hsp->end('hit');
-        my $query_start = $hsp->start('query');
-        my $query_end = $hsp->end('query');
-        
-        
-        #print "homology string\n$homo_string\nQuery start: $query_start  hit_start: $hit_start\n";
-
-        #initialize variables
-        my $match_len     = 0;
-        my $start_pos     = '';
-        my $end_pos       = '';
-        my $match_query   = '';
-        my $match_hit     = '';
-        my $match_mis_aln = 0;
-        my $total_mis_aln = 0;
-        my $last_good     = 0;
-        my $hit_pos;
-        my $query_pos;
-        my $match_cutoff = 8;
-        my $first_match = 0;
-        if ($len_homo < $match_cutoff) {
-            next;
+    my $seq = $self->seq();
+    $seq =~ s/-//g;
+    my $seq_len = length($seq);
+    my $check_seq = $seq;
+    $check_seq =~ tr/ATGCatgc/TACGtacg/;
+    $check_seq = reverse($check_seq);
+    my $half_seq = substr($seq, 0, $seq_len/2);
+    my $seq_name = $self->id();
+    my $fa_aln_obj = Bio::SearchIO->new(-format => 'fasta', -file => $input_path);
+    my @result;
+    #print "ggsearch results path: $input_path\n";
+    #print $log_out "ggsearch results path: $input_path\n";
+    
+    #go through the FASTA input object . . down to the HSP
+    while (my $result = $fa_aln_obj->next_result) {
+        if ($result->num_hits == 0) {
+            push @result, (0, [0]);
+            last;
         }
-
-        #parse homology string, keeping track of match length and mismatches or gaps
-        for (my $count = 0 ; $count < length($homo_string) ; $count++) {
-          my $homo_char  = substr($homo_string, $count, 1);
-          my $query_char = substr($query_str,   $count, 1);
-          my $hit_char   = substr($hit_str,     $count, 1);
-          if ($round == 1 and $count == 8 and $total_mis_aln >= 5) {
-            if ($match_len < 3) {
-              $match_len   = 0;
-              $start_pos   = '';
-              $match_query = '';
-              $match_hit   = '';
-              $end_pos     = '';
-              #print "No TIRs found near start of sequences, resetting counts and ending\n";
-              last;
-            }
-          }
-          if ($round == 2) {
-            if ($count == 6 and $total_mis_aln >= 4) {
-              $match_len   = 0;
-              $start_pos   = '';
-              $match_query = '';
-              $match_hit   = '';
-              $end_pos     = '';
-              last;
-            }
-          }
-          ## skip any seqs that have 2 or more mismatches in the first 3 bases of the TIR
-          #if ($round == 3 or $round == 1) {
-          if ($round == 1) {
-            if ($count == 3 and $total_mis_aln >= 2) {
-              $match_len   = 0;
-              $start_pos   = '';
-              $match_query = '';
-              $match_hit   = '';
-              $end_pos     = '';
-              last;
-            }
-          }
-
-          if ($match_len == 0) {
-            #if match length equals 0 and position is not a match, continue to next position
-            if ($homo_char eq " ") {
-                if ($round == 1 or $round == 2) {
-                    $total_mis_aln++;
-                    next;
-                }
-                else {
-                    if ($first_match == 0) {
-                        next;
+        while (my $hit = $result->next_hit) {
+            #initialize variables
+            my $matches     = 0;
+            my $mismatches = 0;
+            my $first_three_count = 0;
+            while (my $hsp = $hit->next_hsp) {
+                
+                #grab the query, hit, and homology strings
+                my $homo_string = $hsp->homology_string;
+                my $query_str   = $hsp->query_string;
+                my $hit_str     = $hsp->hit_string;
+                my $len_homo    = length($homo_string);
+                my $len_query   = length($query_str);
+                my $len_hit     = length($hit_str);
+                
+                
+                my $match_query   = '';
+                my $match_hit     = '';
+                my $last_good     = 0;
+                my $hit_pos;
+                my $query_pos;
+                
+                for (my $count = 0 ; $count < 16 ; $count++) {
+                    my $homo_char  = substr($homo_string, $count, 1);
+                    my $query_char = substr($query_str,   $count, 1);
+                    my $hit_char   = substr($hit_str,     $count, 1);
+                    
+                    if ($homo_char eq ":") {
+                        $matches++;
+                        $last_good = $count;
+                        if ($count < 3) {
+                            $first_three_count++;
+                        }
                     }
                     else {
-                        $total_mis_aln++;
-                        next;
+                        $mismatches++;
                     }
                 }
+                if ($first_three_count == 3) {
+                    if ($mismatches/$matches <= 0.25) {
+                        $match_hit = substr($hit_str, 0, $last_good + 1);
+                        $match_query = substr($query_str, 0, $last_good + 1);
+                        my $match_hit_len = $last_good + 1;
+                        my $match_query_len = $last_good + 1;
+                        $match_query =~ s/-//g;
+                        $match_hit   =~ s/-//g;
+                        
+                        $hit_pos = index(uc($half_seq), uc($match_hit)) + 1;
+                        my $initial_query_pos = index(uc($check_seq), uc($match_query));
+                        $query_pos = $seq_len - $initial_query_pos;
+                        
+                        $match_query =~ tr/ATGCatgc/TACGtacg/;
+                        $match_query = reverse($match_query);
+                        
+                        my @match = (
+                        $seq_name,
+                        {
+                            "hit"   => [ $hit_pos,   $match_hit_len ],
+                            "query" => [ $query_pos, $match_query_len ],
+                            "seq" => [$match_hit, $match_query]
+                        }
+                        );
+                        ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
+                        if ($hit_pos == 0 or $query_pos == 0) {
+                            push @result, [0, [0]];
+                        }
+                        else {
+                            push @result, (1, [@match]);
+                        }
+                    }
+                }
+                else {
+                    push @result, [0, [0]];
+                }
             }
-
-            #if position is a match, store info, continue to next position
-            elsif ($homo_char eq "|") {
-              $start_pos = $count;
-              $last_good = $count;
-              $match_len++;
-              $match_query .= $query_char;
-              $match_hit   .= $hit_char;
-              if ($first_match == 0) {
-                  $first_match = 1;
-              }
-
-              #print "Initial match at $start_pos\n";
-              next;
-            }
-          }
-          elsif ($match_len >= 1 and $match_len < ($match_cutoff - 1)) {
-
-            #if match length is 1-3 and position is not a match, increment mismatch counter and check if more than one mismatch has occurred
-            if ($homo_char eq " ") {
-              $match_mis_aln++;
-              $total_mis_aln++;
-
-              #allow one mismatch, store info and continue
-              if ($match_mis_aln <= 1) {
-                $match_len++;
-                $last_good = $count;
-                $match_query .= $query_char;
-                $match_hit   .= $hit_char;
-
-                # print "First Mismatch at $count\n";
-                next;
-              }
-
-              #more than one mismatch, reset counters and other info, continue
-              elsif ($match_mis_aln > 1 and $match_len < 5) {
-                $match_len     = 0;
-                $start_pos     = '';
-                $match_query   = '';
-                $match_hit     = '';
-                $match_mis_aln = 0;
-
-                #print "Another Mismatch at $count, resetting counts\n";
-                next;
-              }
-              elsif ($match_mis_aln < 3 and $match_len >= 5) {
-                $match_len++;
-                $last_good = $count;
-                $match_query .= $query_char;
-                $match_hit   .= $hit_char;
-
-                # print "Another Mismatch at $count\n";
-                next;
-              }
-              else {
-                $match_len   = 0;
-                $start_pos   = '';
-                $match_query = '';
-                $match_hit   = '';
-                $end_pos     = '';
-
-                #print "Another Mismatch at $count, resetting counts and ending\n";
-                last;
-              }
-            }
-
-            #position is a match, store info and continue
-            elsif ($homo_char eq "|") {
-              $last_good = $count;
-              $match_len++;
-              $match_query .= $query_char;
-              $match_hit   .= $hit_char;
-
-              #print "Another match at $count. Length is $match_len\n";
-              next;
-            }
-          }
-          elsif ($match_len >= $match_cutoff - 1) {
-
-            #match length is $match_cutoff or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatches have occurred. If a match, continue.
-            if ($homo_char eq " ") {
-              $match_mis_aln++;
-              $total_mis_aln++;
-
-              #mismatches under 3, store info and continue
-              if ($match_mis_aln <= 3) {
-                $match_len++;
-                $last_good = $count;
-                $match_query .= $query_char;
-                $match_hit   .= $hit_char;
-
-                # print "Another Mismatch at $count, proceeding\n";
-                next;
-              }
-
-              #mismatches 3 or more, store final info for alignment match and end parsing
-              elsif ($match_mis_aln >= 3) {
-                $end_pos = $last_good;
-                $match_query =~ s/-//g;
-                $match_hit   =~ s/-//g;
-
-                #reverse complement the match query sequence
-                #$match_hit =~ tr/ATGCatgc/TACGtacg/;
-                #$match_hit = reverse($match_hit);
-                my $match_query_len = length($match_query);
-                my $match_hit_len   = length($match_hit);
-                
-                                
-                #find the position in the full sequence of the hit and query match sequences
-                $hit_pos = index(uc($reverse_seq), uc($match_hit), ($flank-($hit_end+2)));
-                $query_pos = index(uc($seq), uc($match_query), $query_start-2);
-
-                #print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n\n";
-                #store sequence name and the hit and query info
-                my %match = ("hit"   => [ $hit_pos, $match_hit, $match_hit_len, $seq_len, $seq_name ],
-                    "query" => [ $query_pos, $match_query, $match_query_len, $seq_len, $seq_name ]
-                  );
-                ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
-                push @result, (1, \%match);
-
-                #print "Another Mismatch at $count. Match is long, pushing match info for output\n";
-                last;
-              }
-            }
-
-            #position is a match, store info and continue
-            elsif ($homo_char eq "|") {
-              $last_good = $count;
-              $match_len++;
-              $match_query .= $query_char;
-              $match_hit   .= $hit_char;
-              if ($count == (length($homo_string)-1)) {
-                $end_pos = $last_good;
-                $match_query =~ s/-//g;
-                $match_hit   =~ s/-//g;
-
-                #reverse complement the match query sequence
-                #$match_hit =~ tr/ATGCatgc/TACGtacg/;
-                #$match_hit = reverse($match_hit);
-                my $match_query_len = length($match_query);
-                my $match_hit_len   = length($match_hit);
-                
-                
-                #find the position in the full sequence of the hit and query match sequences
-                $hit_pos = index(uc($reverse_seq), uc($match_hit), ($flank-($hit_end+2)));
-                $query_pos = index(uc($seq), uc($match_query),  $query_start-2);
-
-                #print "$seq_name hit_pos:$hit_pos query_pos:$query_pos $match_hit\n\n";
-                #store sequence name and the hit and query info
-                my %match = ("hit"   => [ $hit_pos, $match_hit, $match_hit_len, $seq_len, $seq_name ],
-                    "query" => [ $query_pos, $match_query, $match_query_len, $seq_len, $seq_name ]
-                  );
-                ## add a catch for $hit_pos or $query_pos == 0 [index returns -1 when $match_hit was not found in $seq]
-                push @result, (1, \%match);
-
-                #print "Another Mismatch at $count. Match is long, pushing match info for output\n";
-                last;
-              }
-              #print "Another match at $count. Length is $match_len\n";
-              next;
-            }
-          }
-        }
-
-        #add in check to see if TIRs were found.
-        if ($end_pos eq '') {
-          push @result, [0, [0]];
         }
     }
-  }
-  return (@result);
+    return (@result);
 }

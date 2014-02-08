@@ -44,7 +44,7 @@ sub help {
   print "
 usage:
 
-activeTE_aa-hits.pl -f <int> -a <aa-hits_flank_file> <genome_file>
+activeTE_aa-hits.pl -f <int> -a <aa-hits_flank_file>
 
 -f length of sequence flanks
 -a keep all output files
@@ -72,6 +72,10 @@ if (!-d $out_path) {
 }
 my $tir_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_tirs.fa");
 open(my $tir_out, ">", $tir_path);
+my $right_tir_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_right-tirs.fa");
+open(my $right_tir_out, ">", $right_tir_path);
+my $left_tir_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_left-tirs.fa");
+open(my $left_tir_out, ">", $left_tir_path);
 my $no_tir_path = File::Spec->catpath($volume, $out_path, $fname_fin . "_no-TIRs.txt");
 open(my $no_tir_out, ">", $no_tir_path);
 
@@ -110,6 +114,7 @@ while ( my $seq_obj = $in->next_seq() ) {
     }
     
     my $seq_len = length($seq);
+    my $half = $seq_len/2.0;
     my $first_path;
     my $last_path;
     
@@ -147,9 +152,9 @@ while ( my $seq_obj = $in->next_seq() ) {
         $out_opt = File::Spec->catpath($volume, $out_path, $fname_fin . ".bl2seq.out");
     }
         
-    system("blastn -task blastn -query $first_path -strand minus -subject $last_path -word_size 5 -gapopen 5 -outfmt 5 -gapextend 2 -penalty -3 -reward 2 -num_alignments 1000 -dust no -out $out_opt");
+    system("blastn -task blastn -query $first_path -strand minus -subject $last_path -word_size 5 -gapopen 5 -outfmt 5 -gapextend 2 -penalty -3 -reward 2 -num_alignments 1000 -dust yes -out $out_opt");
 
-    my @tir_match_results = match_tirs($seq_obj, $out_opt, 3, $strand, $flank);
+    my @tir_match_results = match_tirs($seq_obj, $out_opt, 1, $strand, $flank);
     #print "\n";
     #print Dumper(\@tir_match_results);
     #print "\n\n";
@@ -171,12 +176,717 @@ while ( my $seq_obj = $in->next_seq() ) {
             my $left_index = $matches{"query"}->[0];
             my $right_index = $matches{"hit"}->[0];
             print "left index: $left_index  right index: $right_index\n";
+            
+            my $tsd1;
+            my $tsd2;
+            my $tsd3;
+            my $tsd4;
+            my $tsd4_catch = 0;
+               
+            my $left_2bp  = substr($matches{"hit"}->[1],  0, 2);
+            my $right_2bp = substr($matches{"query"}->[1], -2);
+            my $left_4bp  = substr($matches{"hit"}->[1],  0, 4);
+            my $right_4bp = substr($matches{"query"}->[1], -4);
+            
+            my $left_tsd;
+            my $alt_left_tsd;
+            my $right_tsd;
+            my $alt_right_tsd;
+            
+            if ($left_index >= 20 and ($seq_len - ($right_index + 20) >= 20)) {
+                
+                $left_tsd = substr($seq, ($left_index - 20),  20);
+                $alt_left_tsd = substr($seq, ($left_index - 19), 20);
+                
+                $right_tsd = substr($seq, ($right_index), 20);
+                $alt_right_tsd = substr($seq, ($right_index)-1, 20);
+            }
+                
+            if ($left_2bp eq $right_2bp) {
+                $tsd1 = $left_2bp;
+                print "Round 1 TSD search - Yes! $fname_fin\n$tsd1\n";
+            }
+            if ($left_4bp eq $right_4bp) {
+                $tsd2 = $left_4bp;
+                print "Round 2 TSD search - Yes! $fname_fin\n$tsd2\n";
+            }
+            if (defined $left_tsd and defined $right_tsd) {
+                for (my $i = 0 ; $i < 19 ; $i++) {
+                    if (substr($left_tsd, $i) eq substr($right_tsd, 0, -($i))) {
+                        $tsd3 = substr($left_tsd, $i);
+                        print "Round 3 TSD search - Yes! $i $fname_fin\n$tsd3\n";
+                        last;
+                    }
+                
+                }
+                for (my $i = 0 ; $i < 19 ; $i++) {
+                    if (substr($alt_left_tsd, $i) eq substr($alt_right_tsd, 0, -($i))) {
+                        $tsd4 = substr($alt_left_tsd, $i);
+                        print "Round 4 TSD search - Yes! $i $fname_fin\n$tsd4\n";
+                        $tsd4_catch++;
+                        last;
+                    }
+                }
+            }
+            if ($tsd4) {
+                if (!$tsd1 and !$tsd2 and !$tsd3) {
+                    my $left_tir = substr($matches{'hit'}->[1], 1);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -1);
+                    $left_index++;
+                    $right_index--;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
+                    print $element_out ">$title\n$element\n";
+                    
+                    
+                    $c++;
+                    next LINE;
+                }
+                elsif (!$tsd1 and !$tsd2 and $tsd3) {
+                    if (length($tsd4) > length($tsd3)+1) {
+                        my $left_tir = substr($matches{'hit'}->[1], 1);
+                        my $right_tir = $matches{'query'}->[1];
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        $right_tir = reverse($right_tir);
+                        $right_tir = substr($right_tir, 0, -1);
+                        $left_index++;
+                        $right_index--;
+                        my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                        my $element = substr($seq, $left_index, -($right_index));
+                        
+                        if ($strand eq 'minus') {
+                            $element =~ tr/ATGCatgc/TACGtacg/;
+                            $element = reverse($element);
+                            $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_right_tir = reverse($left_tir);
+                            $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_left_tir = reverse($right_tir);
+                            $left_tir = $new_left_tir;
+                            $right_tir = $new_right_tir;
+                        }
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        
+                        my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
+                        print $element_out ">$title\n$element\n";
+                        
+                        $c++;
+                        next LINE;
+                    }
+                    else {
+                        my $left_tir = $matches{'hit'}->[1];
+                        my $right_tir = $matches{'query'}->[1];
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        $right_tir = reverse($right_tir);
+                        my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                        my $element = substr($seq, $left_index, -($right_index));
+                        
+                        if ($strand eq 'minus') {
+                            $element =~ tr/ATGCatgc/TACGtacg/;
+                            $element = reverse($element);
+                            $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_right_tir = reverse($left_tir);
+                            $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_left_tir = reverse($right_tir);
+                            $left_tir = $new_left_tir;
+                            $right_tir = $new_right_tir;
+                        }
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                        
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                        
+                        my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
+                        print $element_out ">$title\n$element\n";
+                        
+                        $c++;
+                        next LINE;
+                    }
+                }
+                elsif ($tsd2) {
+                    if (length($tsd4) > length($tsd2)+1) {
+                        my $left_tir = substr($matches{'hit'}->[1], 1);
+                        my $right_tir = $matches{'query'}->[1];
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        $right_tir = reverse($right_tir);
+                        $right_tir = substr($right_tir, 0, -1);
+                        $left_index++;
+                        $right_index--;
+                        my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                        my $element = substr($seq, $left_index, -($right_index));
+                        
+                        if ($strand eq 'minus') {
+                            $element =~ tr/ATGCatgc/TACGtacg/;
+                            $element = reverse($element);
+                            $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_right_tir = reverse($left_tir);
+                            $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_left_tir = reverse($right_tir);
+                            $left_tir = $new_left_tir;
+                            $right_tir = $new_right_tir;
+                        }
+                        
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        
+                        my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
+                        print $element_out ">$title\n$element\n";
+                        
+                        $c++;
+                        next LINE;
+                    }
+                    else {
+                        my $left_tir = substr($matches{'hit'}->[1], 4);
+                        my $right_tir = $matches{'query'}->[1];
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        $right_tir = reverse($right_tir);
+                        $right_tir = substr($right_tir, 0, -4);
+                        $left_index = $left_index + 4;
+                        $right_index = $right_index - 4;
+                        my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                        my $element = substr($seq, $left_index, -($right_index));
+                        
+                        if ($strand eq 'minus') {
+                            $element =~ tr/ATGCatgc/TACGtacg/;
+                            $element = reverse($element);
+                            $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_right_tir = reverse($left_tir);
+                            $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_left_tir = reverse($right_tir);
+                            $left_tir = $new_left_tir;
+                            $right_tir = $new_right_tir;
+                        }
+                        
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                        
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                        
+                        my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
+                        print $element_out ">$title\n$element\n";
+                        
+                        $c++;
+                        next LINE;
+                    }
+                }
+                elsif (!$tsd2 and !$tsd3 and $tsd1) {
+                    if (length($tsd4) > length($tsd1)) {
+                        my $left_tir = substr($matches{'hit'}->[1], 1);
+                        my $right_tir = $matches{'query'}->[1];
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        $right_tir = reverse($right_tir);
+                        $right_tir = substr($right_tir, 0, -1);
+                        $left_index++;
+                        $right_index--;
+                        my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                        my $element = substr($seq, $left_index, -($right_index));
+                        
+                        if ($strand eq 'minus') {
+                            $element =~ tr/ATGCatgc/TACGtacg/;
+                            $element = reverse($element);
+                            $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_right_tir = reverse($left_tir);
+                            $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_left_tir = reverse($right_tir);
+                            $left_tir = $new_left_tir;
+                            $right_tir = $new_right_tir;
+                        }
+                        
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        
+                        my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
+                        print $element_out ">$title\n$element\n";
+                        
+                        $c++;
+                        next LINE;
+                    }
+                    else {
+                        my $left_tir = substr($matches{'hit'}->[1], 2);
+                        my $right_tir = $matches{'query'}->[1];
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        $right_tir = reverse($right_tir);
+                        $right_tir = substr($right_tir, 0, -2);
+                        $left_index = $left_index + 2;
+                        $right_index = $right_index - 2;
+                        my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                        my $element = substr($seq, $left_index, -($right_index));
+                        
+                        if ($strand eq 'minus') {
+                            $element =~ tr/ATGCatgc/TACGtacg/;
+                            $element = reverse($element);
+                            $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_right_tir = reverse($left_tir);
+                            $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                            my $new_left_tir = reverse($right_tir);
+                            $left_tir = $new_left_tir;
+                            $right_tir = $new_right_tir;
+                        }
+                        
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                        
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                        
+                        my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
+                        print $element_out ">$title\n$element\n";
+                        
+                        $c++;
+                        next LINE;
+                    }
+                }
+            }
+            
+            if ($tsd1 and $tsd4_catch == 0) {
+                if (!$tsd2 and !$tsd3) {
+                    my $left_tir = substr($matches{'hit'}->[1], 2);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -2);
+                    $left_index = $left_index + 2;
+                    $right_index = $right_index - 2;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                }
+                elsif (!$tsd2 and $tsd3) {
+                  if ( (length($tsd3) > length($tsd1)) and (substr($tsd3, 0, 2) eq $tsd1) and (substr($tsd3, -2) eq $tsd1)) {
+                    my $left_tir = $matches{'hit'}->[1];
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                  else {
+                    my $left_tir = substr($matches{'hit'}->[1], 2);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -2);
+                    $left_index = $left_index + 2;
+                    $right_index = $right_index - 2;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                }
+                elsif ($tsd2 and !$tsd3 and $tsd4_catch == 0) {
+                  if (substr($tsd2, 0, 2) eq $tsd1 and substr($tsd2, -2) eq $tsd1) {
+                    my $left_tir = substr($matches{'hit'}->[1], 4);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -4);
+                    $left_index = $left_index + 4;
+                    $right_index = $right_index - 4;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                  else {
+                    my $left_tir = substr($matches{'hit'}->[1], 2);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -2);
+                    $left_index = $left_index + 2;
+                    $right_index = $right_index - 2;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                }
+                elsif ($tsd2 and $tsd3 and $tsd4_catch == 0) {
+                  if ( (substr($tsd3, 0, 2) eq $tsd1) and (substr($tsd3, -2) eq $tsd1)) {
+                    my $left_tir = $matches{'hit'}->[1];
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                  elsif ((substr($tsd2, 0, 2) eq $tsd1) and (substr($tsd2, -2) eq $tsd1)) {
+                    my $left_tir = substr($matches{'hit'}->[1], 4);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -4);
+                    $left_index = $left_index + 4;
+                    $right_index = $right_index - 4;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                  else {
+                    my $left_tir = substr($matches{'hit'}->[1], 2);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -2);
+                    $left_index = $left_index + 2;
+                    $right_index = $right_index - 2;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                  }
+                }
+            }
+            elsif ($tsd3 and $tsd4_catch == 0) {
+                if (!$tsd2) {
+                    my $left_tir = $matches{'hit'}->[1];
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
+                    print $element_out ">$title\n$element\n";
+                    
+                    $c++;
+                    next LINE;
+                }
+                else {
+                  if ((length($tsd3) > length($tsd2)) and (substr($tsd3, 0, 4) eq $tsd2) and (substr($tsd3, -4) eq $tsd2)) {
+                    my $left_tir = $matches{'hit'}->[1];
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
+                    print $element_out ">$title\n$element\n";
+                    $c++;
+                    next LINE;
+                  }
+                  else {
+                    my $left_tir = substr($matches{'hit'}->[1], 4);
+                    my $right_tir = $matches{'query'}->[1];
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    $right_tir = reverse($right_tir);
+                    $right_tir = substr($right_tir, 0, -4);
+                    $left_index = $left_index + 4;
+                    $right_index = $right_index - 4;
+                    my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                    my $element = substr($seq, $left_index, -($right_index));
+                    
+                    if ($strand eq 'minus') {
+                        $element =~ tr/ATGCatgc/TACGtacg/;
+                        $element = reverse($element);
+                        $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_right_tir = reverse($left_tir);
+                        $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                        my $new_left_tir = reverse($right_tir);
+                        $left_tir = $new_left_tir;
+                        $right_tir = $new_right_tir;
+                    }
+                    
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    
+                    my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
+                    print $element_out ">$title\n$element\n";                  
+                    
+                    $c++;
+                    next LINE;
+                  }
+                }
+            }
+            elsif ($tsd2 and $tsd4_catch == 0) {
+                my $left_tir = substr($matches{'hit'}->[1], 4);
+                my $right_tir = $matches{'query'}->[1];
+                $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                $right_tir = reverse($right_tir);
+                $right_tir = substr($right_tir, 0, -4);
+                $left_index = $left_index + 4;
+                $right_index = $right_index - 4;
+                my $difference = ($half - $left_index) + (($seq_len - $right_index) - $half);
+                my $element = substr($seq, $left_index, -($right_index));
+                
+                if ($strand eq 'minus') {
+                    $element =~ tr/ATGCatgc/TACGtacg/;
+                    $element = reverse($element);
+                    $left_tir =~ tr/ATGCatgc/TACGtacg/;
+                    my $new_right_tir = reverse($left_tir);
+                    $right_tir =~ tr/ATGCatgc/TACGtacg/;
+                    my $new_left_tir = reverse($right_tir);
+                    $left_tir = $new_left_tir;
+                    $right_tir = $new_right_tir;
+                }
+                
+                print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                
+                print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
+                print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                
+                my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
+                print $element_out ">$title\n$element\n";
+                $c++;
+                next LINE;
+            }
+            
+            
+
             my $left_tir = $matches{'query'}->[1];
             my $right_tir = $matches{'hit'}->[1];
             $right_tir =~ tr/ATGCatgc/TACGtacg/;
             $right_tir = reverse($right_tir);
             my $element = substr($seq, $left_index, -($right_index));
-            my $half = $seq_len/2.0;
+            
             my $diff = ($half - $left_index) + (($seq_len - $right_index) - $half);
             
             my $title = $seq_id_ori . "_tir" . $c . "_" . $diff;
@@ -200,6 +910,9 @@ while ( my $seq_obj = $in->next_seq() ) {
             print $element_out ">$title\n$element\n";
             print $tir_out ">$ltitle\n$left_tir\n>$rtitle\n$right_tir\n";
             
+            print $left_tir_out ">$ltitle\n$left_tir\n";
+            print $right_tir_out ">$rtitle\n$right_tir\n";
+            
             $c++;
         }
         else {
@@ -208,6 +921,8 @@ while ( my $seq_obj = $in->next_seq() ) {
     }
 }
 close($tir_out);
+close($left_tir_out);
+close($right_tir_out);
 close($no_tir_out);
 print "Finished searches!\n";
 
@@ -282,7 +997,7 @@ sub match_tirs {
         my $last_good     = 0;
         my $hit_pos;
         my $query_pos;
-        my $match_cutoff = 8;
+        my $match_cutoff = 10;
         my $first_match = 0;
 
         #parse homology string, keeping track of match length and mismatches or gaps
@@ -290,7 +1005,7 @@ sub match_tirs {
           my $homo_char  = substr($homo_string, $count, 1);
           my $query_char = substr($query_str,   $count, 1);
           my $hit_char   = substr($hit_str,     $count, 1);
-          if ($round == 1 and $count == 8 and $total_mis_aln >= 5) {
+          if ($round == 1 and $count == 8 and $total_mis_aln >= 4) {
             if ($match_len < 3) {
               $match_len   = 0;
               $start_pos   = '';
@@ -313,8 +1028,8 @@ sub match_tirs {
           }
           ## skip any seqs that have 2 or more mismatches in the first 3 bases of the TIR
           #if ($round == 3 or $round == 1) {
-          if ($round == 1) {
-            if ($count == 3 and $total_mis_aln >= 2) {
+          if ($round == 3 or $round == 1) {
+            if (($count <= 3) and $total_mis_aln >= 1) {
               $match_len   = 0;
               $start_pos   = '';
               $match_query = '';
@@ -327,19 +1042,8 @@ sub match_tirs {
           if ($match_len == 0) {
             #if match length equals 0 and position is not a match, continue to next position
             if ($homo_char eq " ") {
-                if ($round == 1 or $round == 2) {
-                    $total_mis_aln++;
-                    next;
-                }
-                else {
-                    if ($first_match == 0) {
-                        next;
-                    }
-                    else {
-                        $total_mis_aln++;
-                        next;
-                    }
-                }
+                $total_mis_aln++;
+                next;
             }
 
             #if position is a match, store info, continue to next position
@@ -357,7 +1061,7 @@ sub match_tirs {
               next;
             }
           }
-          elsif ($match_len >= 1 and $match_len < ($match_cutoff - 1)) {
+          elsif ($match_len >= 1 and $match_len < $match_cutoff) {
 
             #if match length is 1-3 and position is not a match, increment mismatch counter and check if more than one mismatch has occurred
             if ($homo_char eq " ") {
@@ -365,7 +1069,7 @@ sub match_tirs {
               $total_mis_aln++;
 
               #allow one mismatch, store info and continue
-              if ($match_mis_aln <= 1) {
+              if ($match_mis_aln <= 2) {
                 $match_len++;
                 $last_good = $count;
                 $match_query .= $query_char;
@@ -375,27 +1079,7 @@ sub match_tirs {
                 next;
               }
 
-              #more than one mismatch, reset counters and other info, continue
-              elsif ($match_mis_aln > 1 and $match_len < 5) {
-                $match_len     = 0;
-                $start_pos     = '';
-                $match_query   = '';
-                $match_hit     = '';
-                $match_mis_aln = 0;
-
-                #print "Another Mismatch at $count, resetting counts\n";
-                next;
-              }
-              elsif ($match_mis_aln < 3 and $match_len >= 5) {
-                $match_len++;
-                $last_good = $count;
-                $match_query .= $query_char;
-                $match_hit   .= $hit_char;
-
-                # print "Another Mismatch at $count\n";
-                next;
-              }
-              elsif ($total_mis_aln >= 3) {
+              else {
                 $match_len   = 0;
                 $start_pos   = '';
                 $match_query = '';
@@ -418,7 +1102,7 @@ sub match_tirs {
               next;
             }
           }
-          elsif ($match_len >= $match_cutoff - 1) {
+          elsif ($match_len >= $match_cutoff) {
 
             #match length is $match_cutoff or higher. If position is not a match, increment mismatch counter and check if more than 2 mismatches have occurred. If a match, continue.
             if ($homo_char eq " ") {
