@@ -251,11 +251,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
 
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
                     print $element_out ">$title\n$element\n";
@@ -286,11 +286,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                             $left_tir = $new_left_tir;
                             $right_tir = $new_right_tir;
                         }
-                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                         
-                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                         
                         my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
                         print $element_out ">$title\n$element\n";
@@ -316,11 +316,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                             $left_tir = $new_left_tir;
                             $right_tir = $new_right_tir;
                         }
-                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                         
-                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                         
                         my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
                         print $element_out ">$title\n$element\n";
@@ -352,11 +352,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                             $right_tir = $new_right_tir;
                         }
                         
-                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                         
-                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                         
                         my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
                         print $element_out ">$title\n$element\n";
@@ -386,11 +386,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                             $right_tir = $new_right_tir;
                         }
                         
-                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                         
-                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                         
                         my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
                         print $element_out ">$title\n$element\n";
@@ -422,11 +422,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                             $right_tir = $new_right_tir;
                         }
                         
-                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                         
-                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$left_tir\n";
-                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd4\-$tsd4\n$right_tir\n";
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd4\-$tsd4\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd4\-$tsd4\n$right_tir\n";
                         
                         my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd4-$tsd4";
                         print $element_out ">$title\n$element\n";
@@ -456,11 +456,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                             $right_tir = $new_right_tir;
                         }
                         
-                        print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                        print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                        print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                        print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                         
-                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                        print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                        print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                         
                         my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
                         print $element_out ">$title\n$element\n";
@@ -494,11 +494,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
                     print $element_out ">$title\n$element\n";
@@ -526,11 +526,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
                     print $element_out ">$title\n$element\n";
@@ -560,11 +560,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
                     print $element_out ">$title\n$element\n";
@@ -596,11 +596,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
                     print $element_out ">$title\n$element\n";
@@ -630,11 +630,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
                     print $element_out ">$title\n$element\n";
@@ -664,11 +664,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
                     print $element_out ">$title\n$element\n";
@@ -698,11 +698,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
                     print $element_out ">$title\n$element\n";
@@ -732,11 +732,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd1\-$tsd1\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd1\-$tsd1\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd1\-$tsd1\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd1-$tsd1";
                     print $element_out ">$title\n$element\n";
@@ -766,11 +766,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
                     print $element_out ">$title\n$element\n";
@@ -798,11 +798,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd3\-$tsd3\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd3\-$tsd3\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd3\-$tsd3\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd3-$tsd3";
                     print $element_out ">$title\n$element\n";
@@ -831,11 +831,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                         $right_tir = $new_right_tir;
                     }
                     
-                    print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                    print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                     
-                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                    print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                    print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                     
                     my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
                     print $element_out ">$title\n$element\n";                  
@@ -867,11 +867,11 @@ while ( my $seq_obj = $in->next_seq() ) {
                     $right_tir = $new_right_tir;
                 }
                 
-                print $tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                print $tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                print $tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                print $tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                 
-                print $left_tir_out ">$seq_id_ori\_ltir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$left_tir\n";
-                print $right_tir_out ">$seq_id_ori\_rtir$c\_$left_index\-$right_index\-$difference\_tsd2\-$tsd2\n$right_tir\n";
+                print $left_tir_out ">$seq_id_ori\_ltir$c\_$difference\_tsd2\-$tsd2\n$left_tir\n";
+                print $right_tir_out ">$seq_id_ori\_rtir$c\_$difference\_tsd2\-$tsd2\n$right_tir\n";
                 
                 my $title = $seq_id_ori."_tir".$c."_".$left_index."-".$right_index . "-$difference" . "_tsd2-$tsd2";
                 print $element_out ">$title\n$element\n";
