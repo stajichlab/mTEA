@@ -4247,6 +4247,9 @@ sub match_tirs {
 
             #if position is a match, store info, continue to next position
             elsif ($homo_char eq ":") {
+              if ($hit_char eq 'N' or $query_char eq 'N') {
+                  next;
+              }
               $start_pos = $count;
               $last_good = $count;
               $match_len++;
@@ -4606,7 +4609,7 @@ sub generate_gff {
         $eleid = $1;
       }
       my $ltir_end = $start + length($ele_info_ref->{"left_tir_seq"}) - 1;
-      my $rtir_start = $end - (length($ele_info_ref->{"right_tir_seq"}) - 1);
+      my $rtir_start = $end - length($ele_info_ref->{"right_tir_seq"});
       my $ele_id    = $ele_info_ref->{"element_id"};
       my $tir_id    = $ele_info_ref->{"left_tir_id"};
       my $ele_class = $type . '||N/A';
