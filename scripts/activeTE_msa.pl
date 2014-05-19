@@ -5803,7 +5803,7 @@ sub match_tirs2 {
                     if ($homo_char eq ":") {
                         $matches++;
                         $last_good = $count;
-                        if ($count < 3) {
+                        if ($count < 3 and $query_char ne "N" and $hit_char ne "N") {
                             $first_three_count++;
                         }
                     }
