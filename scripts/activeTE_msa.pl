@@ -4170,6 +4170,9 @@ sub match_tirs {
         my $hit_pos;
         my $query_pos;
         my $match_cutoff = 9;
+        if ($round == 2) {
+            $match_cutoff = 10;
+        }
         my $first_match = 0;
 
         #parse homology string, keeping track of match length and mismatches or gaps
@@ -4190,12 +4193,20 @@ sub match_tirs {
           }
           if ($round == 2) {
             if (($count == 20 and $total_mis_aln >= 12) or ($count == 30 and $match_len <= $match_cutoff) ) {
-              $match_len = 0;
-              $start_pos = '';
-              $match_query = '';
-              $match_hit = '';
-              $end_pos = '';
-              last;
+                $match_len = 0;
+                $start_pos = '';
+                $match_query = '';
+                $match_hit = '';
+                $end_pos = '';
+                last;
+            }
+            elsif ($match_len == 4 and $match_mis_aln > 1) {
+                $match_len = 0;
+                $start_pos = '';
+                $match_query = '';
+                $match_hit = '';
+                $end_pos = '';
+                last;
             }
           }
           ## skip any seqs that have 1 or more mismatches in the first 3 bases of the TIR
@@ -4561,21 +4572,25 @@ sub generate_gff {
         $copy_num = $1;
         $eleid    = $2;
         $seqid    = $3;
-        $start    = $4 + $left_comp;
-        $end      = $5 + $right_comp;
+        $start = $4;
+        $end = $5;
         $strand   = $6;
         if ($strand eq 'plus') {
             $strand = '+';
+            $start = $start + $left_comp;
+            $end = $end + $right_comp;
         }
         else {
-            $strand = '-'
+            $strand = '-';
+            $start = $start + $right_comp;
+            $end = $end + $left_comp;
         }
       }
       elsif ($seq_name =~ /(.+hit[0-9]+)_(.+)_([0-9]+)_([0-9]+)_(plus|minus)/) {
         $input = $1;
         $seqid = $2;
-        $start = $3 + $left_comp;
-        $end = $4 + $right_comp;
+        $start = $3;
+        $end = $4;
         $strand = $5;
         $copy_num = $count;
         if ($filename =~ /(cluster[0-9]+)_/) {
@@ -4583,9 +4598,13 @@ sub generate_gff {
         }
         if ($strand eq 'plus') {
             $strand = '+';
+            $start = $start + $left_comp;
+            $end = $end + $right_comp;
         }
         else {
-            $strand = '-'
+            $strand = '-';
+            $start = $start + $right_comp;
+            $end = $end + $left_comp;
         }
           
           
