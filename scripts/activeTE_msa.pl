@@ -3204,7 +3204,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
       $tsd1_count++;
     }
     elsif (!$tsd2 and $tsd3) {
-      if (length($tsd3) > length($tsd1)) {
+      if ((length($tsd3) > length($tsd1)) or ($tsd1 =~ /TA/i and $p_type eq "hAT")) {
         my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3 ];
         push @putative_TSD3, $tsd3;
