@@ -307,7 +307,7 @@ my ($org_right_tir_start1, $org_left_tir_start1) = ($right_tir_start1, $left_tir
 my $left_tir_adjusted = $org_left_tir_start1 - $left_tir_start1;
 my $right_tir_adjusted = $right_tir_start1 - $org_right_tir_start1;
 
-#check whether any sequences have gaps within 25bp of start of putative TIRSs and remove them
+#check whether any sequences have gaps within 25bp of start of putative TIRSs and remove them 
 my ($left_tir_start, $right_tir_start, $ref2array, $ref2hash);
 ($left_tir_start, $right_tir_start, $ref2array, $trimmed_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start1, $right_tir_start1, \%tir_positions, "other", $try);
 @gap_seq_pos_remove = @$ref2array;
@@ -1011,13 +1011,7 @@ print "after get_col: $left_tir_start, $right_tir_start,$left_tir_end, $right_ti
 print $log_out "after get_col: $left_tir_start, $right_tir_start,$left_tir_end, $right_tir_end \n";
 
 my $reimpport_num_seqs = $ori_aln_obj->num_sequences;
-#if ($reimpport_num_seqs > 4) {
-#   cleaning up aln using tir_starts found with get_columns and overwriting the tir_starts with the adj values
-#    ($left_tir_start, $right_tir_start) = adjust_tir_starts($ori_aln_obj, $left_tir_start, $right_tir_start, 2);
-#    print "rt:$right_tir_start , lt:$left_tir_start\n";
-#    print $log_out "rt:$right_tir_start , lt:$left_tir_start\n";
-#
-#Clear and rebuild the TIR posistions hash off the new values
+
 undef %tir_positions;
 
 foreach my $seq_obj ($ori_aln_obj->each_seq()) {
@@ -3210,7 +3204,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
       $tsd1_count++;
     }
     elsif (!$tsd2 and $tsd3) {
-      if ( (length($tsd3) > length($tsd1)) and (substr($tsd3, 0, 2) eq $tsd1) and (substr($tsd3, -2) eq $tsd1)) {
+      if (length($tsd3) > length($tsd1)) {
         my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3 ];
         push @putative_TSD3, $tsd3;
@@ -4056,16 +4050,11 @@ foreach my $tsd_info_ref (@final_tsd_info) {
     #store all classifications and the number of hits to each
     foreach my $row_ref (@sorted) {
         my @info = @{$row_ref};
-        if ($info[1] == ${ $sorted[0] }[1]) {
-            if ($classification eq '') {
-                $classification = $classification . $info[0] . "_" . $info[1];
-            }
-            else {
-                $classification = $classification . ", " . $info[0] . "_" . $info[1];
-            }
+        if ($classification eq '') {
+            $classification = $classification . $info[0] . "_" . $info[1];
         }
         else {
-            last;
+            $classification = $classification . ", " . $info[0] . "_" . $info[1];
         }
     }
     if ($classification eq '' or !defined $classification) {
@@ -5142,7 +5131,7 @@ sub consensus_filter {
   }
   $aln_obj = $aln_obj->remove_gaps('-', 1);
   ($left_tir_start, $right_tir_start) = get_columns($aln_obj, $tir_positions, 1);
-  #}    ##paren for remove most
+  
   print "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
   print $log_out "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
   print "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
@@ -5519,8 +5508,7 @@ sub remove_most {
   print $log_out "remove most after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
 
 #my ($left_tir_start1,$right_tir_start1,$tmp_aln_obj,$ref2tp,$ref2gsr, $ref2gspr) = remove_most ($full_aln_obj,\%tir_positions, \@full_id_array);
-  return ($left_tir_start, $right_tir_start, $aln_obj, $tir_positions,
-    $ref2gsr, $ref2gspr);
+  return ($left_tir_start, $right_tir_start, $aln_obj, $tir_positions, $ref2gsr, $ref2gspr);
 
 } ## end remove_most
 
@@ -5822,7 +5810,7 @@ sub match_tirs2 {
                     if ($homo_char eq ":") {
                         $matches++;
                         $last_good = $count;
-                        if ($count < 3 and $query_char ne "N" and $hit_char ne "N") {
+                        if ($count < 3 and $query_char ne "N" and $query_char ne "n" and $hit_char ne "N" and $hit_char ne "n") {
                             $first_three_count++;
                         }
                     }
