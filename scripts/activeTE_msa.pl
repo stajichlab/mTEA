@@ -84,7 +84,7 @@ sub help {
 
 usage:
 
-activeTE_msa.pl -a -f -p <int> <multiple alignment file>
+activeTE_msa.pl -a -f <int> -p  <multiple alignment file>
 
 -a keep all intermediate files  DEFAULT = remove
 -f length of sequence flanks  DEFAULT = 100
@@ -313,7 +313,9 @@ while ($check == 1 ) {
         }
         $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps('-', 1);
         ($left_tir_start1, $right_tir_start1) = get_columns($trimmed_aln_obj, \%tir_positions, 1);
-        ($left_tir_start1, $right_tir_start1, $ref2array, $trimmed_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start1, $right_tir_start1, \%tir_positions, $try);
+        my $ref2array;
+        my $ref2hash;
+        ($left_tir_start1, $right_tir_start1, $ref2array, $trimmed_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start1, $right_tir_start1, \%tir_positions, $try, 'N');
         @gap_seq_pos_remove = @$ref2array;
         %tir_positions      = %$ref2hash;
     }
@@ -2530,7 +2532,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     }
                     else {
                         my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
-                        pmy $empty_site = substr($starting_left_flank, 0, -4) . substr($starting_right_flank, 4+length($tsd3));
+                        my $empty_site = substr($starting_left_flank, 0, -4) . substr($starting_right_flank, 4+length($tsd3));
                         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                         push @putative_TSD3, $tsd3;
                         push @put_TSD_names3, [ $seq_name, $tsd3 ];
@@ -3091,7 +3093,7 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
       $tsd1_count++;
     }
     elsif (!$tsd2 and $tsd3) {
-      if ((length($tsd3) > length($tsd1)) or ($tsd1 =~ /TA/i and $p_type eq "hAT"))) {
+      if ((length($tsd3) > length($tsd1)) or ($tsd1 =~ /TA/i and $p_type eq "hAT")) {
         my $insertion_site = substr($left_tsd, (-4 - length($tsd3) - 10),(length($tsd3) + 10)) . substr($right_tsd, 4 + length($tsd3), 10);
         my $empty_site = substr($starting_left_flank, 0, -4) . substr($starting_right_flank, 4+length($tsd3));
         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
@@ -4756,6 +4758,7 @@ sub consensus_filter {
   my $right_tir_start    = shift;
   my $tir_positions      = shift;              # \%tir_positions
   my $try = shift;
+  my $round = shift;
   if (!defined $try) {
       $try = 1;
   }
@@ -4767,9 +4770,6 @@ sub consensus_filter {
     print $log_out "consensus_filter: <= 1 sequences\n";
     return ($left_tir_start, $right_tir_start, $gap_seq_pos_remove, $aln_obj, $tir_positions);
   }
-  $round = defined $round ? $round : 'other';
-  print "in consensu_filt sub: round=$round\n";
-  print $log_out "in consensu_filt sub: round=$round\n";
   my %trim_gap_seq_remove;
   ## this will generate a sequence with '?' at every position in which there is less
   ## than 80% consensus
