@@ -331,7 +331,7 @@ my $right_tir_adjusted = $right_tir_start1 - $org_right_tir_start1;
 
 #check whether any sequences have gaps within 25bp of start of putative TIRSs and remove them
 my ($left_tir_start, $right_tir_start, $ref2array, $ref2hash);
-($left_tir_start, $right_tir_start, $ref2array, $trimmed_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start1, $right_tir_start1, \%tir_positions, $try);
+($left_tir_start, $right_tir_start, $ref2array, $trimmed_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start1, $right_tir_start1, \%tir_positions, $try, "final");
 @gap_seq_pos_remove = @$ref2array;
 %tir_positions      = %$ref2hash;
 print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
@@ -4762,7 +4762,7 @@ sub consensus_filter {
   if (!defined $try) {
       $try = 1;
   }
-
+  $round = defined $round ? $round : 'other';
   my $aln_len            = $aln_obj->length;
   my $num_seqs = $aln_obj->num_sequences;
   if ($num_seqs <= 1) {
