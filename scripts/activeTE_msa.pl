@@ -15,6 +15,7 @@ activeTE_msa family.aln
  -flank     [integer] Length of flanking sequence (default 100)
  -all       Process all
  -protein   input MSA is from protein searches
+ -debug     print verbose output for debugging
 
 =head1 AUTHORS - Brad Cavinder
 
@@ -52,6 +53,7 @@ GetOptions(
   'flank:i'    => \$flank,
   'all'        => \$all,
   'protein'    => \$protein,
+  'debug'      => \$debug,
   'trimal:s'   => \$trimal,
 );
 
@@ -160,7 +162,9 @@ if (!-d $out_path) {
 }
 else {
     my $glob_path = File::Spec->catpath($volume, $out_path, "*");
-    print "Glob path: $glob_path\n";
+    if ($debug) {
+        print "Glob path: $glob_path\n";
+    }
     my @files = glob $glob_path;
     foreach my $path (@files) {
         unlink $path or warn "Failed to unlink $path: $!";
@@ -233,7 +237,6 @@ my $first_col_80 = 1;
 my $last_col_80  = $full_aln_len;
 
 print "Starting Full ID calculation\n";
-warn "Starting Full ID calculation - warn\n";
 print $log_out "Starting Full ID calculation\n";
 @full_id_array = get_percentID_perCol($infile, $full_id_out_path);
 my $try = 0;
@@ -266,7 +269,6 @@ print $log_out "Current number of sequences in temp_aln_obj = $current_num_seq.\
 if ($left_tir_start1 == 0 or $right_tir_start1 == 0 or $current_num_seq <= 5) {
   my $aln_obj = get_org_aln($infile);
   print "run less stringent intial filtering\n";
-  warn "run less stringent intial filtering - warn\n";
   print $log_out "run less stringent intial filtering\n";
   ($left_tir_start1, $right_tir_start1, $tmp_aln_obj, $ref2tp, $ref2gsr, $ref2gspr) = remove_least($aln_obj, \%tir_positions, \@full_id_array, $try);
   %tir_positions      = %$ref2tp;
@@ -334,9 +336,10 @@ my ($left_tir_start, $right_tir_start, $ref2array, $ref2hash);
 ($left_tir_start, $right_tir_start, $ref2array, $trimmed_aln_obj, $ref2hash) = consensus_filter(\@gap_seq_pos_remove, $trimmed_aln_obj, $left_tir_start1, $right_tir_start1, \%tir_positions, $try, "final");
 @gap_seq_pos_remove = @$ref2array;
 %tir_positions      = %$ref2hash;
-print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
-
-print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
+if ($debug) {
+    print "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
+    print $log_out "new tir starts after consensus filter: $left_tir_start, $right_tir_start\n";
+}
 $current_num_seq = $trimmed_aln_obj->num_sequences;
 
 if ($current_num_seq > 9) {
@@ -347,8 +350,10 @@ if ($current_num_seq > 9) {
 }
 $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps('-', 1);
 
-print "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
-print $log_out "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+if ($debug) {
+    print "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+    print $log_out "before get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+}
 
 
 ($left_tir_start1, $right_tir_start1) =  get_columns($trimmed_aln_obj, \%tir_positions, 1);
@@ -366,10 +371,12 @@ if ($test_len == 0) {
 my $trim_aln_out2 = File::Spec->catpath($volume, $out_path, $filename . ".trim2");
 my $out2 = Bio::AlignIO->new(-file => ">$trim_aln_out2", -format => 'fasta', -displayname_flat => 0);
 $out2->write_aln($trimmed_aln_obj);
-print "after get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
-print $log_out "after get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
-print "Trim2 Right TIR start column: $right_tir_start1 (filename.trim2)\n";
-print $log_out "Trim2 Right TIR start column: $right_tir_start1 (filename.trim2)\n";
+if ($debug) {
+    print "after get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+    print $log_out "after get_Col: Trim2 Left TIR start column: $left_tir_start1\n";
+    print "Trim2 Right TIR start column: $right_tir_start1 (filename.trim2)\n";
+    print $log_out "Trim2 Right TIR start column: $right_tir_start1 (filename.trim2)\n";
+}
 
 #check for too many mismatches within 12bp of start of putative TIRSs against the consensus sequence
 my @consensus_remove = tir_mismatch_filter($trimmed_aln_obj, $left_tir_start1, $right_tir_start1, 1, 0);
@@ -389,8 +396,10 @@ foreach my $seq_name (@consensus_remove) {
 }
 $trimmed_aln_obj = $trimmed_aln_obj->remove_gaps('-', 1);
 ($left_tir_start1, $right_tir_start1) =  get_columns($trimmed_aln_obj, \%tir_positions, 1);
-print "Last TIRs before .trim3: Left tir start1: $left_tir_start1  Right tir start1: $right_tir_start1\n";
-print $log_out "Last TIRs before .trim3: Left tir start1: $left_tir_start1  Right tir start1: $right_tir_start1\n";
+if ($debug) {
+    print "Last TIRs before .trim3: Left tir start1: $left_tir_start1  Right tir start1: $right_tir_start1\n";
+    print $log_out "Last TIRs before .trim3: Left tir start1: $left_tir_start1  Right tir start1: $right_tir_start1\n";
+}
 
 $test_len = $trimmed_aln_obj->length();
 if ($test_len == 0) {
@@ -439,9 +448,10 @@ my @sorted_right_tir_start_keys = sort {$right_tir_start_check_counts{$b} <=> $r
 my $left_flank_catch  = 0;
 my $right_flank_catch = 0;
 
-print "sorted_left_tir_start_keys[0] = $sorted_left_tir_start_keys[0] ...\nsorted_right_tir_start_keys[0] = $sorted_right_tir_start_keys[0] ...\n";
-
-print $log_out "sorted_left_tir_start_keys[0] = $sorted_left_tir_start_keys[0] ...\nsorted_right_tir_start_keys[0] = $sorted_right_tir_start_keys[0] ...\n";
+if ($debug) {
+    print "sorted_left_tir_start_keys[0] = $sorted_left_tir_start_keys[0] ...\nsorted_right_tir_start_keys[0] = $sorted_right_tir_start_keys[0] ...\n";
+    print $log_out "sorted_left_tir_start_keys[0] = $sorted_left_tir_start_keys[0] ...\nsorted_right_tir_start_keys[0] = $sorted_right_tir_start_keys[0] ...\n";
+}
 
 if (!defined $sorted_left_tir_start_keys[0]) {
     if ($try == 1) {
@@ -465,10 +475,12 @@ elsif (!defined $sorted_right_tir_start_keys[0]) {
     my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
     error_out($abort_out_path, "$filename\tRight flank TIR not found.", 0);
 }
-  print "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
-  print $log_out "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
-  print "This is after the .trim2 to .trim3 transition\n";
-  print $log_out "This is after the .trim2 to .trim3 transition\n";
+  if ($debug) {
+      print "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
+      print $log_out "After removing copies with problems in TIRs these are the most common nucleotide positions of the TIRs:\n\tLeft TIR  start: $sorted_left_tir_start_keys[0]\tRight TIR start: $sorted_right_tir_start_keys[0]\n";
+      print "This is after the .trim2 to .trim3 transition\n";
+      print $log_out "This is after the .trim2 to .trim3 transition\n";
+  }
 
 if ($sorted_left_tir_start_keys[0] <= $flank - 25) {
   $left_flank_catch++;
@@ -517,8 +529,10 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
 
   #grab sequence name and shorten it for use in some output filenames
   my $seq_name    = $seq_obj->id();
-  print "Seq name first tir search: $seq_name\n";
-  print $log_out "Seq name first tir search: $seq_name\n";
+  if ($debug) {
+      print "Seq name first tir search: $seq_name\n";
+      print $log_out "Seq name first tir search: $seq_name\n";
+  }
   my $fname_start = $seq_name;
   if ($seq_name =~ /\:/) {
     my @seqn_part   = split(":", $seq_name);
@@ -630,8 +644,8 @@ else {
   @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys(%hit_match_len);
   @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys(%query_match_len);
 
-  print "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
-  print $log_out "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+  print "Most frequent columns for the TIR ends and consensus TIR length:\n\@sorted_hitcolumn_keys (Left TIR): $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys (Right TIR): $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+  print $log_out "Most frequent columns for the TIR ends and consensus TIR length:\n\@sorted_hitcolumn_keys (Left TIR): $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys (Right TIR): $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
   
 }
 
@@ -666,8 +680,10 @@ foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
 
   #grab sequence name and shorten it for use in some output filenames
   my $seq_name    = $seq_obj->id();
-  print "Seq name 2nd tir search: $seq_name\n";
-  print $log_out "Seq name 2nd tir search: $seq_name\n";
+  if ($debug) {
+      print "Seq name 2nd tir search: $seq_name\n";
+      print $log_out "Seq name 2nd tir search: $seq_name\n";
+  }
   my $fname_start = $seq_name;
   if ($seq_name =~ /\:/) {
     my @seqn_part   = split(":", $seq_name);
@@ -876,8 +892,8 @@ if ($good_aln_len2 == 0 and $good_aln_len == 0) {
       @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys(%hit_match_len);
       @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys(%query_match_len);
     
-      print "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
-      print $log_out "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+      print "Most frequent columns for the TIR ends and consensus TIR length:\n\@sorted_hitcolumn_keys (Left TIR): $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys (Right TIR): $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
+      print $log_out "Most frequent columns for the TIR ends and consensus TIR length:\n\@sorted_hitcolumn_keys (Left TIR): $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys (Right TIR): $sorted_querycolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n";
       
     }
 }
@@ -943,9 +959,11 @@ foreach my $seq_obj (@bad_remove) {
   }
 }
 
-print "before get_tir_nt_positions: ($sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
-print $log_out "before get_tir_nt_positions: ($sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
-my $tir_length = $sorted_hit_len_keys[0];
+if ($debug) {
+    print "before get_tir_nt_positions: ($sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
+    print $log_out "before get_tir_nt_positions: ($sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
+    my $tir_length = $sorted_hit_len_keys[0];
+}
 
 my ($ref2_tir_positions, $ref2remove_these) = get_tir_nt_starts($trimmed_aln_obj, \%tir_positions, $sorted_hitcolumn_keys[0], $sorted_querycolumn_keys[0]);
 %tir_positions = %$ref2_tir_positions;
@@ -1008,7 +1026,9 @@ if ($left_tir_adjusted or $right_tir_adjusted) {
     if ($after_right_tir =~ s/^(-+)//){
       $right_gaps = $1;
     }
-    #print substr($seq_id,0,4),":$left_gaps...$before_left_tir...$element...$after_right_tir...$right_gaps\n";
+    if ($debug) {
+        print substr($seq_id,0,4),":$left_gaps...$before_left_tir...$element...$after_right_tir...$right_gaps\n";
+    }
     my $new_seq = $left_gaps.$before_left_tir.$element.$after_right_tir.$right_gaps;
     $seq_obj->seq($new_seq);
   }
@@ -1016,19 +1036,27 @@ if ($left_tir_adjusted or $right_tir_adjusted) {
 }
 
 foreach my $key (keys %tir_positions) {
-    #print "tir position key: $key\n";
+    if ($debug) {
+        print "tir position key: $key\n";
+    }
     if (!exists $trimmed_track{$key}) {
-        print "tir position key not in trimmed alignment: $key\n";
+        if ($debug) {
+            print "tir position key not in trimmed alignment: $key\n";
+        }
         delete $tir_positions{$key};
     }
 }
 #get the column positions of tirs in the original alignment
-print "before get_col: lts:$left_tir_start, rts:$right_tir_start,\n";
-print $log_out "before get_col: lts:$left_tir_start, rts:$right_tir_start,\n";
+if ($debug) {
+    print "before get_col: lts:$left_tir_start, rts:$right_tir_start,\n";
+    print $log_out "before get_col: lts:$left_tir_start, rts:$right_tir_start,\n";
+}
 my ($left_tir_end, $right_tir_end);
 ($left_tir_start, $right_tir_start) = get_columns($ori_aln_obj, \%tir_positions, 1);
-print "after get_col: $left_tir_start, $right_tir_start \n";
-print $log_out "after get_col: $left_tir_start, $right_tir_start \n";
+if ($debug) {
+    print "after get_col: $left_tir_start, $right_tir_start \n";
+    print $log_out "after get_col: $left_tir_start, $right_tir_start \n";
+}
 
 my $reimpport_num_seqs = $ori_aln_obj->num_sequences;
 
@@ -1057,9 +1085,11 @@ foreach my $seq_obj ($ori_aln_obj->each_seq()) {
 
 ($left_tir_start, $right_tir_start) = get_columns($ori_aln_obj, \%tir_positions, 1);
 
-print "after tir_positions rebuild: $left_tir_start, $right_tir_start \n";
-print $log_out "after tir_positions rebuild: $left_tir_start, $right_tir_start \n";
-print "Before tir mismatch filter in first filtering after reimporting\nlts: $left_tir_start  rts: $right_tir_start\n";
+if ($debug) {
+    print "after tir_positions rebuild: $left_tir_start, $right_tir_start \n";
+    print $log_out "after tir_positions rebuild: $left_tir_start, $right_tir_start \n";
+    print "Before tir mismatch filter in first filtering after reimporting\nlts: $left_tir_start  rts: $right_tir_start\n";
+}
 
 my @consensus_remove2 = tir_mismatch_filter($ori_aln_obj, $left_tir_start, $right_tir_start, $tir_length, 1);
 foreach my $seq_name (@consensus_remove2) {
@@ -1071,7 +1101,9 @@ foreach my $seq_name (@consensus_remove2) {
         }
     }
 }
-print "After tir mismatch filter in first filtering after reimporting\nlts: $left_tir_start  rts: $right_tir_start\n\n";
+if ($debug) {
+    print "After tir mismatch filter in first filtering after reimporting\nlts: $left_tir_start  rts: $right_tir_start\n\n";
+}
 print "Num Seqs after first filtering after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
 print $log_out "Num Seqs after first filtering after reimporting ori: ",$ori_aln_obj->num_sequences(),"\n";
 
@@ -1112,8 +1144,10 @@ if ($left_tir_start == 0 or $right_tir_start == 0){
 
 #get the column positions of tirs in the intermediate alignment 
 ($left_tir_start, $right_tir_start) = get_columns($final_aln_obj, \%tir_positions, 1);
-print "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start\nRight TIR Start: $right_tir_start (filename.intermediate)\n";
-print $log_out "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start\nRight TIR Start: $right_tir_start (filename.intermediate)\n";
+if ($debug) {
+    print "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start\nRight TIR Start: $right_tir_start (filename.intermediate)\n";
+    print $log_out "2nd column grab after removing some TIR disrupting copies and removing gap only columns\nLeft Tir Start: $left_tir_start\nRight TIR Start: $right_tir_start (filename.intermediate)\n";
+}
 
 if ($left_tir_start == 0 or $right_tir_start == 0){
     #open a file to store info on why analysis of an element was aborted
@@ -1124,8 +1158,10 @@ if ($left_tir_start == 0 or $right_tir_start == 0){
 foreach my $seq_obj ($final_aln_obj->each_seq()) {
   my $seq_name = $seq_obj->id();
   next if !defined $seq_obj;
-  print "Seq name final tir search: $seq_name\n";
-  print $log_out "Seq name final tir search: $seq_name\n";
+  if ($debug) {
+      print "Seq name final tir search: $seq_name\n";
+      print $log_out "Seq name final tir search: $seq_name\n";
+  }
   my $fname_start = $seq_name;
   if ($seq_name =~ /\:/) {
     my @seqn_part   = split(":", $seq_name);
@@ -1235,11 +1271,13 @@ foreach my $row_ref (@good_aln) {
 @sorted_hit_len_keys = sort { $hit_match_len{$b} <=> $hit_match_len{$a} } keys(%hit_match_len);
 @sorted_query_len_keys = sort { $query_match_len{$b} <=> $query_match_len{$a} } keys(%query_match_len);
 
-print
-"\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_query_len_keys: $sorted_query_len_keys[0]\n";
-
-print $log_out
-"\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_query_len_keys: $sorted_query_len_keys[0]\n";
+if ($debug) {
+    print
+    "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_query_len_keys: $sorted_query_len_keys[0]\n";
+    
+    print $log_out
+    "\@sorted_hitcolumn_keys: $sorted_hitcolumn_keys[0]  \@sorted_hit_len_keys: $sorted_hit_len_keys[0]\n\@sorted_querycolumn_keys: $sorted_querycolumn_keys[0]  \@sorted_query_len_keys: $sorted_query_len_keys[0]\n";
+}
 
 $tir_length = $sorted_hit_len_keys[0];
 $left_tir_start = $sorted_hitcolumn_keys[0];
@@ -1250,8 +1288,10 @@ if ($left_tir_start == 0 or $right_tir_start == 0 or $tir_length <= 0){
   my $abort_out_path = File::Spec->catpath($volume, $out_path, $filename . ".abort");
   error_out($abort_out_path, "$filename\tTIRs not found in Final MSA", 0);
 }
-print "Before get columns\nlt_start: $left_tir_start  rt_start: $right_tir_start\n";
-print $log_out "Before get columns\nlt_start: $left_tir_start  rt_start: $right_tir_start\n";
+if ($debug) {
+    print "Before get columns\nlt_start: $left_tir_start  rt_start: $right_tir_start\n";
+    print $log_out "Before get columns\nlt_start: $left_tir_start  rt_start: $right_tir_start\n";
+}
 
 $final_aln_obj = $final_aln_obj->remove_gaps('-', 1);
 my $int_aln_out3 = File::Spec->catpath($volume, $out_path, $filename . ".intermediate3");
@@ -1261,8 +1301,10 @@ my $last_len = $final_aln_obj->length();
 
 #get the column positions of tirs in the final alignment
 ($left_tir_start, $right_tir_start) = get_columns($final_aln_obj, \%tir_positions, 1);
-print "After - lt_start: $left_tir_start  rt_start: $right_tir_start\n";
-print $log_out "After - lt_start: $left_tir_start  rt_start: $right_tir_start\n";
+if ($debug) {
+    print "After - lt_start: $left_tir_start  rt_start: $right_tir_start\n";
+    print $log_out "After - lt_start: $left_tir_start  rt_start: $right_tir_start\n";
+}
 
 #check for too many mismatches in putative TIRSs against the consensus sequence
 my @consensus_remove3 = tir_mismatch_filter($final_aln_obj, $left_tir_start, $right_tir_start, $tir_length, 2);
@@ -1284,8 +1326,10 @@ $last_len = $final_aln_obj->length();
 #get the column positions of tirs in the final alignment
 ($left_tir_start, $right_tir_start) = get_columns($final_aln_obj, \%tir_positions, 1);
 
-print "4th column grab after removing copies with mismatches in TIRs\nLeft Tir Start: $left_tir_start  Right TIR Start: $right_tir_start ($filename.intermediate3)\n";
-print $log_out "4th column grab after removing copies with mismatches in TIRs\nLeft Tir Start: $left_tir_start  Right TIR Start: $right_tir_start ($filename.intermediate3)\n";
+if ($debug) {
+    print "4th column grab after removing copies with mismatches in TIRs\nLeft Tir Start: $left_tir_start  Right TIR Start: $right_tir_start ($filename.intermediate3)\n";
+    print $log_out "4th column grab after removing copies with mismatches in TIRs\nLeft Tir Start: $left_tir_start  Right TIR Start: $right_tir_start ($filename.intermediate3)\n";
+}
 
 if ($left_tir_start == 0 or $right_tir_start == 0 or $tir_length <= 0){
   #open a file to store info on why analysis of an element was aborted
@@ -1354,9 +1398,11 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   my $alt_right_tsd_substr;
   my $starting_right_flank;
   my $last = 0;
-
-  #print "Seq name: $seq_name\n";
-  #print $log_out "Seq name: $seq_name\n";
+  
+  if ($debug) {
+      print "Seq name: $seq_name\n";
+      print $log_out "Seq name: $seq_name\n";
+  }
 
   #get seq_pos of the start of TIRs from column # in alignment. Adjust to include the 4-bp at outside ends of TIRs and then split into the 2-, 4-, and 10-bp sequences to search for TSDs
   my $left_tsd_loc_obj = $seq_obj->location_from_column($left_tir_start);
@@ -1367,8 +1413,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
     my $message = "Left flank too short to look at TSDs.\n";
     $left_short_count++;
     print $no_TSD_found_out $message;
-    print "$message\n";
-    print $log_out "$message\n";
+    if ($debug) {
+        print "$message\n";
+        print $log_out "$message\n";
+    }
     next;
   }
   $left_tsd_substr = substr($left_tsd, 10, 20);
@@ -1382,8 +1430,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
     my $message = "Right flank too short to look at TSDs.";
     $right_short_count++;
     print $no_TSD_found_out $message;
-    print "$message\n";
-    print $log_out "$message\n";
+    if ($debug) {
+        print "$message\n";
+        print $log_out "$message\n";
+    }
     next;
   }
   $right_tsd_substr = substr($right_tsd, 4, 20);
@@ -1441,7 +1491,6 @@ elsif ($aln_count_check - $right_short_count < 1) {
     error_out($abort_out_path, "$filename\tRight flank similar, TIR start too close to end for TSD finding.", 0);
 }
 
-
 print "Starting code to find TSDs\n";
 print $log_out "Starting code to find TSDs\n";
 my $tsd1_count = 0;
@@ -1489,9 +1538,11 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   }
   $right_tsd_substr = substr($right_tsd, 4, 20);
   $alt_right_tsd_substr = substr($right_tsd, 3, 20);
-
-  print "$seq_name\nleft tsd: $left_tsd_substr  alt left tsd: $alt_left_tsd_substr\nright tsd: $right_tsd_substr  alt right tsd: $alt_right_tsd_substr\n";
-  print $log_out "$seq_name\nleft tsd: $left_tsd_substr  alt left tsd: $alt_left_tsd_substr\nright tsd: $right_tsd_substr  alt right tsd: $alt_right_tsd_substr\n";
+  
+  if ($debug) {
+      print "$seq_name\nleft tsd: $left_tsd_substr  alt left tsd: $alt_left_tsd_substr\nright tsd: $right_tsd_substr  alt right tsd: $alt_right_tsd_substr\n";
+      print $log_out "$seq_name\nleft tsd: $left_tsd_substr  alt left tsd: $alt_left_tsd_substr\nright tsd: $right_tsd_substr  alt right tsd: $alt_right_tsd_substr\n";
+  }
 
   my $left_2bp  = substr($left_tsd,  -4, 2);
   my $right_2bp = substr($right_tsd, 2,  2);
@@ -1507,45 +1558,57 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
   my $tsd4_catch = 0;
 
   if ($left_2bp eq $right_2bp) {
-    print "Round 1 TSD search - Yes! $fname_start\n";
-    print $log_out "Round 1 TSD search - Yes! $fname_start\n";
+    if ($debug) {
+        print "Round 1 TSD search - Yes! $fname_start\n";
+        print $log_out "Round 1 TSD search - Yes! $fname_start\n";
+    }
     $tsd1 = $left_2bp;
   }
   if ($left_4bp eq $right_4bp) {
-    print "Round 2 TSD search - Yes! $fname_start\n";
-    print $log_out "Round 2 TSD search - Yes! $fname_start\n";
+    if ($debug) {
+        print "Round 2 TSD search - Yes! $fname_start\n";
+        print $log_out "Round 2 TSD search - Yes! $fname_start\n";
+    }
     $tsd2 = $left_4bp;
   }
   for (my $i = 0 ; $i < 19 ; $i++) {
     if (substr($left_tsd_substr, $i) eq substr($right_tsd_substr, 0, -($i))) {
-      print "Round 3 TSD search - Yes! $i $fname_start\n";
-      print $log_out "Round 3 TSD search - Yes! $i $fname_start\n";
-      $tsd3 = substr($left_tsd_substr, $i);
-      last;
+        if ($debug) {
+            print "Round 3 TSD search - Yes! $i $fname_start\n";
+            print $log_out "Round 3 TSD search - Yes! $i $fname_start\n";
+        }
+        $tsd3 = substr($left_tsd_substr, $i);
+        last;
     }
   }
   for (my $i = 0 ; $i < 19 ; $i++) {
     if (substr($alt_left_tsd_substr, $i) eq substr($alt_right_tsd_substr, 0, -($i))) {
-      print "Round 4 TSD search - Yes! $i $fname_start\n";
-      print $log_out "Round 4 TSD search - Yes! $i $fname_start\n";
-      $tsd4 = substr($alt_left_tsd_substr, $i);
-      last;
+        if ($debug) {
+            print "Round 4 TSD search - Yes! $i $fname_start\n";
+            print $log_out "Round 4 TSD search - Yes! $i $fname_start\n";
+        }
+        $tsd4 = substr($alt_left_tsd_substr, $i);
+        last;
     }
   }
   for (my $i = 0 ; $i < 19 ; $i++) {
     if (substr($left_tsd_substr, $i) eq substr($alt_right_tsd_substr, 0, -($i))) {
-      print "Round 5 TSD search - Yes! $i $fname_start\n";
-      print $log_out "Round 5 TSD search - Yes! $i $fname_start\n";
-      $tsd5 = substr($alt_left_tsd_substr, $i);
-      last;
+        if ($debug) {
+            print "Round 5 TSD search - Yes! $i $fname_start\n";
+            print $log_out "Round 5 TSD search - Yes! $i $fname_start\n";
+        }
+        $tsd5 = substr($alt_left_tsd_substr, $i);
+        last;
     }
   }
   for (my $i = 0 ; $i < 19 ; $i++) {
     if (substr($alt_left_tsd_substr, $i) eq substr($right_tsd_substr, 0, -($i))) {
-      print "Round 6 TSD search - Yes! $i $fname_start\n";
-      print $log_out "Round 6 TSD search - Yes! $i $fname_start\n";
-      $tsd6 = substr($alt_left_tsd_substr, $i);
-      last;
+        if ($debug) {
+            print "Round 6 TSD search - Yes! $i $fname_start\n";
+            print $log_out "Round 6 TSD search - Yes! $i $fname_start\n";
+        }
+        $tsd6 = substr($alt_left_tsd_substr, $i);
+        last;
     }
   }
 
@@ -1561,8 +1624,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                         push @putative_TSD4, $tsd4;
                         push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                        print "tsd4: $fname_start\n\n";
-                        print $log_out "tsd4: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd4: $fname_start\n\n";
+                            print $log_out "tsd4: $fname_start\n\n";
+                        }
                         $tsd4_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -1578,8 +1643,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1594,8 +1661,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -1611,8 +1680,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1627,8 +1698,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -1644,8 +1717,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1660,8 +1735,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -1678,8 +1755,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                         push @putative_TSD5, $tsd5;
                         push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                        print "tsd5: $fname_start\n\n";
-                        print $log_out "tsd5: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd5: $fname_start\n\n";
+                            print $log_out "tsd5: $fname_start\n\n";
+                        }
                         $tsd5_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -1695,8 +1774,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1711,8 +1792,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -1728,8 +1811,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1744,8 +1829,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -1761,8 +1848,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1776,8 +1865,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             my $empty_site = substr($starting_left_flank, 0, -2) . substr($starting_right_flank, 4);
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -1796,8 +1887,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                         push @putative_TSD4, $tsd4;
                         push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                        print "tsd4: $fname_start\n\n";
-                        print $log_out "tsd4: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd4: $fname_start\n\n";
+                            print $log_out "tsd4: $fname_start\n\n";
+                        }
                         $tsd4_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -1813,8 +1906,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1829,8 +1924,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -1846,8 +1943,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1862,8 +1961,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -1879,8 +1980,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1895,8 +1998,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -1913,8 +2018,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                         push @putative_TSD6, $tsd6;
                         push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                        print "tsd6: $fname_start\n\n";
-                        print $log_out "tsd6: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd6: $fname_start\n\n";
+                            print $log_out "tsd6: $fname_start\n\n";
+                        }
                         $tsd6_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -1930,8 +2037,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1946,8 +2055,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -1963,8 +2074,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -1979,8 +2092,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -1996,8 +2111,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2012,8 +2129,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -2033,8 +2152,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                             push @putative_TSD4, $tsd4;
                             push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                            print "tsd4: $fname_start\n\n";
-                            print $log_out "tsd4: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd4: $fname_start\n\n";
+                                print $log_out "tsd4: $fname_start\n\n";
+                            }
                             $tsd4_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2050,8 +2171,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                                 push @putative_TSD4, $tsd4;
                                 push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                                print "tsd4: $fname_start\n\n";
-                                print $log_out "tsd4: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd4: $fname_start\n\n";
+                                    print $log_out "tsd4: $fname_start\n\n";
+                                }
                                 $tsd4_count++;
                                 $tsd4_catch = 1;
                                 undef $tsd1;
@@ -2066,8 +2189,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                                 push @putative_TSD3, $tsd3;
                                 push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                                print "tsd3: $fname_start\n\n";
-                                print $log_out "tsd3: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd3: $fname_start\n\n";
+                                    print $log_out "tsd3: $fname_start\n\n";
+                                }
                                 $tsd3_count++;
                                 undef $tsd1;
                                 undef $tsd2;
@@ -2083,8 +2208,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                                 push @putative_TSD4, $tsd4;
                                 push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                                print "tsd4: $fname_start\n\n";
-                                print $log_out "tsd4: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd4: $fname_start\n\n";
+                                    print $log_out "tsd4: $fname_start\n\n";
+                                }
                                 $tsd4_count++;
                                 $tsd4_catch = 1;
                                 undef $tsd1;
@@ -2099,8 +2226,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                                 push @putative_TSD2, $tsd2;
                                 push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                                print "tsd2: $fname_start\n\n";
-                                print $log_out "tsd2: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd2: $fname_start\n\n";
+                                    print $log_out "tsd2: $fname_start\n\n";
+                                }
                                 $tsd2_count++;
                                 undef $tsd1;
                                 undef $tsd4;
@@ -2116,8 +2245,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                                 push @putative_TSD4, $tsd4;
                                 push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                                print "tsd4: $fname_start\n\n";
-                                print $log_out "tsd4: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd4: $fname_start\n\n";
+                                    print $log_out "tsd4: $fname_start\n\n";
+                                }
                                 $tsd4_count++;
                                 $tsd4_catch = 1;
                                 undef $tsd1;
@@ -2132,8 +2263,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                                 push @putative_TSD1, $tsd1;
                                 push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                                print "tsd1: $fname_start\n\n";
-                                print $log_out "tsd1: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd1: $fname_start\n\n";
+                                    print $log_out "tsd1: $fname_start\n\n";
+                                }
                                 $tsd1_count++;
                                 undef $tsd4;
                                 undef $tsd2;
@@ -2150,8 +2283,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2167,8 +2302,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                                 push @putative_TSD6, $tsd6;
                                 push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                                print "tsd6: $fname_start\n\n";
-                                print $log_out "tsd6: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd6: $fname_start\n\n";
+                                    print $log_out "tsd6: $fname_start\n\n";
+                                }
                                 $tsd6_count++;
                                 $tsd4_catch = 1;
                                 undef $tsd1;
@@ -2183,8 +2320,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                                 push @putative_TSD3, $tsd3;
                                 push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                                print "tsd3: $fname_start\n\n";
-                                print $log_out "tsd3: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd3: $fname_start\n\n";
+                                    print $log_out "tsd3: $fname_start\n\n";
+                                }
                                 $tsd3_count++;
                                 undef $tsd1;
                                 undef $tsd2;
@@ -2200,8 +2339,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                                 push @putative_TSD6, $tsd6;
                                 push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                                print "tsd6: $fname_start\n\n";
-                                print $log_out "tsd6: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd6: $fname_start\n\n";
+                                    print $log_out "tsd6: $fname_start\n\n";
+                                }
                                 $tsd6_count++;
                                 $tsd4_catch = 1;
                                 undef $tsd1;
@@ -2216,8 +2357,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                                 push @putative_TSD2, $tsd2;
                                 push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                                print "tsd2: $fname_start\n\n";
-                                print $log_out "tsd2: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd2: $fname_start\n\n";
+                                    print $log_out "tsd2: $fname_start\n\n";
+                                }
                                 $tsd2_count++;
                                 undef $tsd1;
                                 undef $tsd4;
@@ -2233,8 +2376,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                                 push @putative_TSD6, $tsd6;
                                 push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                                print "tsd6: $fname_start\n\n";
-                                print $log_out "tsd6: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd6: $fname_start\n\n";
+                                    print $log_out "tsd6: $fname_start\n\n";
+                                }
                                 $tsd6_count++;
                                 $tsd4_catch = 1;
                                 undef $tsd1;
@@ -2249,8 +2394,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                                 push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                                 push @putative_TSD1, $tsd1;
                                 push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                                print "tsd1: $fname_start\n\n";
-                                print $log_out "tsd1: $fname_start\n\n";
+                                if ($debug) {
+                                    print "tsd1: $fname_start\n\n";
+                                    print $log_out "tsd1: $fname_start\n\n";
+                                }
                                 $tsd1_count++;
                                 undef $tsd4;
                                 undef $tsd2;
@@ -2268,8 +2415,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                         push @putative_TSD5, $tsd5;
                         push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                        print "tsd5: $fname_start\n\n";
-                        print $log_out "tsd5: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd5: $fname_start\n\n";
+                            print $log_out "tsd5: $fname_start\n\n";
+                        }
                         $tsd5_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2285,8 +2434,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2301,8 +2452,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -2318,8 +2471,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2334,8 +2489,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -2351,8 +2508,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2367,8 +2526,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -2385,8 +2546,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                         push @putative_TSD6, $tsd6;
                         push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                        print "tsd6: $fname_start\n\n";
-                        print $log_out "tsd6: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd6: $fname_start\n\n";
+                            print $log_out "tsd6: $fname_start\n\n";
+                        }
                         $tsd6_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2402,8 +2565,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2418,8 +2583,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -2435,8 +2602,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2451,8 +2620,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -2468,8 +2639,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2484,8 +2657,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -2503,8 +2678,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                     push @putative_TSD4, $tsd4;
                     push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                    print "tsd4: $fname_start\n\n";
-                    print $log_out "tsd4: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd4: $fname_start\n\n";
+                        print $log_out "tsd4: $fname_start\n\n";
+                    }
                     $tsd4_count++;
                     $tsd4_catch = 1;
                     undef $tsd1;
@@ -2520,8 +2697,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                         push @putative_TSD4, $tsd4;
                         push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                        print "tsd4: $fname_start\n\n";
-                        print $log_out "tsd4: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd4: $fname_start\n\n";
+                            print $log_out "tsd4: $fname_start\n\n";
+                        }
                         $tsd4_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2536,8 +2715,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                         push @putative_TSD3, $tsd3;
                         push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                        print "tsd3: $fname_start\n\n";
-                        print $log_out "tsd3: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd3: $fname_start\n\n";
+                            print $log_out "tsd3: $fname_start\n\n";
+                        }
                         $tsd3_count++;
                         undef $tsd1;
                         undef $tsd2;
@@ -2553,8 +2734,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                         push @putative_TSD4, $tsd4;
                         push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                        print "tsd4: $fname_start\n\n";
-                        print $log_out "tsd4: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd4: $fname_start\n\n";
+                            print $log_out "tsd4: $fname_start\n\n";
+                        }
                         $tsd4_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2569,8 +2752,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                         push @putative_TSD2, $tsd2;
                         push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                        print "tsd2: $fname_start\n\n";
-                        print $log_out "tsd2: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd2: $fname_start\n\n";
+                            print $log_out "tsd2: $fname_start\n\n";
+                        }
                         $tsd2_count++;
                         undef $tsd1;
                         undef $tsd4;
@@ -2586,8 +2771,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info4, [ $seq_name, $insertion_site, $tsd4, $empty_site ];
                         push @putative_TSD4, $tsd4;
                         push @put_TSD_names4, [ $seq_name, $tsd4 ];
-                        print "tsd4: $fname_start\n\n";
-                        print $log_out "tsd4: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd4: $fname_start\n\n";
+                            print $log_out "tsd4: $fname_start\n\n";
+                        }
                         $tsd4_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2602,8 +2789,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                         push @putative_TSD1, $tsd1;
                         push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                        print "tsd1: $fname_start\n\n";
-                        print $log_out "tsd1: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd1: $fname_start\n\n";
+                            print $log_out "tsd1: $fname_start\n\n";
+                        }
                         $tsd1_count++;
                         undef $tsd4;
                         undef $tsd2;
@@ -2622,8 +2811,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                     push @putative_TSD5, $tsd5;
                     push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                    print "tsd5: $fname_start\n\n";
-                    print $log_out "tsd5: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd5: $fname_start\n\n";
+                        print $log_out "tsd5: $fname_start\n\n";
+                    }
                     $tsd5_count++;
                     $tsd4_catch = 1;
                     undef $tsd1;
@@ -2638,8 +2829,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                         push @putative_TSD5, $tsd5;
                         push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                        print "tsd5: $fname_start\n\n";
-                        print $log_out "tsd5: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd5: $fname_start\n\n";
+                            print $log_out "tsd5: $fname_start\n\n";
+                        }
                         $tsd5_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2653,8 +2846,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                         push @putative_TSD3, $tsd3;
                         push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                        print "tsd3: $fname_start\n\n";
-                        print $log_out "tsd3: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd3: $fname_start\n\n";
+                            print $log_out "tsd3: $fname_start\n\n";
+                        }
                         $tsd3_count++;
                         undef $tsd1;
                         undef $tsd2;
@@ -2669,8 +2864,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                         push @putative_TSD5, $tsd5;
                         push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                        print "tsd5: $fname_start\n\n";
-                        print $log_out "tsd5: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd5: $fname_start\n\n";
+                            print $log_out "tsd5: $fname_start\n\n";
+                        }
                         $tsd5_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2684,8 +2881,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                         push @putative_TSD2, $tsd2;
                         push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                        print "tsd2: $fname_start\n\n";
-                        print $log_out "tsd2: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd2: $fname_start\n\n";
+                            print $log_out "tsd2: $fname_start\n\n";
+                        }
                         $tsd2_count++;
                         undef $tsd1;
                         undef $tsd5;
@@ -2700,8 +2899,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                         push @putative_TSD5, $tsd5;
                         push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                        print "tsd5: $fname_start\n\n";
-                        print $log_out "tsd5: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd5: $fname_start\n\n";
+                            print $log_out "tsd5: $fname_start\n\n";
+                        }
                         $tsd5_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2715,8 +2916,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                         push @putative_TSD1, $tsd1;
                         push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                        print "tsd1: $fname_start\n\n";
-                        print $log_out "tsd1: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd1: $fname_start\n\n";
+                            print $log_out "tsd1: $fname_start\n\n";
+                        }
                         $tsd1_count++;
                         undef $tsd5;
                         undef $tsd2;
@@ -2733,8 +2936,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                         push @putative_TSD5, $tsd5;
                         push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                        print "tsd5: $fname_start\n\n";
-                        print $log_out "tsd5: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd5: $fname_start\n\n";
+                            print $log_out "tsd5: $fname_start\n\n";
+                        }
                         $tsd5_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2750,8 +2955,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2766,8 +2973,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -2783,8 +2992,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2799,8 +3010,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -2816,8 +3029,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info5, [ $seq_name, $insertion_site, $tsd5, $empty_site ];
                             push @putative_TSD5, $tsd5;
                             push @put_TSD_names5, [ $seq_name, $tsd5 ];
-                            print "tsd5: $fname_start\n\n";
-                            print $log_out "tsd5: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd5: $fname_start\n\n";
+                                print $log_out "tsd5: $fname_start\n\n";
+                            }
                             $tsd5_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2832,8 +3047,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -2850,8 +3067,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                         push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                         push @putative_TSD6, $tsd6;
                         push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                        print "tsd6: $fname_start\n\n";
-                        print $log_out "tsd6: $fname_start\n\n";
+                        if ($debug) {
+                            print "tsd6: $fname_start\n\n";
+                            print $log_out "tsd6: $fname_start\n\n";
+                        }
                         $tsd6_count++;
                         $tsd4_catch = 1;
                         undef $tsd1;
@@ -2867,8 +3086,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2883,8 +3104,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                             push @putative_TSD3, $tsd3;
                             push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                            print "tsd3: $fname_start\n\n";
-                            print $log_out "tsd3: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd3: $fname_start\n\n";
+                                print $log_out "tsd3: $fname_start\n\n";
+                            }
                             $tsd3_count++;
                             undef $tsd1;
                             undef $tsd2;
@@ -2900,8 +3123,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2916,8 +3141,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                             push @putative_TSD2, $tsd2;
                             push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                            print "tsd2: $fname_start\n\n";
-                            print $log_out "tsd2: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd2: $fname_start\n\n";
+                                print $log_out "tsd2: $fname_start\n\n";
+                            }
                             $tsd2_count++;
                             undef $tsd1;
                             undef $tsd4;
@@ -2933,8 +3160,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                             push @putative_TSD6, $tsd6;
                             push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                            print "tsd6: $fname_start\n\n";
-                            print $log_out "tsd6: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd6: $fname_start\n\n";
+                                print $log_out "tsd6: $fname_start\n\n";
+                            }
                             $tsd6_count++;
                             $tsd4_catch = 1;
                             undef $tsd1;
@@ -2949,8 +3178,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                             push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                             push @putative_TSD1, $tsd1;
                             push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                            print "tsd1: $fname_start\n\n";
-                            print $log_out "tsd1: $fname_start\n\n";
+                            if ($debug) {
+                                print "tsd1: $fname_start\n\n";
+                                print $log_out "tsd1: $fname_start\n\n";
+                            }
                             $tsd1_count++;
                             undef $tsd4;
                             undef $tsd2;
@@ -2969,8 +3200,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                 push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                 push @putative_TSD6, $tsd6;
                 push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                print "tsd6: $fname_start\n\n";
-                print $log_out "tsd6: $fname_start\n\n";
+                if ($debug) {
+                    print "tsd6: $fname_start\n\n";
+                    print $log_out "tsd6: $fname_start\n\n";
+                }
                 $tsd6_count++;
                 $tsd4_catch = 1;
                 undef $tsd1;
@@ -2986,8 +3219,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                     push @putative_TSD6, $tsd6;
                     push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                    print "tsd6: $fname_start\n\n";
-                    print $log_out "tsd6: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd6: $fname_start\n\n";
+                        print $log_out "tsd6: $fname_start\n\n";
+                    }
                     $tsd6_count++;
                     $tsd4_catch = 1;
                     undef $tsd1;
@@ -3002,8 +3237,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
                     push @putative_TSD3, $tsd3;
                     push @put_TSD_names3, [ $seq_name, $tsd3 ];
-                    print "tsd3: $fname_start\n\n";
-                    print $log_out "tsd3: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd3: $fname_start\n\n";
+                        print $log_out "tsd3: $fname_start\n\n";
+                    }
                     $tsd3_count++;
                     undef $tsd1;
                     undef $tsd2;
@@ -3019,8 +3256,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                     push @putative_TSD6, $tsd6;
                     push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                    print "tsd6: $fname_start\n\n";
-                    print $log_out "tsd6: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd6: $fname_start\n\n";
+                        print $log_out "tsd6: $fname_start\n\n";
+                    }
                     $tsd6_count++;
                     $tsd4_catch = 1;
                     undef $tsd1;
@@ -3035,8 +3274,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
                     push @putative_TSD2, $tsd2;
                     push @put_TSD_names2, [ $seq_name, $tsd2 ];
-                    print "tsd2: $fname_start\n\n";
-                    print $log_out "tsd2: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd2: $fname_start\n\n";
+                        print $log_out "tsd2: $fname_start\n\n";
+                    }
                     $tsd2_count++;
                     undef $tsd1;
                     undef $tsd4;
@@ -3052,8 +3293,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info6, [ $seq_name, $insertion_site, $tsd6, $empty_site ];
                     push @putative_TSD6, $tsd6;
                     push @put_TSD_names6, [ $seq_name, $tsd6 ];
-                    print "tsd6: $fname_start\n\n";
-                    print $log_out "tsd6: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd6: $fname_start\n\n";
+                        print $log_out "tsd6: $fname_start\n\n";
+                    }
                     $tsd6_count++;
                     $tsd4_catch = 1;
                     undef $tsd1;
@@ -3068,8 +3311,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
                     push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
                     push @putative_TSD1, $tsd1;
                     push @put_TSD_names1, [ $seq_name, $tsd1 ];
-                    print "tsd1: $fname_start\n\n";
-                    print $log_out "tsd1: $fname_start\n\n";
+                    if ($debug) {
+                        print "tsd1: $fname_start\n\n";
+                        print $log_out "tsd1: $fname_start\n\n";
+                    }
                     $tsd1_count++;
                     undef $tsd4;
                     undef $tsd2;
@@ -3088,8 +3333,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
       push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
       push @putative_TSD1, $tsd1;
       push @put_TSD_names1, [ $seq_name, $tsd1 ];
-      print "tsd1: $fname_start\n\n";
-      print $log_out "tsd1: $fname_start\n\n";
+      if ($debug) {
+          print "tsd1: $fname_start\n\n";
+          print $log_out "tsd1: $fname_start\n\n";
+      }
       $tsd1_count++;
     }
     elsif (!$tsd2 and $tsd3) {
@@ -3099,8 +3346,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
         push @putative_TSD3, $tsd3;
         push @put_TSD_names3, [ $seq_name, $tsd3 ];
-        print "tsd3: $fname_start\n\n";
-        print $log_out "tsd3: $fname_start\n\n";
+        if ($debug) {
+            print "tsd3: $fname_start\n\n";
+            print $log_out "tsd3: $fname_start\n\n";
+        }
         $tsd3_count++;
       }
       else {
@@ -3109,8 +3358,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
         push @putative_TSD1, $tsd1;
         push @put_TSD_names1, [ $seq_name, $tsd1 ];
-        print "tsd1: $fname_start\n\n";
-        print $log_out "tsd1: $fname_start\n\n";
+        if ($debug) {
+            print "tsd1: $fname_start\n\n";
+            print $log_out "tsd1: $fname_start\n\n";
+        }
         $tsd1_count++;
       }
     }
@@ -3121,8 +3372,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
         push @putative_TSD2, $tsd2;
         push @put_TSD_names2, [ $seq_name, $tsd2 ];
-        print "tsd2: $fname_start\n\n";
-        print $log_out "tsd2: $fname_start\n\n";
+        if ($debug) {
+            print "tsd2: $fname_start\n\n";
+            print $log_out "tsd2: $fname_start\n\n";
+        }
         $tsd2_count++;
       }
       else {
@@ -3131,8 +3384,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
         push @putative_TSD1, $tsd1;
         push @put_TSD_names1, [ $seq_name, $tsd1 ];
-        print "tsd1: $fname_start\n\n";
-        print $log_out "tsd1: $fname_start\n\n";
+        if ($debug) {
+            print "tsd1: $fname_start\n\n";
+            print $log_out "tsd1: $fname_start\n\n";
+        }
         $tsd1_count++;
       }
     }
@@ -3143,8 +3398,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
         push @putative_TSD3, $tsd3;
         push @put_TSD_names3, [ $seq_name, $tsd3 ];
-        print "tsd3: $fname_start\n\n";
-        print $log_out "tsd3: $fname_start\n\n";
+        if ($debug) {
+            print "tsd3: $fname_start\n\n";
+            print $log_out "tsd3: $fname_start\n\n";
+        }
         $tsd3_count++;
       }
       elsif ((substr($tsd2, 0, 2) eq $tsd1) and (substr($tsd2, -2) eq $tsd1)) {
@@ -3153,8 +3410,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
         push @putative_TSD2, $tsd2;
         push @put_TSD_names2, [ $seq_name, $tsd2 ];
-        print "tsd2: $fname_start\n\n";
-        print $log_out "tsd2: $fname_start\n\n";
+        if ($debug) {
+            print "tsd2: $fname_start\n\n";
+            print $log_out "tsd2: $fname_start\n\n";
+        }
         $tsd2_count++;
       }
       else {
@@ -3163,8 +3422,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info1, [ $seq_name, $insertion_site, $tsd1, $empty_site ];
         push @putative_TSD1, $tsd1;
         push @put_TSD_names1, [ $seq_name, $tsd1 ];
-        print "tsd1: $fname_start\n\n";
-        print $log_out "tsd1: $fname_start\n\n";
+        if ($debug) {
+            print "tsd1: $fname_start\n\n";
+            print $log_out "tsd1: $fname_start\n\n";
+        }
         $tsd1_count++;
       }
     }
@@ -3176,8 +3437,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
       push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
       push @putative_TSD3, $tsd3;
       push @put_TSD_names3, [ $seq_name, $tsd3 ];
-      print "tsd3: $fname_start\n\n";
-      print $log_out "tsd3: $fname_start\n\n";
+      if ($debug) {
+          print "tsd3: $fname_start\n\n";
+          print $log_out "tsd3: $fname_start\n\n";
+      }
       $tsd3_count++;
     }
     else {
@@ -3187,8 +3450,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info3, [ $seq_name, $insertion_site, $tsd3, $empty_site ];
         push @putative_TSD3, $tsd3;
         push @put_TSD_names3, [ $seq_name, $tsd3 ];
-        print "tsd3: $fname_start\n\n";
-        print $log_out "tsd3: $fname_start\n\n";
+        if ($debug) {
+            print "tsd3: $fname_start\n\n";
+            print $log_out "tsd3: $fname_start\n\n";
+        }
         $tsd3_count++;
       }
       else {
@@ -3197,8 +3462,10 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
         push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
         push @putative_TSD2, $tsd2;
         push @put_TSD_names2, [ $seq_name, $tsd2 ];
-        print "tsd2: $fname_start\n\n";
-        print $log_out "tsd2: $fname_start\n\n";
+        if ($debug) {
+            print "tsd2: $fname_start\n\n";
+            print $log_out "tsd2: $fname_start\n\n";
+        }
         $tsd2_count++;
       }
     }
@@ -3209,14 +3476,18 @@ foreach my $seq_obj ($final_aln_obj->each_seq()) {
     push @TSD_info2, [ $seq_name, $insertion_site, $tsd2, $empty_site ];
     push @putative_TSD2, $tsd2;
     push @put_TSD_names2, [ $seq_name, $tsd2 ];
-    print "tsd2: $fname_start\n\n";
-    print $log_out "tsd2: $fname_start\n\n";
+    if ($debug) {
+        print "tsd2: $fname_start\n\n";
+        print $log_out "tsd2: $fname_start\n\n";
+    }
     $tsd2_count++;
   }
   elsif (!$tsd1 and !$tsd2 and !$tsd3 and !$tsd4 and !$tsd5 and !$tsd6) {
     push @no_TSD_found, $seq_name;
-    print "no TSD: $fname_start\n\n";
-    print $log_out "no TSD: $fname_start\n\n";
+    if ($debug) {
+        print "no TSD: $fname_start\n\n";
+        print $log_out "no TSD: $fname_start\n\n";
+    }
   }
 }
 print "\ntsd4 count: $tsd4_count\ntsd5 count: $tsd5_count\ntsd6 count: $tsd6_count\ntsd1 count: $tsd1_count\ntsd2 count: $tsd2_count\ntsd3 count: $tsd3_count\n\n";
@@ -3240,8 +3511,10 @@ $out->write_aln($final_aln_obj);
 
 my $no_TSD_found_len = @no_TSD_found;
 if ($no_TSD_found_len >= 1) {
-  print "Copies without TSDs printed to file\n";
-  print $log_out "Copies without TSDs printed to file\n";
+    if ($debug) {
+      print "Copies without TSDs printed to file\n";
+      print $log_out "Copies without TSDs printed to file\n";
+    }
   foreach my $item (@no_TSD_found) {
     print $no_TSD_found_out "$item\tNo TSDs found\n";
   }
@@ -3640,8 +3913,10 @@ print_fasta($element_fasta_out_path, $element_aln_obj);
 my %TSD_counts;
 my $TSD_array_length = @putative_TSD;
 if ($TSD_array_length == 0) {
-  print "No TSDs found\n";
-  print $log_out "No TSDs found\n";
+    if ($debug) {
+        print "No TSDs found\n";
+        print $log_out "No TSDs found\n";
+    }
   my $bad_out_path = File::Spec->catpath($volume, $out_path, $filename . ".no_tsd");
   error_out($bad_out_path, "$filename\tNo TSDs found for any copy", 1);
   my $gff_path = File::Spec->catpath($volume, $out_path, $filename . ".gff");
@@ -3901,9 +4176,6 @@ while (my $line = <$TE_in>) {
 }
 print "Checking element for DNA TE charateristics\n";
 print $log_out "Checking element for DNA TE charateristics\n";
-#print "final_tsd_info array dump\n";
-#print $log_out "final_tsd_info array dump\n";
-#print Dumper(\@final_tsd_info);
 
 foreach my $tsd_info_ref (@final_tsd_info) {
     my %element_hits;
@@ -3977,8 +4249,8 @@ foreach my $tsd_info_ref (@final_tsd_info) {
 if (defined $protein and defined $p_type) {
     $element_info{"classification"} = $p_type . "||" . $element_info{"classification"};
 }
-print "Element classification finished\n";
-print $log_out "Element classification finished\n";
+print "Element classification finished. Classification = $element_info{"classification"}\n";
+print $log_out "Element classification finished. Classification = $element_info{"classification"}\n";
 my $element_info_out_path = File::Spec->catpath($volume, $out_path, $filename . ".element_info");
 open(my $element_info_out, ">", $element_info_out_path)
   or die "Error creating $element_info_out_path. $!\n";
@@ -4006,6 +4278,8 @@ if (!defined $all) {
   print $log_out "Cleaning up files\n";
   clean_files($out_path);
 }
+print "Run finished!\n";
+print $log_out "Run finished!\n";
 exit 0;
 
 #--------------------------Subroutines---------------------------------#
@@ -4029,14 +4303,14 @@ sub match_tirs {
   my $seq_name = $self->id();
   my $fa_aln_obj = Bio::SearchIO->new(-format => 'fasta', -file => $input_path);
   my @result;
-  #print "ggsearch results path: $input_path\n";
-  #print $log_out "ggsearch results path: $input_path\n";
 
   #go through the FASTA input object . . down to the HSP
   while (my $result = $fa_aln_obj->next_result) {
-
-    #print "numHits: ",$result->num_hits,"\n";
-    #print $log_out "numHits: ",$result->num_hits,"\n";
+    if ($debug) {
+        print "numHits: ",$result->num_hits,"\n";
+        print $log_out "numHits: ",$result->num_hits,"\n";
+    }
+    
     if ($result->num_hits == 0) {
       push @result, (0, [0]);
       last;
@@ -4081,7 +4355,9 @@ sub match_tirs {
               $match_query = '';
               $match_hit = '';
               $end_pos = '';
-              #print "No TIRs found near start of sequences, resetting counts and ending\n";
+              if ($debug) {
+                  print "No TIRs found near start of sequences, resetting counts and ending\n";
+              }
               last;
             }
           }
@@ -4163,8 +4439,9 @@ sub match_tirs {
               if ($first_match == 0) {
                   $first_match = 1;
               }
-
-              #print "Initial match at $start_pos\n";
+              if ($debug) {
+                  print "Initial match at $start_pos\n";
+              }
               next;
             }
           }
@@ -4179,7 +4456,9 @@ sub match_tirs {
                 $last_good = $count;
                 $match_query .= $query_char;
                 $match_hit .= $hit_char;
-                # print "First Mismatch at $count\n";
+                if ($debug) {
+                    print "First Mismatch at $count\n";
+                }
                 next;
               }
               #more than one mismatch, reset counters and other info, continue
@@ -4189,7 +4468,9 @@ sub match_tirs {
                 $match_query = '';
                 $match_hit = '';
                 $match_mis_aln = 0;
-                #print "Another Mismatch at $count, resetting counts\n";
+                if ($debug) {
+                    print "Another Mismatch at $count, resetting counts\n";
+                }
                 next;
               }
               elsif ($match_mis_aln < 3 and $match_len >= 5) {
@@ -4197,7 +4478,9 @@ sub match_tirs {
                 $last_good = $count;
                 $match_query .= $query_char;
                 $match_hit .= $hit_char;
-                # print "Another Mismatch at $count\n";
+                if ($debug) {
+                    print "Another Mismatch at $count\n";
+                }
                 next;
               }
               else {
@@ -4207,7 +4490,9 @@ sub match_tirs {
                     $match_query = '';
                     $match_hit = '';
                     $end_pos = '';
-                    #print "Another Mismatch at $count, resetting counts and ending\n";
+                    if ($debug) {
+                        print "Another Mismatch at $count, resetting counts and ending\n";
+                    }
                     last;
                 }
                 else {
@@ -4216,7 +4501,9 @@ sub match_tirs {
                     $match_query = '';
                     $match_hit = '';
                     $match_mis_aln = 0;
-                    #print "Another Mismatch at $count, resetting counts\n";
+                    if ($debug) {
+                        print "Another Mismatch at $count, resetting counts\n";
+                    }
                     next;
                 }
               }
@@ -4228,8 +4515,9 @@ sub match_tirs {
               $match_len++;
               $match_query .= $query_char;
               $match_hit .= $hit_char;
-
-              #print "Another match at $count. Length is $match_len\n";
+              if ($debug) {
+                  print "Another match at $count. Length is $match_len\n";
+              }
               next;
             }
           }
@@ -4260,14 +4548,16 @@ sub match_tirs {
                     #$hit_pos = index(uc($seq), uc($match_hit), 40) + 1;
                     my $initial_query_pos = index(uc($check_seq), uc($match_query));
                     $query_pos = $seq_len - $initial_query_pos;
-                    
-                    #print "\nSeq: $seq\n";
+                    if ($debug) {
+                        print "\nSeq: $seq\n";
+                    }
                     #reverse complement the match query sequence
                     $match_query =~ tr/ATGCatgc/TACGtacg/;
                     $match_query = reverse($match_query);
-                    
-                    print "1st catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
-                    print $log_out "1st catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    if ($debug) {
+                        print "1st catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                        print $log_out "1st catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    }
                     #store sequence name and the hit and query info
                     my @match = (
                     $seq_name,
@@ -4291,8 +4581,10 @@ sub match_tirs {
                     }
                     last;
                 }
-                # print "Another Mismatch at $count, proceeding\n";
-                # print $log_out "Another Mismatch at $count, proceeding\n";
+                if ($debug) {
+                    print "Another Mismatch at $count, proceeding\n";
+                    print $log_out "Another Mismatch at $count, proceeding\n";
+                }
                 next;
               }
               #mismatches 3 or more, store final info for alignment match and end parsing
@@ -4312,13 +4604,13 @@ sub match_tirs {
                 my $initial_query_pos = index(uc($check_seq), uc($match_query));
                 $query_pos = $seq_len - $initial_query_pos;
                     
-                #print "\nSeq: $seq\n";
                 #reverse complement the match query sequence
                 $match_query =~ tr/ATGCatgc/TACGtacg/;
                 $match_query = reverse($match_query);
-                
-                print "2nd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
-                print $log_out "2nd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                if ($debug) {
+                    print "2nd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    print $log_out "2nd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                }
                 #store sequence name and the hit and query info
                 my @match = (
                   $seq_name,
@@ -4366,13 +4658,13 @@ sub match_tirs {
                     my $initial_query_pos = index(uc($check_seq), uc($match_query));
                     $query_pos = $seq_len - $initial_query_pos;
                     
-                    #print "\nSeq: $seq\n";
                     #reverse complement the match query sequence
                     $match_query =~ tr/ATGCatgc/TACGtacg/;
                     $match_query = reverse($match_query);
-                    
-                    print "3rd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
-                    print $log_out "3rd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    if ($debug) {
+                        print "3rd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                        print $log_out "3rd catch:\n$seq_name hit_pos:$hit_pos query_pos:$query_pos  $match_hit  $match_query\n";
+                    }
                     #store sequence name and the hit and query info
                     my @match = (
                     $seq_name,
@@ -4396,8 +4688,10 @@ sub match_tirs {
                     }
                     last;
               }
-              #print "Another match at $count. Length is $match_len\n";
-              #print $log_out "Another match at $count. Length is $match_len\n";
+              if ($debug) {
+                  print "Another match at $count. Length is $match_len\n";
+                  print $log_out "Another match at $count. Length is $match_len\n";
+              }
               next;
             }
           }
@@ -4422,17 +4716,20 @@ sub generate_gff {
   my $left_flank = shift;
   my $right_flank = shift;
   my $type = shift;
-  
-  print "Entered .gff printer\n";
-  print $log_out "Entered .gff printer\n";
+  if ($debug) {
+      print "Entered .gff printer\n";
+      print $log_out "Entered .gff printer\n";
+  }
   $self->throw("Need Bio::Align::AlignI argument")
     unless ref $self && $self->isa('Bio::Align::AlignI');
 
   #not fully implemented: round changes the output based on when the call is made
   if ($round eq 'final' or $round eq 'TSD') {
     open(my $out, ">", $path) or die "Error creating $path. $!\n";
-    print "Round = final\n";
-    print $log_out "Round = final\n";
+    if ($debug) {
+        print "Round = final\n";
+        print $log_out "Round = final\n";
+    }
     my $count = 1;
     foreach my $seq_obj ($self->each_seq()) {
       my $seq_name = $seq_obj->id();
@@ -4584,17 +4881,20 @@ sub get_columns {
         delete $tir_positions->{$seq_name};
       }
       elsif ($round == 2) {
-        ##print "Round = $round\n";
-        ##print $log_out "Round = $round\n";
+        if ($debug) {
+            print "Round = $round\n";
+            print $log_out "Round = $round\n";
+        }
         $left_tir_end = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'left_tir_end'});
         $right_tir_end = $self->column_from_residue_number($seq_name, $tir_positions->{$seq_name}{'right_tir_end'});
         last;
       }
     }
   }
-
-  #print "in get_col subrout: left tir start: $left_tir_start, right_tir_start: $right_tir_start, left_tir_end: $left_tir_end, right_tir_end: $right_tir_end\n";
-  #print $log_out "in get_col subrout: left tir start: $left_tir_start, right_tir_start: $right_tir_start, left_tir_end: $left_tir_end, right_tir_end: $right_tir_end\n";
+  if ($debug) {
+      print "in get_col subrout: left tir start: $left_tir_start, right_tir_start: $right_tir_start, left_tir_end: $left_tir_end, right_tir_end: $right_tir_end\n";
+      print $log_out "in get_col subrout: left tir start: $left_tir_start, right_tir_start: $right_tir_start, left_tir_end: $left_tir_end, right_tir_end: $right_tir_end\n";
+  }
   return ($left_tir_start, $right_tir_start, $left_tir_end, $right_tir_end);
 }
 
@@ -4613,8 +4913,10 @@ sub adjust_tir_starts {
   if ($round == 2) {
       $catch = 0.9;
   }
-  print "In adjust_tir left_tir_start = $left_tir_start  right_tir_start = $right_tir_start\n";
-  print $log_out "In adjust_tir left_tir_start = $left_tir_start  right_tir_start = $right_tir_start\n";
+  if ($debug) {
+      print "In adjust_tir left_tir_start = $left_tir_start  right_tir_start = $right_tir_start\n";
+      print $log_out "In adjust_tir left_tir_start = $left_tir_start  right_tir_start = $right_tir_start\n";
+  }
 
   my $num_seqs = $aln_obj->num_sequences;
   my %count;
@@ -4650,8 +4952,10 @@ sub adjust_tir_starts {
     if ($start2left =~ /(-+)$/) {
       $gaps_left = $1;
       $start2left =~ s/(-+)$//;
-      #print "after:  $start2left\n";
-      #print $log_out "after:  $start2left\n";
+      if ($debug) {
+          print "after:  $start2left\n";
+          print $log_out "after:  $start2left\n";
+      }
     }
     my @gaps = split '', $gaps_left;
     my @start2left = split '', $start2left;
@@ -4659,7 +4963,6 @@ sub adjust_tir_starts {
     for (my $i = ((scalar @start2left) - 1) ; $i >= 0 ; $i--) {
       my $nt = $start2left[$i];
       $count{left}{$i}{$nt}++;
-      #print substr($seq_id,0,5) ," $i $nt " , $count{left}{$i}{$nt} , "\n";
     }
     my $new_seq = $gaps_left . $start2left . $left2right . $next2end . $gaps_right;
     $modified{$seq_id} = $new_seq;
@@ -4676,9 +4979,10 @@ sub adjust_tir_starts {
     }
     my $nt_count   = $count{right}{$pos}{$nt};
     my $percent_nt = $nt_count / $num_seqs;
-
-    #print "adjust_tirs RT $nt($pos):nt_count (nextposIN:$count{left}{$pos-1}) %=$percent_nt\n";
-    #print $log_out "adjust_tirs RT $nt($pos):nt_count (nextposIN:$count{left}{$pos-1}) %=$percent_nt\n";
+    if ($debug) {
+        print "adjust_tirs RT $nt($pos):nt_count (nextposIN:$count{left}{$pos-1}) %=$percent_nt\n";
+        print $log_out "adjust_tirs RT $nt($pos):nt_count (nextposIN:$count{left}{$pos-1}) %=$percent_nt\n";
+    }
     if ($percent_nt >= $catch) {
       $right_tir_start++;
     }
@@ -4696,9 +5000,10 @@ sub adjust_tir_starts {
     }
     my $nt_count   = $count{left}{$pos}{$nt};
     my $percent_nt = $nt_count / $num_seqs;
-
-    #print "adjust_tirs LT $nt($pos):nt_count  ($nt_count/$num_seqs)=$percent_nt%\n";
-    #print $log_out "adjust_tirs LT $nt($pos):nt_count  ($nt_count/$num_seqs)=$percent_nt%\n";
+    if ($debug) {
+        print "adjust_tirs LT $nt($pos):nt_count  ($nt_count/$num_seqs)=$percent_nt%\n";
+        print $log_out "adjust_tirs LT $nt($pos):nt_count  ($nt_count/$num_seqs)=$percent_nt%\n";
+    }
     if ($percent_nt >= $catch) {
       $left_tir_start--;
     }
@@ -4709,14 +5014,16 @@ sub adjust_tir_starts {
   }
 
   if ($orig_right_tir_start != $right_tir_start or $orig_left_tir_start != $left_tir_start) {
-    print "origR: $orig_right_tir_start\n";
-    print $log_out "origR: $orig_right_tir_start\n";
-    print "after adjR: $right_tir_start\n";
-    print $log_out "after adjR: $right_tir_start\n";
-    print "origL: $orig_left_tir_start\n";
-    print $log_out "origL: $orig_left_tir_start\n";
-    print "after adjL: $left_tir_start\n";
-    print $log_out "after adjL: $left_tir_start\n";
+    if ($debug) {
+        print "origR: $orig_right_tir_start\n";
+        print $log_out "origR: $orig_right_tir_start\n";
+        print "after adjR: $right_tir_start\n";
+        print $log_out "after adjR: $right_tir_start\n";
+        print "origL: $orig_left_tir_start\n";
+        print $log_out "origL: $orig_left_tir_start\n";
+        print "after adjL: $left_tir_start\n";
+        print $log_out "after adjL: $left_tir_start\n";
+    }
     foreach my $seq_obj ($aln_obj->each_seq) {
       ## replace org seq with mod seq
       my $seq_id = $seq_obj->id;
@@ -4766,17 +5073,20 @@ sub consensus_filter {
   my $aln_len            = $aln_obj->length;
   my $num_seqs = $aln_obj->num_sequences;
   if ($num_seqs <= 1) {
-    print "consensus_filter: <= 1 sequences\n";
-    print $log_out "consensus_filter: <= 1 sequences\n";
+    if ($debug) {
+        print "consensus_filter: <= 1 sequences\n";
+        print $log_out "consensus_filter: <= 1 sequences\n";
+    }
     return ($left_tir_start, $right_tir_start, $gap_seq_pos_remove, $aln_obj, $tir_positions);
   }
   my %trim_gap_seq_remove;
   ## this will generate a sequence with '?' at every position in which there is less
   ## than 80% consensus
   my $consensus = $aln_obj->consensus_string(80);
-  
-  print "consensus:\n$consensus\n";
-  print $log_out "consensus:\n$consensus\n";
+  if ($debug) {  
+      print "consensus:\n$consensus\n";
+      print $log_out "consensus:\n$consensus\n";
+  }
   
   my $limit;
   if (defined $protein) {
@@ -4795,8 +5105,10 @@ sub consensus_filter {
         $limit = 10;
     }
   }
-  print "Limit: $limit\n";
-  print "left_tir_start: $left_tir_start  right_tir_start: $right_tir_start\n";
+  if ($debug) {
+      print "Limit: $limit\n";
+      print "left_tir_start: $left_tir_start  right_tir_start: $right_tir_start\n";
+  }
   ## first round of tir finding
   if ($left_tir_start == 0 && $right_tir_start == 0 or defined $protein) {
     my @consensus    = split '', $consensus;
@@ -4940,10 +5252,12 @@ sub consensus_filter {
       }
     }
   }
-  print "in con_fil sub: leftTIR: $left_tir_start\n";
-  print $log_out "in con_fil sub: leftTIR: $left_tir_start\n";
-  print "in con_fil sub: rightTIR: $right_tir_start\n";
-  print $log_out "in con_fil sub: rightTIR: $right_tir_start\n";
+  if ($debug) {
+      print "in con_fil sub: leftTIR: $left_tir_start\n";
+      print $log_out "in con_fil sub: leftTIR: $left_tir_start\n";
+      print "in con_fil sub: rightTIR: $right_tir_start\n";
+      print $log_out "in con_fil sub: rightTIR: $right_tir_start\n";
+  }
   
   my $aln_depth = $aln_obj->num_sequences;
   my %con_mm;
@@ -4973,10 +5287,12 @@ sub consensus_filter {
     }
   }
   my $to_remove_count = keys %to_remove;
-  print "in con_fil sub before get_tir_nt_starts: leftTIR: $left_tir_start\n";
-  print $log_out "in con_fil sub before get_tir_nt_starts: leftTIR: $left_tir_start\n";
-  print "in con_fil sub before get_tir_nt_starts: rightTIR: $right_tir_start\n";
-  print $log_out "in con_fil sub before get_tir_nt_starts: rightTIR: $right_tir_start\n";
+  if ($debug) {
+      print "in con_fil sub before get_tir_nt_starts: leftTIR: $left_tir_start\n";
+      print $log_out "in con_fil sub before get_tir_nt_starts: leftTIR: $left_tir_start\n";
+      print "in con_fil sub before get_tir_nt_starts: rightTIR: $right_tir_start\n";
+      print $log_out "in con_fil sub before get_tir_nt_starts: rightTIR: $right_tir_start\n";
+  }
   ## skip seq removal if the number to remove is about the depth of the aln
   print "there are $aln_depth seqs in aln before cons_filter\n";
   print $log_out "there are $aln_depth seqs in aln before cons_filter\n";
@@ -5041,11 +5357,12 @@ sub consensus_filter {
   }
   $aln_obj = $aln_obj->remove_gaps('-', 1);
   ($left_tir_start, $right_tir_start) = get_columns($aln_obj, $tir_positions, 1);
-  
-  print "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
-  print $log_out "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
-  print "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
-  print $log_out "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
+  if ($debug) {
+      print "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
+      print $log_out "in con_fil sub after getCol: leftTIR: $left_tir_start\n";
+      print "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
+      print $log_out "in con_fil sub after getCol: rightTIR: $right_tir_start\n";
+  }
   return ($left_tir_start, $right_tir_start, $gap_seq_pos_remove, $aln_obj, $tir_positions);
 }
 
@@ -5128,15 +5445,12 @@ sub get_tir_nt_starts {
   my $left_tir_start  = shift;
   my $right_tir_start = shift;
   my $remove_these;
-  print "get_tir_nt_starts(top): lts:$left_tir_start rts:$right_tir_start\n";
-  print $log_out "get_tir_nt_starts(top): lts:$left_tir_start rts:$right_tir_start\n";
+  if ($debug) {
+      print "get_tir_nt_starts(top): lts:$left_tir_start rts:$right_tir_start\n";
+      print $log_out "get_tir_nt_starts(top): lts:$left_tir_start rts:$right_tir_start\n";
+  }
   foreach my $seq_obj ($aln_obj->each_seq()) {
     my $seq_name            = $seq_obj->id();
-    #my $seq                 = $seq_obj->seq();
-    #if ($seq =~ /^-+$/g){
-    #  #print "$seq_name: no seq found\n";
-    #  #print $log_out "$seq_name: no seq found\n";
-    #}
     if (defined $seq_obj->location_from_column($left_tir_start)){
       my $left_tir_start_obj  = $seq_obj->location_from_column($left_tir_start);
       my $left_tir_start_pos  = $left_tir_start_obj->start();
@@ -5185,8 +5499,10 @@ sub get_tir_nt_positions {
   my $right_tir_start = shift;    # $sorted_querycolumn_keys[0]
   my $right_tir_len   = shift;    # $sorted_query_len_keys[0]
   my $remove_these;
-  print "in get_tir_nt_positions: lts=$left_tir_start,rts=$right_tir_start\n";
-  print $log_out "in get_tir_nt_positions: lts=$left_tir_start,rts=$right_tir_start\n";
+  if ($debug) {
+      print "in get_tir_nt_positions: lts=$left_tir_start,rts=$right_tir_start\n";
+      print $log_out "in get_tir_nt_positions: lts=$left_tir_start,rts=$right_tir_start\n";
+  }
   foreach my $seq_obj ($trimmed_aln_obj->each_seq()) {
     my $seq_name           = $seq_obj->id();
     if (defined $seq_obj->location_from_column($left_tir_start)){
@@ -5239,7 +5555,6 @@ sub error_out {
   print $bad_out "$message\n";
   print "ERROR:$message\n";
   print $log_out "ERROR:$message\n";
-  #warn "ERROR:$message\n";
   close($bad_out);
   if (!defined $all) {
     print "Cleaning up files\n";
@@ -5411,11 +5726,10 @@ sub remove_most {
 
   my ($left_tir_start, $right_tir_start);
   ($left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $tir_positions) = consensus_filter($ref2gspr, $aln_obj, 0, 0, $tir_positions, $try);
-
-  #@gap_seq_pos_remove = @{$ref2gspr};
-
-  print "remove most after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
-  print $log_out "remove most after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+  if ($debug) {
+      print "remove most after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+      print $log_out "remove most after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+  }
 
 #my ($left_tir_start1,$right_tir_start1,$tmp_aln_obj,$ref2tp,$ref2gsr, $ref2gspr) = remove_most ($full_aln_obj,\%tir_positions, \@full_id_array);
   return ($left_tir_start, $right_tir_start, $aln_obj, $tir_positions, $ref2gsr, $ref2gspr);
@@ -5434,8 +5748,10 @@ sub remove_least {
   if (defined $protein) {
       my ($left_tir_start, $right_tir_start);
       ($left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $ref2tp) = consensus_filter($ref2gspr, $aln_obj, 0, 0, $tir_positions, $try);
-      print "after protein cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
-      print $log_out "after protein cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+      if ($debug) {
+          print "after protein cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+          print $log_out "after protein cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+      }
       
       return ($left_tir_start, $right_tir_start, $aln_obj, $tir_positions, $ref2gsr, $ref2gspr);
       print "Shouldn't print this!\n";
@@ -5451,9 +5767,10 @@ sub remove_least {
       $last_col_80 = $col_id;
     }
   }
-
-  print "first_col_80:$first_col_80 last_col_80:$last_col_80\n";
-  print $log_out "first_col_80:$first_col_80 last_col_80:$last_col_80\n";
+  if ($debug) {
+      print "first_col_80:$first_col_80 last_col_80:$last_col_80\n";
+      print $log_out "first_col_80:$first_col_80 last_col_80:$last_col_80\n";
+  }
   for (my $i = $first_col_80 ; $i < $last_col_80 ; $i++) {
     next if $i == $first_col_80 + ($aln_len * .4) or $i < $last_col_80 - ($aln_len * .4);
     my $id_row_ref      = $$id_array[$i];
@@ -5498,11 +5815,10 @@ sub remove_least {
 
   my ($left_tir_start, $right_tir_start);
   ($left_tir_start, $right_tir_start, $ref2gspr, $aln_obj, $ref2tp) = consensus_filter($ref2gspr, $aln_obj, 0, 0, $tir_positions, $try);
-
-  #@gap_seq_pos_remove = @{$ref2gspr};
-
-  print "remove least after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
-  print $log_out "remove least after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+  if ($debug) {
+      print "remove least after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+      print $log_out "remove least after cons_filter filename.trim: $left_tir_start, $right_tir_start\n";
+  }
 
   return ($left_tir_start, $right_tir_start, $aln_obj, $tir_positions,
     $ref2gsr, $ref2gspr);
@@ -5559,8 +5875,6 @@ sub tir_mismatch_filter {
     print $log_out "Max mismatch = $max_mismatch  Max half: $max_half\n";
     #check for too many mismatches in putative TIRSs against the consensus sequence
     my $aln_consensus = $aln_obj->consensus_string(80);
-    #print "Consensus for mismatches:\n$aln_consensus\n\n";
-    #print $log_out "Consensus for mismatches:\n$aln_consensus\n\n";
 
     foreach my $seq_obj ($aln_obj->each_seq()) {
         my $mismatches = 0;
@@ -5568,16 +5882,22 @@ sub tir_mismatch_filter {
         my $right_mis = 0;
         my $seq_name = $seq_obj->id();
         my $seq = $seq_obj->seq();
-        #print "Seq for $seq_name:\n$seq\n";
-        #print $log_out "Seq for $seq_name:\n$seq\n";
+        if ($debug) {
+            print "Seq for $seq_name:\n$seq\n";
+            print $log_out "Seq for $seq_name:\n$seq\n";
+        }
         for (my $i = 1; $i < length($aln_consensus); $i++) {
             my $pos_seq = substr($seq, $i-1, 1);
             my $consensus_pos = substr($aln_consensus, ($i-1), 1);
-            #print "compare: $pos_seq to $consensus_pos\n";
-            #print $log_out "compare: $pos_seq to $consensus_pos\n";
+            if ($debug) {
+                print "compare: $pos_seq to $consensus_pos\n";
+                print $log_out "compare: $pos_seq to $consensus_pos\n";
+            }
             if ($i >= $left_tir_start and $i <= $left_tir_end) {
-                print "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
-                print $log_out "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                if ($debug) {
+                    print "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                    print $log_out "In left TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                }
                 next if ($round == 0 or $round == 1) and $pos_seq eq "-";
                 if ($round == 2 and $pos_seq eq "-") {
                     $mismatches++;
@@ -5602,14 +5922,18 @@ sub tir_mismatch_filter {
                     }
                 }
                 else {
-                    #print "Equal\n";
-                    #print $log_out "Equal\n";
+                    if ($debug) {
+                        print "Equal\n";
+                        print $log_out "Equal\n";
+                    }
                 }
             }
 
             elsif ($i >= $right_tir_end and $i <= $right_tir_start) {
-                print "In right TIR, compare at $i: $pos_seq to $consensus_pos\n";
-                print $log_out "In right TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                if ($debug) {
+                    print "In right TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                    print $log_out "In right TIR, compare at $i: $pos_seq to $consensus_pos\n";
+                }
                 next if ($round == 0 or $round == 1) and $pos_seq eq "-";
                 if ($round == 2 and $pos_seq eq "-") {
                     $mismatches++;
@@ -5634,13 +5958,17 @@ sub tir_mismatch_filter {
                     }
                 }
                 else {
-                    #print "Equal\n";
-                    #print $log_out "Equal\n";
+                    if ($debug) {
+                        print "Equal\n";
+                        print $log_out "Equal\n";
+                    }
                 }
             }
             else {
-                #print "$i not in TIR sequences\n";
-                #print $log_out "$i not in TIR sequences\n";
+                if ($debug) {
+                    print "$i not in TIR sequences\n";
+                    print $log_out "$i not in TIR sequences\n";
+                }
                 next;
             }
             if ($mismatches >= $max_mismatch or $left_mis >= $max_half or $right_mis >= $max_half) {
@@ -5673,8 +6001,6 @@ sub match_tirs2 {
     my $seq_name = $self->id();
     my $fa_aln_obj = Bio::SearchIO->new(-format => 'fasta', -file => $input_path);
     my @result;
-    #print "ggsearch results path: $input_path\n";
-    #print $log_out "ggsearch results path: $input_path\n";
     
     #go through the FASTA input object . . down to the HSP
     while (my $result = $fa_aln_obj->next_result) {
