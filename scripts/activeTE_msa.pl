@@ -46,6 +46,7 @@ autoflush STDOUT 1;
 my $flank = 100;
 my $trimal = 'trimal';   # specify the full path to this if it can't be found automatically
 my $all;
+my $debug;
 my $protein;
 my $PROGRAM_NAME = "activeTE";
 
@@ -962,8 +963,8 @@ foreach my $seq_obj (@bad_remove) {
 if ($debug) {
     print "before get_tir_nt_positions: ($sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
     print $log_out "before get_tir_nt_positions: ($sorted_hitcolumn_keys[0],$sorted_hit_len_keys[0],$sorted_querycolumn_keys[0],$sorted_query_len_keys[0])\n";
-    my $tir_length = $sorted_hit_len_keys[0];
 }
+my $tir_length = $sorted_hit_len_keys[0];
 
 my ($ref2_tir_positions, $ref2remove_these) = get_tir_nt_starts($trimmed_aln_obj, \%tir_positions, $sorted_hitcolumn_keys[0], $sorted_querycolumn_keys[0]);
 %tir_positions = %$ref2_tir_positions;
@@ -4249,8 +4250,8 @@ foreach my $tsd_info_ref (@final_tsd_info) {
 if (defined $protein and defined $p_type) {
     $element_info{"classification"} = $p_type . "||" . $element_info{"classification"};
 }
-print "Element classification finished. Classification = $element_info{"classification"}\n";
-print $log_out "Element classification finished. Classification = $element_info{"classification"}\n";
+print "Element classification finished. Classification = $element_info{'classification'}\n";
+print $log_out "Element classification finished. Classification = $element_info{'classification'}\n";
 my $element_info_out_path = File::Spec->catpath($volume, $out_path, $filename . ".element_info");
 open(my $element_info_out, ">", $element_info_out_path)
   or die "Error creating $element_info_out_path. $!\n";
@@ -5091,7 +5092,7 @@ sub consensus_filter {
   my $limit;
   if (defined $protein) {
       if ($num_seqs <= 6) {
-          $limit = 16;
+          $limit = 10;
       }
       else {
         $limit = 13;
